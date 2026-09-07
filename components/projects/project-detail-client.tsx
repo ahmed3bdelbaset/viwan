@@ -11,6 +11,12 @@ import { FinalCta } from '@/components/site/final-cta'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Layers, FileDown } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
+import {
+  ArchitecturalFrame,
+  ArchitecturalDivider,
+  TechnicalStamp,
+  DraftingRuler,
+} from '@/components/site/architectural-frame'
 
 interface ProjectDetailClientProps {
   project: Project
@@ -121,11 +127,19 @@ export function ProjectDetailClient({
       </section>
 
       {/* Overview & Metadata Grid */}
-      <section className="section-gap border-b border-stone/40">
+      <section className="section-gap border-b border-stone/40 relative">
+        <div className="container-viwan mb-10">
+          <ArchitecturalDivider
+            axis="AXIS 01"
+            label={project.name.toUpperCase()}
+            level="ARCHITECTURAL MONOGRAPH"
+          />
+        </div>
+
         <div className="container-viwan grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20">
           {/* Left Column: Narrative */}
           <div className="lg:col-span-7 flex flex-col gap-8">
-            <SectionIndex n="01" label={lang === 'ar' ? 'الموجز المعماري' : 'ARCHITECTURAL BRIEF'} />
+            <SectionIndex n="01" label={lang === 'ar' ? 'الموجز المعماري' : 'ARCHITECTURAL BRIEF'} axis="BRIEF-01" />
             <Display as="h2" size="sm" className="text-charcoal leading-tight">
               {project.heading}
             </Display>
@@ -134,8 +148,11 @@ export function ProjectDetailClient({
             </div>
 
             {/* Architecture philosophy block */}
-            <div className="mt-8 p-8 md:p-12 border-s-2 border-gold bg-secondary/60 relative overflow-hidden">
-              <p className="eyebrow text-gold mb-3">{lang === 'ar' ? 'فلسفة التصميم' : 'Design Intent'}</p>
+            <div className="mt-8 p-8 md:p-12 border-s-2 border-gold bg-secondary/60 relative overflow-hidden corner-ticks">
+              <div className="flex items-center justify-between mb-3">
+                <p className="eyebrow text-gold">{lang === 'ar' ? 'فلسفة التصميم' : 'Design Intent'}</p>
+                <span className="font-mono text-[9px] text-stone-400 uppercase tracking-widest">[DATUM // CONCEPT]</span>
+              </div>
               <p className="font-serif italic text-xl md:text-2xl text-charcoal leading-relaxed">
                 &ldquo;{project.philosophy}&rdquo;
               </p>
@@ -144,7 +161,10 @@ export function ProjectDetailClient({
 
           {/* Right Column: Project Specifications Sidebar */}
           <div className="lg:col-span-5 flex flex-col gap-10">
-            <SectionIndex n="02" label={lang === 'ar' ? 'المواصفات الفنية' : 'SPECIFICATIONS'} />
+            <div className="flex items-center justify-between">
+              <SectionIndex n="02" label={lang === 'ar' ? 'المواصفات الفنية' : 'SPECIFICATIONS'} axis="SPEC-01" />
+              <DraftingRuler />
+            </div>
 
             <div className="flex flex-col divide-y divide-stone/40 border-y border-stone/40 text-sm">
               <div className="py-4 flex items-center justify-between gap-4">
@@ -153,17 +173,21 @@ export function ProjectDetailClient({
               </div>
               <div className="py-4 flex items-center justify-between gap-4">
                 <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'السنة' : 'Year'}</span>
-                <span className="font-medium text-charcoal">{project.year}</span>
+                <span className="font-medium text-charcoal font-mono">{project.year}</span>
               </div>
               <div className="py-4 flex items-center justify-between gap-4">
                 <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'نوع المشروع' : 'Typology'}</span>
                 <span className="font-medium text-charcoal">{project.type}</span>
               </div>
+              <div className="py-4 flex items-center justify-between gap-4">
+                <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'مستوى النمذجة (BIM)' : 'BIM Level'}</span>
+                <span className="font-mono text-xs text-gold font-semibold">LOD-400 VERIFIED</span>
+              </div>
               <div className="py-4 flex items-start justify-between gap-4">
                 <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'التخصصات' : 'Disciplines'}</span>
                 <div className="flex flex-wrap gap-1.5 justify-end rtl:justify-start max-w-xs">
                   {project.disciplines.map((d) => (
-                    <span key={d} className="border border-stone/60 px-2 py-0.5 text-xs text-charcoal">
+                    <span key={d} className="border border-stone/60 px-2 py-0.5 text-xs text-charcoal font-mono">
                       {lang === 'ar' && disciplineTranslations[d] ? disciplineTranslations[d] : d}
                     </span>
                   ))}
@@ -179,10 +203,13 @@ export function ProjectDetailClient({
               </div>
             </div>
 
-            <div className="p-6 border border-gold/40 bg-background flex flex-col gap-4">
-              <p className="eyebrow text-gold text-xs">
-                {lang === 'ar' ? 'مهتم بتنفيذ مشروع مماثل؟' : 'Interested in a similar project?'}
-              </p>
+            <div className="p-6 border border-gold/40 bg-background flex flex-col gap-4 corner-ticks">
+              <div className="flex items-center justify-between">
+                <p className="eyebrow text-gold text-xs">
+                  {lang === 'ar' ? 'مهتم بتنفيذ مشروع مماثل؟' : 'Interested in a similar project?'}
+                </p>
+                <span className="font-mono text-[8.5px] text-stone-400">REF: VW-{project.year}</span>
+              </div>
               <p className="text-sm text-muted-foreground">
                 {lang === 'ar'
                   ? 'ناقش محددات موقعك ورؤيتك المعمارية والبرنامج الفراغي مع فريق VIWAN.'
@@ -255,22 +282,28 @@ export function ProjectDetailClient({
                   className={`flex flex-col gap-3 ${colSpan}`}
                   delay={i * 80}
                 >
-                  <div
-                    className={`relative w-full overflow-hidden bg-secondary zoom-img ${
-                      isHeroGallery ? 'aspect-[16/9] md:aspect-[21/9]' : 'aspect-[4/3]'
-                    }`}
+                  <ArchitecturalFrame
+                    label={`ARCHITECTURAL PLATE // 0${i + 1}`}
+                    scale="1:100"
+                    caption={img.caption}
                   >
-                    <Image
-                      src={img.src}
-                      alt={img.caption}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 1200px"
-                      className="object-cover"
-                    />
-                  </div>
+                    <div
+                      className={`relative w-full overflow-hidden bg-secondary zoom-img ${
+                        isHeroGallery ? 'aspect-[16/9] md:aspect-[21/9]' : 'aspect-[4/3]'
+                      }`}
+                    >
+                      <Image
+                        src={img.src}
+                        alt={img.caption}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 1200px"
+                        className="object-cover"
+                      />
+                    </div>
+                  </ArchitecturalFrame>
                   <figcaption className="flex items-center justify-between text-xs eyebrow text-muted-foreground pt-1">
                     <span>{img.caption}</span>
-                    <span className="text-gold">{img.category}</span>
+                    <span className="text-gold font-mono text-[10px]">{img.category}</span>
                   </figcaption>
                 </Reveal>
               )

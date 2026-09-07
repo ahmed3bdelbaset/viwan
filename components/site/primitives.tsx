@@ -60,19 +60,28 @@ export function Eyebrow({
 export function SectionIndex({
   n,
   label,
+  axis,
   className,
   dark = false,
 }: {
   n: string
   label: string
+  axis?: string
   className?: string
   dark?: boolean
 }) {
   return (
-    <div className={cn('flex items-center gap-4 eyebrow', className)}>
-      <span className="text-gold">{n}</span>
+    <div className={cn('flex items-center gap-3 font-mono text-[10px] tracking-widest uppercase select-none', className)}>
+      <span className="text-gold font-bold">+</span>
+      <span className="text-gold font-semibold">{n}</span>
       <span className={dark ? 'text-stone/60' : 'text-stone'}>/</span>
-      <span className="text-muted-foreground">{label}</span>
+      <span className={cn(dark ? 'text-stone/70' : 'text-muted-foreground')}>{label}</span>
+      {axis && (
+        <>
+          <span className="text-stone/40 hidden sm:inline">|</span>
+          <span className="hidden sm:inline text-[9px] text-stone-400 font-mono">[{axis}]</span>
+        </>
+      )}
     </div>
   )
 }

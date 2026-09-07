@@ -650,7 +650,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* 3. THE 8 DISCIPLINES ARCHITECTURAL SHOWCASE GRID (24 PROJECTS) */}
-      <section className="bg-[#FAF9F5] py-12 md:py-16">
+      <section className="bg-[#FAF9F5] py-12 md:py-16 drafting-grid relative">
         <div className="container-viwan">
           {/* 4-column layout matching reference image */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-s border-stone/30">
@@ -670,8 +670,8 @@ export default function ProjectsPage() {
                     {/* Header: Number + Category Title + VIEW ALL -> */}
                     <div className="flex items-center justify-between gap-2 mb-4">
                       <div className="flex items-baseline gap-2.5">
-                        <span className="font-mono text-sm tracking-wider text-gold font-medium">
-                          {cat.num}
+                        <span className="font-mono text-xs tracking-widest text-gold font-semibold">
+                          + {cat.num}
                         </span>
                         <h2 className="display text-lg sm:text-xl text-charcoal tracking-tight font-serif">
                           {catTitle}
@@ -701,7 +701,7 @@ export default function ProjectsPage() {
                           scope: isAr ? featured.scopeAr : featured.scopeEn,
                         })
                       }
-                      className="group/card relative aspect-[16/10] w-full overflow-hidden mb-3 bg-stone/20 border border-stone/20 cursor-pointer"
+                      className="group/card relative aspect-[16/10] w-full overflow-hidden mb-3 bg-stone/20 border border-stone/20 cursor-pointer corner-ticks"
                     >
                       <Image
                         src={featured.image}

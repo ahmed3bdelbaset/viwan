@@ -12,41 +12,60 @@ import { DisciplinesShowcase } from '@/components/home/disciplines-showcase'
 import { PROCESS, SERVICES } from '@/lib/site'
 import { FEATURED_PROJECT, HOME_PROJECTS, type Project } from '@/lib/projects'
 import { useLanguage } from '@/lib/i18n'
+import {
+  ArchitecturalFrame,
+  ArchitecturalDivider,
+  TechnicalStamp,
+  DraftingRuler,
+} from '@/components/site/architectural-frame'
 
 /* 02 — WHO WE ARE */
 export function WhoWeAre() {
   const { t } = useLanguage()
 
   return (
-    <section className="section-gap">
+    <section className="section-gap relative">
+      <div className="container-viwan mb-8">
+        <ArchitecturalDivider axis="AXIS 02" label={t.whoWeAre.label} level="STUDIO MONOGRAPH" />
+      </div>
       <div className="container-viwan grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         <Reveal className="lg:col-span-5 flex flex-col gap-8">
-          <SectionIndex n={t.whoWeAre.index} label={t.whoWeAre.label} />
+          <SectionIndex n={t.whoWeAre.index} label={t.whoWeAre.label} axis="A-02" />
           <Display>
             {t.whoWeAre.heading}
           </Display>
           <p className="max-w-md text-base leading-relaxed text-muted-foreground">
             {t.whoWeAre.body}
           </p>
-          <ButtonLink href="/studio" variant="text" className="self-start">
-            {t.whoWeAre.button}
-          </ButtonLink>
+          <div className="flex items-center gap-6 pt-2">
+            <ButtonLink href="/studio" variant="text" className="self-start">
+              {t.whoWeAre.button}
+            </ButtonLink>
+            <DraftingRuler />
+          </div>
         </Reveal>
         <Reveal delay={150} className="lg:col-span-7 relative">
-          <div className="zoom-img relative aspect-[4/3] lg:aspect-[3/2] overflow-hidden">
-            <Image
-              src="/images/detail-courtyard.png"
-              alt="Travertine courtyard with an olive tree and vertical wood screen"
-              fill
-              sizes="(min-width: 1024px) 60vw, 100vw"
-              className="object-cover"
-            />
-          </div>
-          <div className="absolute -bottom-6 end-6 hidden md:flex flex-col gap-1 eyebrow text-muted-foreground bg-background px-5 py-4 shadow-sm border border-stone/20">
+          <ArchitecturalFrame
+            label="DETAIL SPEC // COURTYARD"
+            scale="1:50 DETAIL"
+            coordinates="30.0617°N 31.2198°E"
+            caption="TRAVERTINE COURTYARD & OLIVE ENCLAVE"
+          >
+            <div className="zoom-img relative aspect-[4/3] lg:aspect-[3/2] overflow-hidden">
+              <Image
+                src="/images/detail-courtyard.png"
+                alt="Travertine courtyard with an olive tree and vertical wood screen"
+                fill
+                sizes="(min-width: 1024px) 60vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+          </ArchitecturalFrame>
+          <div className="absolute -bottom-6 end-6 hidden md:flex flex-col gap-1 eyebrow text-muted-foreground bg-background px-5 py-4 shadow-sm border border-stone/35 font-mono text-[10px]">
             <span>{t.whoWeAre.badge1}</span>
             <span>{t.whoWeAre.badge2}</span>
             <span>{t.whoWeAre.badge3}</span>
-            <span className="text-gold">{t.whoWeAre.badge4}</span>
+            <span className="text-gold font-semibold">{t.whoWeAre.badge4}</span>
           </div>
         </Reveal>
       </div>
@@ -67,7 +86,15 @@ function ProjectMeta({ project, light = false }: { project: Project; light?: boo
 
   return (
     <div className="flex items-start justify-between gap-6 pt-5">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5 flex-1">
+        <div className="flex flex-wrap items-center gap-2 text-[9px] font-mono tracking-wider text-stone-500 uppercase">
+          <span className="text-gold font-bold">+</span>
+          <span className="font-semibold text-foreground font-mono">{project.slug.toUpperCase()}</span>
+          <span className="text-stone/40">|</span>
+          <span>SCALE 1:100</span>
+          <span className="text-stone/40">|</span>
+          <span className="text-gold font-mono">LOD-400 BIM</span>
+        </div>
         <h3 className="eyebrow text-[0.8rem] font-medium">{project.name}</h3>
         <p className={`eyebrow ${light ? 'text-ivory/60' : 'text-muted-foreground'}`}>
           {project.location}, {project.country} <span className="mx-2 text-stone">|</span>{' '}
@@ -97,60 +124,84 @@ export function SelectedProjects() {
   const { t } = useLanguage()
 
   return (
-    <section className="section-gap">
+    <section className="section-gap relative">
+      <div className="container-viwan mb-6">
+        <ArchitecturalDivider axis="AXIS 03" label={t.selectedProjects.label} level="WORKS MONOGRAPH" />
+      </div>
       <div className="container-viwan flex flex-col gap-14">
         <Reveal className="flex items-end justify-between gap-6">
           <div className="flex flex-col gap-6">
-            <SectionIndex n={t.selectedProjects.index} label={t.selectedProjects.label} />
+            <SectionIndex n={t.selectedProjects.index} label={t.selectedProjects.label} axis="A-03" />
             <Display>{t.selectedProjects.heading}</Display>
           </div>
-          <ButtonLink href="/projects" variant="text" className="hidden sm:inline-flex">
-            {t.selectedProjects.viewAll}
-          </ButtonLink>
+          <div className="hidden sm:flex items-center gap-6">
+            <DraftingRuler />
+            <ButtonLink href="/projects" variant="text">
+              {t.selectedProjects.viewAll}
+            </ButtonLink>
+          </div>
         </Reveal>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-14">
           <Reveal as="article" className="lg:col-span-12">
             <Link href={`/projects/${first.slug}`} className="group block">
-              <div className="zoom-img relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden">
-                <Image
-                  src={first.cover}
-                  alt={first.name}
-                  fill
-                  sizes="100vw"
-                  className="object-cover"
-                />
-              </div>
+              <ArchitecturalFrame
+                label={`PROJECT FOLIO // ${first.name.toUpperCase()}`}
+                scale="1:100"
+                coordinates={`${first.location.toUpperCase()} // ${first.year}`}
+              >
+                <div className="zoom-img relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden">
+                  <Image
+                    src={first.cover}
+                    alt={first.name}
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                </div>
+              </ArchitecturalFrame>
               <ProjectMeta project={first} />
             </Link>
           </Reveal>
 
           <Reveal as="article" className="lg:col-span-7">
             <Link href={`/projects/${second.slug}`} className="group block">
-              <div className="zoom-img relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={second.cover}
-                  alt={second.name}
-                  fill
-                  sizes="(min-width: 1024px) 58vw, 100vw"
-                  className="object-cover"
-                />
-              </div>
+              <ArchitecturalFrame
+                label={`ELEVATION REF // ${second.name.toUpperCase()}`}
+                scale="1:100"
+                coordinates={`${second.location.toUpperCase()} // ${second.year}`}
+              >
+                <div className="zoom-img relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={second.cover}
+                    alt={second.name}
+                    fill
+                    sizes="(min-width: 1024px) 58vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              </ArchitecturalFrame>
               <ProjectMeta project={second} />
             </Link>
           </Reveal>
 
           <Reveal as="article" delay={120} className="lg:col-span-5 lg:pt-24">
             <Link href={`/projects/${third.slug}`} className="group block">
-              <div className="zoom-img relative aspect-[4/5] overflow-hidden">
-                <Image
-                  src={third.cover}
-                  alt={third.name}
-                  fill
-                  sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-cover"
-                />
-              </div>
+              <ArchitecturalFrame
+                label={`AXONOMETRIC // ${third.name.toUpperCase()}`}
+                scale="1:100"
+                coordinates={`${third.location.toUpperCase()} // ${third.year}`}
+              >
+                <div className="zoom-img relative aspect-[4/5] overflow-hidden">
+                  <Image
+                    src={third.cover}
+                    alt={third.name}
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              </ArchitecturalFrame>
               <ProjectMeta project={third} />
             </Link>
           </Reveal>
@@ -233,7 +284,7 @@ export function FeaturedProject() {
   const { t } = useLanguage()
 
   return (
-    <section className="relative surface-dark min-h-[70svh] lg:min-h-[85svh] flex items-end overflow-hidden">
+    <section className="relative surface-dark min-h-[70svh] lg:min-h-[85svh] flex items-end overflow-hidden corner-ticks">
       <Image
         src={p.cinematic}
         alt={p.name}
@@ -241,8 +292,24 @@ export function FeaturedProject() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/85 via-charcoal/25 to-transparent" aria-hidden />
-      <div className="relative container-viwan py-16 md:py-24 flex flex-col lg:flex-row lg:items-end justify-between gap-10 w-full">
+      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/30 to-charcoal/20" aria-hidden />
+
+      {/* Top Architectural Datum Bar */}
+      <div className="absolute top-8 start-8 end-8 hidden sm:flex items-center justify-between z-10 text-[9px] font-mono uppercase tracking-widest text-ivory/60 select-none">
+        <div className="flex items-center gap-2">
+          <span className="text-gold font-bold">+</span>
+          <span>FEATURED MONOGRAPH // 01</span>
+        </div>
+        <TechnicalStamp
+          code="PRJ-2024-KAFD"
+          scale="SCALE 1:200"
+          location="RIYADH, KSA"
+          bim="LOD-400 VERIFIED"
+          dark
+        />
+      </div>
+
+      <div className="relative container-viwan py-16 md:py-24 flex flex-col lg:flex-row lg:items-end justify-between gap-10 w-full z-10">
         <Reveal className="flex flex-col gap-6">
           <Eyebrow gold>{t.featuredProject.label}</Eyebrow>
           <Display size="lg" className="uppercase tracking-tight">
@@ -255,10 +322,11 @@ export function FeaturedProject() {
             {t.featuredProject.view}
           </ButtonLink>
         </Reveal>
-        <Reveal delay={200} className="hidden lg:flex flex-col items-end rtl:items-start gap-1 eyebrow text-ivory/60">
-          <span>Timeless</span>
-          <span>by design</span>
-          <span className="mt-3 h-12 w-px bg-ivory/40" aria-hidden />
+        <Reveal delay={200} className="hidden lg:flex flex-col items-end rtl:items-start gap-1 eyebrow text-ivory/60 font-mono text-[10px]">
+          <span>DATUM: ELEV +18.40m</span>
+          <span>LAT: 24.7677° N</span>
+          <span className="text-gold">TIMELESS BY DESIGN</span>
+          <span className="mt-3 h-12 w-px bg-gold/40" aria-hidden />
         </Reveal>
       </div>
     </section>
@@ -270,20 +338,25 @@ export function Philosophy() {
   const { t, lang } = useLanguage()
 
   return (
-    <section className="relative section-gap overflow-hidden">
+    <section className="relative section-gap overflow-hidden drafting-grid border-y border-stone/20">
       <LogoMark
         monochrome
         className="pointer-events-none absolute -end-16 top-1/2 -translate-y-1/2 w-[28rem] lg:w-[38rem] h-auto text-stone/15 select-none"
       />
       <div className="relative container-viwan grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
         <Reveal className="lg:col-span-9">
+          <div className="text-[10px] font-mono text-gold tracking-widest uppercase mb-4 flex items-center gap-2">
+            <span>+</span>
+            <span>AXIS 06 // ARCHITECTURAL CREED</span>
+          </div>
           <Display size="xl" as="p" className="leading-tight">
             {t.philosophy.quote}
           </Display>
         </Reveal>
-        <Reveal delay={150} className="lg:col-span-3 flex flex-col gap-2 eyebrow text-muted-foreground lg:items-end lg:text-right rtl:lg:items-start rtl:lg:text-left">
+        <Reveal delay={150} className="lg:col-span-3 flex flex-col gap-3 eyebrow text-muted-foreground lg:items-end lg:text-right rtl:lg:items-start rtl:lg:text-left border-l rtl:border-r rtl:border-l-0 border-stone/25 ps-6 rtl:pe-6 rtl:ps-0 font-mono text-[11px]">
           <span>{lang === 'ar' ? 'العمارة هي الإطار والهيكل.' : 'Architecture is the framework.'}</span>
-          <span className="text-gold">{lang === 'ar' ? 'والتجربة الفراغية هي الأثر الباقي.' : 'Experience is the outcome.'}</span>
+          <span className="text-gold font-semibold">{lang === 'ar' ? 'والتجربة الفراغية هي الأثر الباقي.' : 'Experience is the outcome.'}</span>
+          <span className="text-[9px] text-stone-400 tracking-widest pt-2">// VIWAN DESIGN ETHOS</span>
         </Reveal>
       </div>
     </section>

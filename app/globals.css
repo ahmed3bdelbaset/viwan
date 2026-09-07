@@ -488,3 +488,115 @@ html[data-scroll-dir="up"] .reveal:not(.is-visible) {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+/* ==============================================================================
+   SWISS ARCHITECTURAL GRID & RIGOR (DRAFTING BOARD SYSTEM)
+   ============================================================================== */
+.drafting-grid {
+  background-image:
+    linear-gradient(to right, rgba(177, 139, 88, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(177, 139, 88, 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.surface-dark .drafting-grid,
+.drafting-grid-dark {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.drafting-grid-dense {
+  background-image:
+    linear-gradient(to right, rgba(177, 139, 88, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(177, 139, 88, 0.09) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.surface-dark .drafting-grid-dense {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Hairline borders matching architectural drawing lines */
+.hairline-border {
+  border: 1px solid rgba(201, 193, 181, 0.35);
+}
+
+.surface-dark .hairline-border {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hairline-t {
+  border-top: 1px solid rgba(201, 193, 181, 0.35);
+}
+
+.surface-dark .hairline-t {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hairline-b {
+  border-bottom: 1px solid rgba(201, 193, 181, 0.35);
+}
+
+.surface-dark .hairline-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Technical datum cross mark */
+.datum-cross {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  color: var(--gold);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 300;
+  user-select: none;
+}
+
+/* Precision Corner Ticks */
+.corner-ticks {
+  position: relative;
+}
+
+.corner-ticks::before,
+.corner-ticks::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  border-color: var(--gold);
+  opacity: 0.65;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+  z-index: 10;
+}
+
+.corner-ticks::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1.5px solid;
+  border-left: 1.5px solid;
+}
+
+.corner-ticks::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 1.5px solid;
+  border-right: 1.5px solid;
+}
+
+.corner-ticks:hover::before,
+.corner-ticks:hover::after {
+  opacity: 1;
+  border-color: var(--gold);
+}
+
+
