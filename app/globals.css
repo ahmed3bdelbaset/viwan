@@ -1,0 +1,467 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+
+  --color-ivory: var(--ivory);
+  --color-charcoal: var(--charcoal);
+  --color-stone: var(--stone);
+  --color-gold: var(--gold);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+
+  --animate-fade-up: fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 1.2s ease both;
+  --animate-scale-in: scale-in 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 35s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap, 2rem)));
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes scale-in {
+    from {
+      transform: scale(1.06);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+}
+
+:root {
+  color-scheme: light;
+
+  --ivory: #f3f0e9;
+  --charcoal: #11110f;
+  --stone: #c9c1b5;
+  --gold: #b18b58;
+  --white: #ffffff;
+
+  --background: var(--ivory);
+  --foreground: var(--charcoal);
+  --card: var(--ivory);
+  --card-foreground: var(--charcoal);
+  --popover: var(--white);
+  --popover-foreground: var(--charcoal);
+  --primary: var(--charcoal);
+  --primary-foreground: var(--ivory);
+  --secondary: #e9e4da;
+  --secondary-foreground: var(--charcoal);
+  --muted: #e9e4da;
+  --muted-foreground: #6f6a61;
+  --accent: var(--gold);
+  --accent-foreground: var(--charcoal);
+  --destructive: #a3412f;
+  --border: var(--stone);
+  --input: var(--stone);
+  --ring: var(--gold);
+  --radius: 0rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    max-width: 100%;
+    position: relative;
+  }
+  ::selection {
+    background: var(--gold);
+    color: var(--charcoal);
+  }
+
+  /* UI/UX Pro Max: Global cursor-pointer enforcement on all interactive elements */
+  button,
+  [role="button"],
+  a,
+  summary,
+  select,
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"],
+  input[type="checkbox"],
+  input[type="radio"],
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  input:disabled {
+    cursor: not-allowed;
+  }
+
+  /* UI/UX Pro Max: High-visibility architectural focus rings for a11y */
+  :focus-visible {
+    outline: 2px solid var(--gold) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* UI/UX Pro Max: Bespoke architectural scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(177, 139, 88, 0.3);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(177, 139, 88, 0.65);
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+@utility display {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  font-optical-sizing: auto;
+}
+
+/* Apple Design: Tactile response on pointer-down (Kill Latency) */
+button:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active,
+.btn-interactive:active,
+a.group:has(span):active {
+  transform: scale(0.978);
+  transition: transform 100ms cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+@utility section-gap {
+  padding-block: clamp(5rem, 10vw, 10rem);
+}
+
+@utility container-viwan {
+  width: 100%;
+  max-width: 1320px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 5rem);
+}
+
+/* Dark surface: swap semantic tokens so children stay themed */
+.surface-dark {
+  --background: var(--charcoal);
+  --foreground: var(--ivory);
+  --muted-foreground: #a39c90;
+  --border: #2c2a25;
+  --secondary: #1c1b18;
+  --secondary-foreground: var(--ivory);
+  --input: #3a372f;
+  background-color: var(--charcoal);
+  color: var(--ivory);
+}
+
+/* Scroll reveal with bidirectional scroll dynamics */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+/* Direction-aware reveal: when scrolling up, elements glide in from above */
+html[data-scroll-dir="up"] .reveal:not(.is-visible) {
+  transform: translateY(-22px);
+}
+
+.reveal.is-visible {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* When offscreen, reset instantaneously with zero duration & delay */
+.reveal:not(.is-visible) {
+  transition: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .zoom-img img {
+    transition: none !important;
+    transform: none !important;
+  }
+  .animate-marquee, [class*="animate-marquee"] {
+    animation: none !important;
+  }
+  [class*="animate-ping"] {
+    animation: none !important;
+  }
+  [class*="animate-bounce"] {
+    animation: none !important;
+  }
+  [class*="animate-scale-in"], [class*="animate-fade-up"], [class*="animate-fade-in"] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Image hover zoom */
+.zoom-img img {
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.zoom-img:hover img {
+  transform: scale(1.04);
+}
+
+/* Link underline reveal */
+.link-line {
+  position: relative;
+}
+.link-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-line:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* RTL Arabic typography adjustments */
+[dir="rtl"] .eyebrow {
+  letter-spacing: 0.04em;
+}
+
+[dir="rtl"] .display {
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+[dir="rtl"] .link-line::after {
+  left: auto;
+  right: 0;
+  transform-origin: left;
+}
+
+[dir="rtl"] .link-line:hover::after {
+  transform-origin: right;
+}
+
+/* Eradicate Next.js DevTools indicator button from root */
+#devtools-indicator,
+[data-nextjs-toast],
+[data-next-badge-root],
+#next-logo,
+[data-next-mark] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+}
+
+
+
+
+/* ═════════════════════════════════════════════════
+   VIWAN Upgrade Pack — Motion & Design Tokens
+═════════════════════════════════════════════════ */
+
+/* Motion Tokens */
+:root {
+  --ease-out-expo:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:      cubic-bezier(0.76, 0, 0.24, 1);
+  --dur-instant:      80ms;
+  --dur-fast:         200ms;
+  --dur-normal:       420ms;
+  --dur-slow:         720ms;
+  --dur-slower:       1050ms;
+  --dur-cinematic:    1500ms;
+  --section-py:       clamp(5rem, 10vw, 9rem);
+  --container-px:     clamp(1.25rem, 5vw, 5.5rem);
+}
+
+/* Layout utilities */
+.viwan-container {
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+}
+.viwan-section { padding-block: var(--section-py); }
+
+/* Fluid Typography */
+.text-fluid-xs   { font-size: clamp(0.65rem,  0.6rem  + 0.3vw,  0.8rem);  }
+.text-fluid-sm   { font-size: clamp(0.8rem,   0.75rem + 0.35vw, 0.95rem); }
+.text-fluid-base { font-size: clamp(0.9rem,   0.85rem + 0.4vw,  1.1rem);  }
+.text-fluid-md   { font-size: clamp(1rem,     0.9rem  + 0.6vw,  1.3rem);  }
+.text-fluid-lg   { font-size: clamp(1.2rem,   1rem    + 1vw,    1.75rem); }
+.text-fluid-xl   { font-size: clamp(1.5rem,   1.2rem  + 1.8vw,  2.5rem);  }
+.text-fluid-2xl  { font-size: clamp(1.8rem,   1.4rem  + 2.5vw,  3.5rem);  }
+.text-fluid-3xl  { font-size: clamp(2.2rem,   1.6rem  + 3.5vw,  5rem);    }
+.text-fluid-hero { font-size: clamp(3rem,     2rem    + 6vw,    8.5rem);  }
+
+/* Reveal System */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity   var(--dur-slow) var(--ease-out-expo),
+    transform var(--dur-slow) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+.reveal.is-visible           { opacity: 1; transform: none; }
+.reveal.reveal-fade          { transform: none; }
+.reveal.reveal-scale         { transform: translateY(20px) scale(0.96); }
+.reveal.reveal-scale.is-visible { transform: none; }
+.reveal.reveal-left          { transform: translateX(-40px); }
+.reveal.reveal-left.is-visible  { transform: none; }
+.reveal.reveal-clip          { opacity:1; transform:none; clip-path:inset(0 100% 0 0); transition: clip-path var(--dur-slow) var(--ease-smooth); }
+.reveal.reveal-clip.is-visible  { clip-path: inset(0 0% 0 0); }
+
+/* Stagger delays */
+.stagger-1 { transition-delay: 60ms;  }
+.stagger-2 { transition-delay: 120ms; }
+.stagger-3 { transition-delay: 180ms; }
+.stagger-4 { transition-delay: 240ms; }
+.stagger-5 { transition-delay: 300ms; }
+.stagger-6 { transition-delay: 360ms; }
+
+/* Image zoom */
+.zoom-img { overflow: hidden; }
+.zoom-img img { transition: transform var(--dur-slower) var(--ease-out-expo); will-change: transform; }
+.zoom-img:hover img { transform: scale(1.05); }
+
+/* Card overlay */
+.card-overlay { position:relative; overflow:hidden; }
+.card-overlay-content {
+  position:absolute; inset:0; display:flex; align-items:flex-end; padding:2rem;
+  background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 60%);
+  opacity:0; transition:opacity var(--dur-normal) var(--ease-out-expo);
+}
+.card-overlay:hover .card-overlay-content { opacity:1; }
+
+/* Page Transitions (View Transitions API) */
+@keyframes vt-slide-in  { from { transform:translateY(24px); opacity:0; } to { transform:none; opacity:1; } }
+@keyframes vt-slide-out { from { transform:none; opacity:1; } to { transform:translateY(-12px); opacity:0; } }
+::view-transition-old(root) { animation: var(--dur-normal) var(--ease-smooth) both vt-slide-out; }
+::view-transition-new(root) { animation: var(--dur-slow) var(--ease-out-expo) both vt-slide-in; }
+
+/* Scroll pulse */
+@keyframes scrollPulse {
+  0%,100% { opacity:.3; transform:scaleY(.8); }
+  50%      { opacity:1;  transform:scaleY(1); }
+}
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal, .reveal.reveal-scale, .reveal.reveal-left, .reveal.reveal-clip {
+    opacity:1 !important; transform:none !important; clip-path:none !important; transition:none !important;
+  }
+  ::view-transition-old(root), ::view-transition-new(root) { animation:none; }
+}
+
+/* Print / Architectural Monograph Export Stylesheet */
+@media print {
+  header, footer, nav, button, [role="dialog"], [aria-label="whatsapp-chat"], .no-print {
+    display: none !important;
+  }
+  body, main {
+    background: #ffffff !important;
+    color: #11110f !important;
+    font-size: 11pt !important;
+  }
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid !important;
+  }
+  section {
+    page-break-inside: avoid !important;
+  }
+}
