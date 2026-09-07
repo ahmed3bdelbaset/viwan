@@ -19,12 +19,12 @@ export function Logo({
 }: LogoProps) {
   if (layout === 'stacked') {
     return (
-      <span className={cn('inline-flex flex-col items-center text-center select-none', className)}>
+      <span dir="ltr" className={cn('inline-flex flex-col items-center text-center select-none', className)}>
         <LogoMark
           monochrome={monochrome}
           className={cn('h-14 md:h-16 w-auto aspect-[312/204] mb-3 shrink-0', markClassName)}
         />
-        <span className="flex flex-col items-center leading-none">
+        <span dir="ltr" className="flex flex-col items-center leading-none">
           <span className="font-serif text-2xl md:text-3xl font-normal tracking-[0.34em] ps-1 leading-none">
             VIWAN
           </span>
@@ -39,12 +39,12 @@ export function Logo({
   }
 
   return (
-    <span className={cn('inline-flex items-center gap-2.5 sm:gap-3 select-none', className)}>
+    <span dir="ltr" className={cn('inline-flex items-center gap-2.5 sm:gap-3 select-none', className)}>
       <LogoMark
         monochrome={monochrome}
         className={cn('h-6 sm:h-7 w-auto aspect-[312/204] shrink-0', markClassName)}
       />
-      <span className="flex flex-col leading-none">
+      <span dir="ltr" className="flex flex-col leading-none">
         <span className="font-serif text-xl sm:text-2xl font-normal tracking-[0.32em] ps-0.5 leading-none">
           VIWAN
         </span>

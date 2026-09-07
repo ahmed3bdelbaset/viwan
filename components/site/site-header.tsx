@@ -205,7 +205,7 @@ export function SiteHeader() {
          ========================================================================= */}
       <div
         className={cn(
-          'fixed inset-0 z-[100] bg-[#0E0E0C]/96 backdrop-blur-3xl text-ivory flex flex-col justify-between overflow-y-auto overscroll-contain transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] select-none',
+          'fixed inset-0 z-[100] w-full max-w-[100vw] bg-[#0E0E0C]/96 backdrop-blur-3xl text-ivory flex flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-none touch-pan-y transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] select-none',
           open
             ? 'opacity-100 pointer-events-auto scale-100'
             : 'opacity-0 pointer-events-none scale-[1.02]',
@@ -214,28 +214,27 @@ export function SiteHeader() {
         aria-modal="true"
         aria-label="Menu"
       >
-        {/* Architectural Ambient Glow */}
-        <div
-          className="absolute -top-40 start-1/4 size-[600px] bg-gold/5 rounded-full blur-[140px] pointer-events-none"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute -bottom-40 end-1/4 size-[600px] bg-gold/5 rounded-full blur-[140px] pointer-events-none"
-          aria-hidden="true"
-        />
+        {/* Architectural Ambient Glow (Clipped to prevent horizontal spill) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute -top-40 start-1/4 size-[600px] bg-gold/5 rounded-full blur-[140px]" />
+          <div className="absolute -bottom-40 end-1/4 size-[600px] bg-gold/5 rounded-full blur-[140px]" />
+        </div>
 
-        {/* Drawer Header */}
-        <div className="container-viwan flex h-20 md:h-[88px] items-center justify-between shrink-0 border-b border-white/10 relative z-10">
+        {/* Drawer Header: Always lock Logo on left and controls on right */}
+        <div
+          dir="ltr"
+          className="container-viwan w-full max-w-full flex h-20 md:h-[88px] items-center justify-between shrink-0 border-b border-white/10 relative z-10"
+        >
           <Link
             href="/"
             onClick={() => setOpen(false)}
             aria-label="VIWAN home"
-            className="active:scale-98 transition-transform"
+            className="active:scale-98 transition-transform shrink-0"
           >
             <Logo />
           </Link>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             {/* Bilingual Switcher Inside Drawer */}
             <div className="flex items-center border border-white/15 rounded-xs p-0.5 bg-white/[0.03]">
               <button
@@ -277,7 +276,7 @@ export function SiteHeader() {
         </div>
 
         {/* Drawer Main Content */}
-        <div className="container-viwan flex-1 py-8 sm:py-12 md:py-16 relative z-10 flex flex-col justify-center">
+        <div className="container-viwan w-full max-w-full overflow-x-hidden flex-1 py-8 sm:py-12 md:py-16 relative z-10 flex flex-col justify-center">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             {/* Left 7-8 Cols: Numbered Links with Interactive Hover */}
             <div className="lg:col-span-8">
@@ -299,7 +298,7 @@ export function SiteHeader() {
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        'group/item relative flex items-baseline justify-between py-3 sm:py-4 transition-all duration-300 cursor-pointer',
+                        'group/item relative flex items-baseline justify-between py-3 sm:py-4 transition-all duration-300 cursor-pointer overflow-hidden max-w-full',
                         'group-hover/navlist:opacity-35 hover:!opacity-100',
                         'ltr:hover:translate-x-3 rtl:hover:-translate-x-3',
                       )}
@@ -469,7 +468,7 @@ export function SiteHeader() {
         </div>
 
         {/* Drawer Footer: Social Media Icons + Copyright */}
-        <div className="container-viwan py-6 border-t border-white/10 shrink-0 relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ivory/60">
+        <div className="container-viwan w-full max-w-full overflow-hidden py-6 border-t border-white/10 shrink-0 relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ivory/60">
           {/* Social Media Icons Section */}
           <div className="flex items-center gap-3">
             <span className="eyebrow text-[11px] text-ivory/50 uppercase tracking-widest me-1 hidden sm:inline-block">

@@ -1,12 +1,13 @@
-﻿'use client'
+'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Display, Eyebrow, SectionIndex } from '@/components/site/primitives'
 import { Reveal } from '@/components/site/reveal'
 import { useLanguage } from '@/lib/i18n'
 import { Layers, Sparkles, ShieldCheck, Compass } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Marquee } from '@/components/ui/marquee'
 
 interface Material {
   id: string
@@ -105,7 +106,25 @@ const MATERIALS: Material[] = [
 export function MaterialityLab() {
   const { lang } = useLanguage()
   const [selectedId, setSelectedId] = useState('travertine')
+  const [isPaused, setIsPaused] = useState(false)
   const active = MATERIALS.find((m) => m.id === selectedId) || MATERIALS[0]
+
+  // Auto-cycle through materials every 6 seconds unless user pauses/hovers
+  useEffect(() => {
+    if (isPaused) return
+    const interval = setInterval(() => {
+      setSelectedId((current) => {
+        const currentIndex = MATERIALS.findIndex((m) => m.id === current)
+        const nextIndex = (currentIndex + 1) % MATERIALS.length
+        return MATERIALS[nextIndex].id
+      })
+    }, 6000)
+
+    return () => clearInterval(interval)
+  }, [isPaused])
+
+  // Duplicated list for completely seamless infinite loop without gaps on wide screens
+  const tickerMaterials = [...MATERIALS, ...MATERIALS]
 
   return (
     <section className="section-gap surface-dark border-t border-border overflow-hidden">
@@ -125,27 +144,52 @@ export function MaterialityLab() {
           </p>
         </Reveal>
 
-        {/* Material Selector Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10 no-scrollbar">
-          {MATERIALS.map((m) => {
-            const isSelected = m.id === selectedId
-            return (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => setSelectedId(m.id)}
-                className={cn(
-                  'px-4 py-3 text-xs tracking-wider uppercase whitespace-nowrap transition-all duration-300 border-b-2 -mb-px flex items-center gap-2 cursor-pointer',
-                  isSelected
-                    ? 'border-gold text-gold font-medium bg-white/[0.03]'
-                    : 'border-transparent text-ivory/50 hover:text-ivory hover:border-white/20'
-                )}
-              >
-                <span className="size-1.5 rounded-full" style={{ backgroundColor: isSelected ? 'var(--gold, #af7e49)' : 'transparent' }} />
-                <span>{lang === 'ar' ? m.nameAr : m.nameEn}</span>
-              </button>
-            )
-          })}
+        {/* Continuous Dynamic Marquee Strip (Loops infinitely and pauses on hover) */}
+        <div
+          className="relative w-full overflow-hidden border-b border-white/10 pb-2 select-none"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+        >
+          {/* Edge gradient fade masks */}
+          <div className="pointer-events-none absolute inset-y-0 start-0 w-12 sm:w-24 z-10 bg-gradient-to-r rtl:bg-gradient-to-l from-[#0E0E0C] via-[#0E0E0C]/80 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 end-0 w-12 sm:w-24 z-10 bg-gradient-to-l rtl:bg-gradient-to-r from-[#0E0E0C] via-[#0E0E0C]/80 to-transparent" />
+
+          <Marquee
+            speed={28}
+            pauseOnHover={true}
+            direction={lang === 'ar' ? 'right' : 'left'}
+            className="p-0 gap-6 [--gap:1.5rem]"
+          >
+            {tickerMaterials.map((m, idx) => {
+              const isSelected = m.id === selectedId
+              return (
+                <button
+                  key={`${m.id}-${idx}`}
+                  type="button"
+                  onClick={() => {
+                    setSelectedId(m.id)
+                    setIsPaused(true)
+                  }}
+                  className={cn(
+                    'px-4 sm:px-5 py-3 text-xs tracking-wider uppercase whitespace-nowrap transition-all duration-300 border-b-2 -mb-px flex items-center gap-2.5 cursor-pointer shrink-0 rounded-xs',
+                    isSelected
+                      ? 'border-gold text-gold font-medium bg-white/[0.04] shadow-[0_0_20px_rgba(197,168,128,0.1)]'
+                      : 'border-transparent text-ivory/50 hover:text-ivory hover:border-white/20 hover:bg-white/[0.02]'
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'size-1.5 rounded-full transition-all duration-300',
+                      isSelected ? 'bg-gold shadow-[0_0_8px_var(--gold)] scale-125' : 'bg-white/20'
+                    )}
+                  />
+                  <span>{lang === 'ar' ? m.nameAr : m.nameEn}</span>
+                </button>
+              )
+            })}
+          </Marquee>
         </div>
 
         {/* Active Material Interactive Showcase Card */}
