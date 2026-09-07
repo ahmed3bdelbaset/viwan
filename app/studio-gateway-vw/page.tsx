@@ -1774,7 +1774,7 @@ function ProjectModal({
           {/* Row 6: Scope and Featured */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'نطاق العمل (مفصول بفواصل)' : 'Scope of Work (comma separated)'}</label>
+              <label className="text-white/70 eyebrow">{isAr ? 'مراحل العمل (مفصول بفواصل)' : 'Scope of Work (comma separated)'}</label>
               <input
                 type="text"
                 value={formData.scopeStr}
@@ -1783,7 +1783,7 @@ function ProjectModal({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'نطاق العمل بالعربية' : 'Scope in Arabic'}</label>
+              <label className="text-white/70 eyebrow">{isAr ? 'مراحل العمل بالعربية' : 'Scope in Arabic'}</label>
               <input
                 type="text"
                 value={formData.scopeArStr}

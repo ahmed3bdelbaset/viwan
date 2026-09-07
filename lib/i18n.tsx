@@ -555,7 +555,7 @@ export const DICTIONARY = {
       label: 'مشاريع مختارة',
       heading: 'أعمال مختارة',
       viewAll: 'عرض كافة المشاريع',
-      scope: 'نطاق العمل',
+      scope: 'مراحل العمل',
       viewProject: 'عرض المشروع',
     },
     servicesPreview: {

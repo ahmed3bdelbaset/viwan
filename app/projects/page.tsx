@@ -859,7 +859,7 @@ export default function ProjectsPage() {
               {selectedProject.scope && selectedProject.scope.length > 0 && (
                 <div>
                   <h4 className="eyebrow text-gold text-xs font-semibold mb-2.5">
-                    {isAr ? 'نطاق العمل المنجز' : 'Delivered Scope'}
+                    {isAr ? 'مراحل العمل المنجزة' : 'Delivered Scope'}
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {selectedProject.scope.map((item) => (

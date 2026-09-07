@@ -170,7 +170,7 @@ export function ProjectDetailClient({
                 </div>
               </div>
               <div className="py-4 flex items-start justify-between gap-4">
-                <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'نطاق العمل' : 'Scope of Work'}</span>
+                <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'مراحل العمل' : 'Scope of Work'}</span>
                 <ul className="text-right rtl:text-left flex flex-col gap-1 text-xs text-charcoal">
                   {project.scope.map((s) => (
                     <li key={s}>{s}</li>
