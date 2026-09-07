@@ -5,7 +5,24 @@ import { Project } from '@/lib/projects'
 export async function GET() {
   try {
     const db = readDb()
-    return NextResponse.json({ success: true, projects: db.projects || [] })
+    const projects = (db.projects || []).map((p: any) => ({
+      ...p,
+      id: p.id || p.slug,
+      slug: p.slug,
+      title: p.title || p.name || 'Untitled Project',
+      name: p.name || p.title || 'Untitled Project',
+      titleAr: p.titleAr || p.nameAr || p.title || p.name,
+      nameAr: p.nameAr || p.titleAr || p.title || p.name,
+      cover: p.cover || p.coverImage || p.image || '/images/hero-villa.png',
+      coverImage: p.coverImage || p.cover || p.image || '/images/hero-villa.png',
+      category: p.category || p.type || (p.disciplines && p.disciplines[0]) || 'Architecture',
+      type: p.type || p.category || (p.disciplines && p.disciplines[0]) || 'Architecture',
+      categoryAr: p.categoryAr || p.typeAr || p.category || p.type || 'الهندسة المعمارية',
+      location: p.location || 'Cairo',
+      year: p.year || '2026',
+      description: p.description || '',
+    }))
+    return NextResponse.json({ success: true, projects })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 })
   }
@@ -17,30 +34,35 @@ export async function POST(req: Request) {
     const db = readDb()
 
     const rawName = body.name || body.title || 'New Architectural Project'
+    const rawCover = body.cover || body.coverImage || body.image || '/images/hero-villa.png'
+    const rawCategory = body.type || body.category || 'Architecture'
     const generatedSlug = (body.slug || rawName)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '') || `project-${Date.now()}`
 
-    const newProject: Project = {
+    const newProject: any = {
       slug: generatedSlug,
       index: body.index || String(db.projects.length + 1).padStart(2, '0'),
       name: rawName,
+      title: rawName,
       location: body.location || 'Cairo',
       country: body.country || 'Egypt',
       year: String(body.year || new Date().getFullYear()),
-      type: body.type || body.category || 'Architecture',
+      type: rawCategory,
+      category: rawCategory,
       disciplines: Array.isArray(body.disciplines) && body.disciplines.length > 0 
         ? body.disciplines 
-        : [body.category || 'Architecture'],
+        : [rawCategory],
       scope: Array.isArray(body.scope) ? body.scope : (typeof body.scope === 'string' ? body.scope.split(',').map((s: string) => s.trim()) : ['Concept Design', 'BIM Coordination']),
       tagline: body.tagline || 'A bespoke spatial composition.',
       heading: body.heading || 'Elevating everyday spatial experience.',
       description: body.description || '',
       philosophy: body.philosophy || 'Architecture shaped by light and proportion.',
-      cover: body.cover || body.image || '/images/hero-villa.png',
-      interior: body.interior || '/images/interior-living-marble.jpg',
-      cinematic: body.cinematic || '/images/hero-villa.png',
+      cover: rawCover,
+      coverImage: rawCover,
+      interior: body.interior || body.interiorImage || '/images/interior-living-marble.jpg',
+      cinematic: body.cinematic || rawCover,
       gallery: Array.isArray(body.gallery) ? body.gallery : [],
       featured: Boolean(body.featured),
     }
@@ -78,12 +100,18 @@ export async function PUT(req: Request) {
 
     // Sanitize updates
     const current = db.projects[idx]
+    const updatedCover = updates.cover || updates.coverImage || updates.image || current.cover
+    const updatedName = updates.name || updates.title || current.name
+    const updatedCategory = updates.type || updates.category || current.type
     db.projects[idx] = {
       ...current,
       ...updates,
-      name: updates.name || updates.title || current.name,
-      cover: updates.cover || updates.image || current.cover,
-      type: updates.type || updates.category || current.type,
+      name: updatedName,
+      title: updatedName,
+      cover: updatedCover,
+      coverImage: updatedCover,
+      type: updatedCategory,
+      category: updatedCategory,
       featured: typeof updates.featured === 'boolean' ? updates.featured : current.featured,
     }
 

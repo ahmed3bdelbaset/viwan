@@ -858,13 +858,18 @@ interface SiteSettings {
 }
 
 interface ProjectData {
-  id: string
-  title: string
+  id?: string
+  title?: string
+  name?: string
   titleAr?: string
+  nameAr?: string
   slug: string
-  category: string
+  category?: string
   categoryAr?: string
+  type?: string
+  typeAr?: string
   discipline?: string
+  disciplines?: string[]
   location: string
   locationAr?: string
   year: string
@@ -874,7 +879,11 @@ interface ProjectData {
   descriptionAr?: string
   scope?: string[]
   scopeAr?: string[]
-  coverImage: string
+  cover?: string
+  coverImage?: string
+  image?: string
+  interior?: string
+  cinematic?: string
   images?: string[]
   featured?: boolean
   status?: string
@@ -1044,14 +1053,14 @@ function OverviewTab({
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/40">
                 <img
-                  src={p.coverImage}
-                  alt={p.title}
+                  src={p.coverImage || p.cover || (p as any).image || '/images/hero-villa.png'}
+                  alt={p.title || (p as any).name || 'Project'}
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute top-2.5 start-2.5">
                   <span className="px-2 py-0.5 rounded-2xs bg-black/60 backdrop-blur-md text-[10px] font-mono text-gold border border-white/10">
-                    {isAr ? (p.categoryAr || p.category) : p.category}
+                    {isAr ? (p.categoryAr || (p as any).typeAr || p.category || (p as any).type || 'الهندسة المعمارية') : (p.category || (p as any).type || 'Architecture')}
                   </span>
                 </div>
                 {p.featured && (
@@ -1064,7 +1073,7 @@ function OverviewTab({
                 )}
                 <div className="absolute bottom-2.5 start-2.5 end-2.5 text-white">
                   <h4 className="font-serif text-sm font-medium leading-tight truncate">
-                    {isAr ? (p.titleAr || p.title) : p.title}
+                    {isAr ? (p.titleAr || (p as any).nameAr || p.title || (p as any).name) : (p.title || (p as any).name)}
                   </h4>
                   <p className="text-[11px] text-white/60 mt-0.5 truncate">
                     {isAr ? (p.locationAr || p.location) : p.location} · {p.year}
@@ -1124,15 +1133,19 @@ function ProjectsTab({
 
   // Filter projects
   const filtered = projects.filter((p) => {
+    const pCategory = (p.category || (p as any).type || '').toLowerCase()
     const matchDiscipline =
       filterDiscipline === 'all' ||
       p.discipline === filterDiscipline ||
-      p.category?.toLowerCase() === filterDiscipline
+      pCategory === filterDiscipline
+    const titleEn = (p.title || (p as any).name || '').toLowerCase()
+    const titleAr = (p.titleAr || (p as any).nameAr || '').toLowerCase()
+    const loc = (p.location || '').toLowerCase()
     const matchSearch =
       searchQuery === '' ||
-      p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.titleAr?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      titleEn.includes(searchQuery.toLowerCase()) ||
+      titleAr.includes(searchQuery.toLowerCase()) ||
+      loc.includes(searchQuery.toLowerCase()) ||
       p.year?.includes(searchQuery)
     return matchDiscipline && matchSearch
   })
@@ -1261,14 +1274,14 @@ function ProjectsTab({
               <div>
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/40">
                   <img
-                    src={p.coverImage}
-                    alt={p.title}
+                    src={p.coverImage || p.cover || (p as any).image || '/images/hero-villa.png'}
+                    alt={p.title || (p as any).name || 'Project'}
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                   <div className="absolute top-3 start-3">
                     <span className="px-2.5 py-1 rounded-2xs bg-black/70 backdrop-blur-md text-[10px] font-mono text-gold border border-white/10">
-                      {isAr ? (p.categoryAr || p.category) : p.category}
+                      {isAr ? (p.categoryAr || (p as any).typeAr || p.category || (p as any).type || 'الهندسة المعمارية') : (p.category || (p as any).type || 'Architecture')}
                     </span>
                   </div>
                   {p.featured && (
@@ -1281,7 +1294,7 @@ function ProjectsTab({
                   )}
                   <div className="absolute bottom-3 start-3 end-3 text-white">
                     <h3 className="font-serif text-base sm:text-lg font-light leading-tight group-hover:text-gold transition-colors">
-                      {isAr ? (p.titleAr || p.title) : p.title}
+                      {isAr ? (p.titleAr || (p as any).nameAr || p.title || (p as any).name) : (p.title || (p as any).name)}
                     </h3>
                     <div className="flex items-center gap-3 text-xs text-white/60 mt-1 font-mono text-[11px]">
                       <span className="flex items-center gap-1">
@@ -1393,21 +1406,21 @@ function ProjectModal({
   const [uploading, setUploading] = useState(false)
 
   const [formData, setFormData] = useState({
-    title: project?.title || '',
-    titleAr: project?.titleAr || '',
+    title: project?.title || (project as any)?.name || '',
+    titleAr: project?.titleAr || (project as any)?.nameAr || project?.title || (project as any)?.name || '',
     slug: project?.slug || '',
-    category: project?.category || 'Architecture',
-    categoryAr: project?.categoryAr || 'الهندسة المعمارية',
-    discipline: project?.discipline || 'architecture',
+    category: project?.category || (project as any)?.type || (project?.disciplines && project.disciplines[0]) || 'Architecture',
+    categoryAr: project?.categoryAr || (project as any)?.typeAr || 'الهندسة المعمارية',
+    discipline: project?.discipline || (project?.disciplines && project.disciplines[0]?.toLowerCase()) || 'architecture',
     location: project?.location || 'New Cairo, Egypt',
-    locationAr: project?.locationAr || 'القاهرة الجديدة، مصر',
+    locationAr: project?.locationAr || project?.location || 'القاهرة الجديدة، مصر',
     year: project?.year || new Date().getFullYear().toString(),
     area: project?.area || '1,200 m²',
     client: project?.client || 'Private Client',
     description: project?.description || '',
-    descriptionAr: project?.descriptionAr || '',
-    coverImage: project?.coverImage || '/images/hero-villa.png',
-    interiorImage: project?.images?.[0] || '/images/service-interior-design.jpg',
+    descriptionAr: project?.descriptionAr || project?.description || '',
+    coverImage: project?.coverImage || (project as any)?.cover || (project as any)?.image || '/images/hero-villa.png',
+    interiorImage: (project as any)?.interior || project?.images?.[0] || '/images/service-interior-design.jpg',
     detailImage: project?.images?.[1] || '/images/detail-courtyard.png',
     featured: project?.featured ?? true,
     status: project?.status || 'Completed',
@@ -1445,14 +1458,19 @@ function ProjectModal({
     setSaving(true)
 
     try {
-      const payload: ProjectData = {
+      const payload: any = {
         id: project?.id || formData.slug || `proj-${Date.now()}`,
-        title: formData.title,
-        titleAr: formData.titleAr || formData.title,
         slug: formData.slug,
+        title: formData.title,
+        name: formData.title,
+        titleAr: formData.titleAr || formData.title,
+        nameAr: formData.titleAr || formData.title,
         category: formData.category,
+        type: formData.category,
         categoryAr: formData.categoryAr,
+        typeAr: formData.categoryAr,
         discipline: formData.discipline,
+        disciplines: [formData.category],
         location: formData.location,
         locationAr: formData.locationAr || formData.location,
         year: formData.year,
@@ -1462,7 +1480,9 @@ function ProjectModal({
         descriptionAr: formData.descriptionAr || formData.description,
         scope: formData.scopeStr.split(',').map((s) => s.trim()).filter(Boolean),
         scopeAr: formData.scopeArStr.split(',').map((s) => s.trim()).filter(Boolean),
+        cover: formData.coverImage,
         coverImage: formData.coverImage,
+        interior: formData.interiorImage,
         images: [formData.interiorImage, formData.detailImage].filter(Boolean),
         featured: formData.featured,
         status: formData.status,
@@ -3247,7 +3267,23 @@ export default function StudioGatewayPage() {
         fetch("/api/admin/admins", { credentials: "include" }).then((r) => r.json()).catch(() => ({})),
       ])
 
-      if (Array.isArray(projRes.projects)) setProjects(projRes.projects)
+      if (Array.isArray(projRes.projects)) {
+        const normalized = projRes.projects.map((p: any) => ({
+          ...p,
+          id: p.id || p.slug,
+          slug: p.slug,
+          title: p.title || p.name || 'Untitled Project',
+          name: p.name || p.title || 'Untitled Project',
+          titleAr: p.titleAr || p.nameAr || p.title || p.name,
+          nameAr: p.nameAr || p.titleAr || p.title || p.name,
+          coverImage: p.coverImage || p.cover || p.image || '/images/hero-villa.png',
+          cover: p.cover || p.coverImage || p.image || '/images/hero-villa.png',
+          category: p.category || p.type || (p.disciplines && p.disciplines[0]) || 'Architecture',
+          type: p.type || p.category || (p.disciplines && p.disciplines[0]) || 'Architecture',
+          categoryAr: p.categoryAr || p.typeAr || p.category || p.type || 'الهندسة المعمارية',
+        }))
+        setProjects(normalized)
+      }
       if (setRes.settings) setSettings(setRes.settings)
       if (Array.isArray(setRes.siteImages)) setSiteImages(setRes.siteImages)
       if (Array.isArray(setRes.counters)) setCounters(setRes.counters)
