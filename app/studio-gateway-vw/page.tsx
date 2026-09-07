@@ -48,6 +48,13 @@ import {
   CheckCheck,
   Bell,
   Clock,
+  LayoutGrid,
+  List,
+  Table as TableIcon,
+  Download,
+  MoreVertical,
+  FileSpreadsheet,
+  Filter,
 } from "lucide-react"
 import { Logo } from "@/components/site/logo"
 
@@ -1115,7 +1122,7 @@ function OverviewTab({
   )
 }
 
-// ── PROJECTS TAB ────────────────────────────────────────────────────────────
+// ── PROJECTS TAB (BESPOKE ARCHITECTURAL MONOGRAPH & REGISTRY SUITE) ──────────
 function ProjectsTab({
   projects,
   onRefresh,
@@ -1136,32 +1143,105 @@ function ProjectsTab({
   askConfirm?: (title: string, message: string, onConfirm: () => void, confirmLabel?: string) => void
 }) {
   const [filterDiscipline, setFilterDiscipline] = useState<string>('all')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'draft' | 'featured'>('all')
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'featured' | 'title'>('newest')
   const [searchQuery, setSearchQuery] = useState('')
+  const [viewMode, setViewMode] = useState<'dual' | 'grid' | 'table'>('dual')
+  const [quickActionSlug, setQuickActionSlug] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [tablePage, setTablePage] = useState(1)
+  const pageSize = 6
 
-  // Filter projects
+  // Project Metrics
+  const totalCount = projects.length
+  const publishedCount = projects.filter((p) => p.status !== 'Draft').length
+  const draftCount = projects.filter((p) => p.status === 'Draft').length
+  const featuredCount = projects.filter((p) => p.featured).length
+
+  // Filter & Sort Projects
   const filtered = projects.filter((p) => {
     const pCategory = (p.category || (p as any).type || '').toLowerCase()
     const matchDiscipline =
       filterDiscipline === 'all' ||
       p.discipline === filterDiscipline ||
       pCategory === filterDiscipline
+
+    const matchStatus =
+      filterStatus === 'all' ||
+      (filterStatus === 'published' && p.status !== 'Draft') ||
+      (filterStatus === 'draft' && p.status === 'Draft') ||
+      (filterStatus === 'featured' && Boolean(p.featured))
+
     const titleEn = (p.title || (p as any).name || '').toLowerCase()
     const titleAr = (p.titleAr || (p as any).nameAr || '').toLowerCase()
-    const loc = (p.location || '').toLowerCase()
+    const loc = (p.location || (p as any).locationAr || '').toLowerCase()
+    const refCode = `ref-${p.year || ''}-${(p.slug || '').slice(0, 3)}`.toLowerCase()
+
     const matchSearch =
       searchQuery === '' ||
       titleEn.includes(searchQuery.toLowerCase()) ||
       titleAr.includes(searchQuery.toLowerCase()) ||
       loc.includes(searchQuery.toLowerCase()) ||
-      p.year?.includes(searchQuery)
-    return matchDiscipline && matchSearch
+      refCode.includes(searchQuery.toLowerCase()) ||
+      (p.year && p.year.includes(searchQuery))
+
+    return matchDiscipline && matchStatus && matchSearch
   })
 
+  // Sort
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'featured') {
+      if (a.featured === b.featured) return 0
+      return a.featured ? -1 : 1
+    }
+    if (sortBy === 'oldest') {
+      return (Number(a.year) || 0) - (Number(b.year) || 0)
+    }
+    if (sortBy === 'title') {
+      const nameA = (a.titleAr || a.title || '').toLowerCase()
+      const nameB = (b.titleAr || b.title || '').toLowerCase()
+      return nameA.localeCompare(nameB)
+    }
+    // Default: newest
+    return (Number(b.year) || 9999) - (Number(a.year) || 0)
+  })
+
+  // Table pagination
+  const paginatedProjects = sorted.slice((tablePage - 1) * pageSize, tablePage * pageSize)
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize))
+
+  // Toggle Featured status directly
+  const handleToggleFeatured = async (p: ProjectData) => {
+    try {
+      const nextFeatured = !p.featured
+      const res = await fetch('/api/admin/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: p.slug, updates: { featured: nextFeatured } }),
+        credentials: 'include',
+      })
+      if (res.ok) {
+        if (showToast) {
+          showToast(
+            nextFeatured
+              ? (isAr ? `تم تمييز مشروع "${p.titleAr || p.title}" في الواجهة` : `Featured "${p.title}"`)
+              : (isAr ? `تم إزالة التمييز عن المشروع` : `Unfeatured "${p.title}"`)
+          )
+        }
+        onRefresh()
+      }
+    } catch {
+      if (showToast) showToast(isAr ? 'فشل تعديل حالة التمييز' : 'Failed to update feature', 'error')
+    }
+  }
+
+  // Delete project
   const handleDelete = async (slug: string, name: string) => {
     const confirmTitle = isAr ? 'حذف المشروع المعماري' : 'Delete Architectural Project'
-    const confirmMsg = isAr ? `هل أنت متأكد من حذف مشروع "${name}" نهائياً من قاعدة البيانات؟` : `Are you sure you want to delete "${name}" permanently?`
+    const confirmMsg = isAr
+      ? `هل أنت متأكد من حذف مشروع "${name}" نهائياً من قاعدة البيانات وسجل المونوغراف؟`
+      : `Are you sure you want to delete "${name}" permanently?`
 
     const executeDelete = async () => {
       setIsDeleting(true)
@@ -1180,6 +1260,7 @@ function ProjectsTab({
         if (showToast) showToast(isAr ? 'حدث خطأ أثناء الاتصال بالخادم' : 'Connection error', 'error')
       } finally {
         setIsDeleting(false)
+        setQuickActionSlug(null)
       }
     }
 
@@ -1190,189 +1271,665 @@ function ProjectsTab({
     }
   }
 
+  // Export CSV Registry
+  const handleExportCSV = () => {
+    const headers = ['Ref Code', 'Title Ar', 'Title En', 'Discipline', 'Location', 'Year', 'Status', 'Featured', 'Slug']
+    const rows = projects.map((p) => [
+      `REF-${p.year || '2024'}-${(p.slug || '').slice(0, 3).toUpperCase()}`,
+      `"${(p.titleAr || (p as any).nameAr || p.title || '').replace(/"/g, '""')}"`,
+      `"${(p.title || (p as any).name || '').replace(/"/g, '""')}"`,
+      `"${(p.categoryAr || (p as any).typeAr || p.category || '').replace(/"/g, '""')}"`,
+      `"${(p.locationAr || p.location || '').replace(/"/g, '""')}"`,
+      p.year || '',
+      p.status || 'Published',
+      p.featured ? 'Yes' : 'No',
+      p.slug || '',
+    ])
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `viwan-projects-registry-${new Date().toISOString().slice(0, 10)}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    if (showToast) showToast(isAr ? 'تم تصدير كشف المشروعات بنجاح (CSV)' : 'Registry exported as CSV')
+  }
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header & New Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-white text-xl sm:text-2xl font-serif font-light">
-            {isAr ? 'إدارة المشاريع المعمارية' : 'Architectural Projects Portfolio'}
-          </h2>
-          <p className="text-white/40 text-xs mt-0.5">
-            {isAr
-              ? `إجمالي المشاريع الحالية: ${projects.length} مشروعاً موثقاً عبر التخصصات الثمانية`
-              : `${projects.length} total projects in studio database across the 8 disciplines`}
-          </p>
+    <div className="space-y-6 sm:space-y-8 animate-fade-in select-text">
+      {/* ── TOP ARCHITECTURAL HEADER & REGISTRY STATS ──────────────────────── */}
+      <div className="space-y-3 border-b border-white/10 pb-6">
+        {/* Technical Subheader Coordinates */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-white/40 tracking-widest uppercase">
+          <div className="flex items-center gap-2 text-gold/80">
+            <span>CODE 04-ARC</span>
+            <span className="text-white/20">//</span>
+            <span>ATELIER V</span>
+            <span className="text-white/20">//</span>
+            <span className="text-white/60">PORTFOLIO REGISTRY</span>
+          </div>
+          <div className="hidden sm:block">METRIC GRID 1:25</div>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsCreating(true)}
-          className="px-4 py-2.5 rounded-xs bg-gold text-charcoal text-xs font-semibold eyebrow hover:bg-[#D4BC96] transition-colors cursor-pointer flex items-center gap-2 self-start sm:self-auto shadow-md shadow-gold/10"
-        >
-          <Plus className="size-3.5" />
-          <span>{isAr ? 'إضافة مشروع جديد' : 'New Project'}</span>
-        </button>
+
+        {/* Main Title & Action Pill */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pt-1">
+          <div className="space-y-1.5 max-w-2xl">
+            <h1 className="text-2xl sm:text-3xl font-serif font-light text-white tracking-wide">
+              {isAr ? 'إدارة المشاريع المعمارية' : 'Architectural Projects Portfolio'}
+            </h1>
+            <p className="text-white/50 text-xs sm:text-[13px] leading-relaxed">
+              {isAr
+                ? 'إدارة وتنظيم جميع المشاريع المعروضة في معرض أعمال الشركة والمونوغراف المعماري الرقمي مع ربط مخططات التنفيذ والتصنيف الإقراري.'
+                : 'Architectural database managing all portfolio works, digital monograph entries, and BIM coordination classifications.'}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Project Metrics Badge */}
+            <div className="px-3.5 py-2 rounded-xs bg-[#0f0f13] border border-white/10 font-mono text-xs flex items-center gap-2.5">
+              <span className="font-serif text-sm text-white font-medium">
+                {totalCount} {isAr ? 'مشروعاً' : 'projects'}
+              </span>
+              <span className="text-white/20">|</span>
+              <span className="text-emerald-400 flex items-center gap-1">
+                <span className="size-1.5 rounded-full bg-emerald-400" />
+                {publishedCount} {isAr ? 'منشور' : 'live'}
+              </span>
+              <span className="text-white/20">·</span>
+              <span className="text-amber-400">{draftCount} {isAr ? 'مسودة' : 'draft'}</span>
+              <span className="text-white/20">·</span>
+              <span className="text-gold">{featuredCount} {isAr ? 'مميز' : 'featured'}</span>
+            </div>
+
+            {/* Add New Project Gold Button */}
+            <button
+              type="button"
+              onClick={() => setIsCreating(true)}
+              className="px-5 py-2.5 rounded-xs bg-gold hover:bg-[#D4BC96] text-charcoal text-xs font-semibold eyebrow transition-all cursor-pointer flex items-center gap-2 shadow-lg shadow-gold/20"
+            >
+              <Plus className="size-3.5 stroke-[2.5]" />
+              <span>{isAr ? 'إضافة مشروع جديد' : 'New Project'}</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-[#141311] border border-white/10 rounded-xs p-4 space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* ── ARCHITECTURAL CONTROL & FILTER TOOLBAR ─────────────────────────── */}
+      <div className="bg-[#0f0f13] border border-white/10 rounded-xs p-3.5 sm:p-4 space-y-3.5 shadow-xl">
+        {/* Upper Row: Search & Filters & View Switcher */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* Search Box */}
           <div className="relative flex-1 max-w-md">
-            <Search className="size-4 text-white/40 absolute start-3 top-1/2 -translate-y-1/2" />
+            <Search className="size-4 text-white/40 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder={isAr ? 'البحث عن مشروع بالاسم، الموقع أو السنة...' : 'Search by title, location or year...'}
+              placeholder={isAr ? 'البحث عن مشروع بالاسم، الموقع أو الكود #Ref...' : 'Search by title, location or #Ref code...'}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-black/40 border border-white/15 rounded-xs ps-9 pe-4 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-gold"
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setTablePage(1)
+              }}
+              className="w-full bg-black/40 border border-white/10 rounded-xs ps-9 pe-4 py-2 text-xs text-white placeholder-white/30 focus:border-gold/60 focus:outline-none font-mono"
             />
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-            <button
-              type="button"
-              onClick={() => setFilterDiscipline('all')}
-              className={`px-3 py-1.5 rounded-xs text-[11px] eyebrow whitespace-nowrap transition-colors cursor-pointer ${
-                filterDiscipline === 'all'
-                  ? 'bg-gold text-charcoal font-semibold'
-                  : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              {isAr ? 'كافة التخصصات' : 'All Disciplines'}
-            </button>
-            {ARCHITECTURAL_DISCIPLINES.map((d) => (
-              <button
-                key={d.id}
-                type="button"
-                onClick={() => setFilterDiscipline(d.id)}
-                className={`px-3 py-1.5 rounded-xs text-[11px] eyebrow whitespace-nowrap transition-colors cursor-pointer ${
-                  filterDiscipline === d.id
-                    ? 'bg-gold text-charcoal font-semibold'
-                    : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
-                }`}
+          {/* Filter Dropdowns & View Mode */}
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            {/* Discipline Dropdown */}
+            <div className="relative">
+              <select
+                value={filterDiscipline}
+                onChange={(e) => {
+                  setFilterDiscipline(e.target.value)
+                  setTablePage(1)
+                }}
+                className="bg-black/40 border border-white/10 rounded-xs px-3 py-2 text-white/80 focus:border-gold/60 focus:outline-none cursor-pointer text-xs font-mono"
               >
-                {isAr ? d.nameAr : d.nameEn}
+                <option value="all">{isAr ? 'كل التخصصات (Disciplines)' : 'All Disciplines'}</option>
+                {ARCHITECTURAL_DISCIPLINES.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.code} · {isAr ? d.nameAr : d.nameEn}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status Dropdown */}
+            <div className="relative">
+              <select
+                value={filterStatus}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value as any)
+                  setTablePage(1)
+                }}
+                className="bg-black/40 border border-white/10 rounded-xs px-3 py-2 text-white/80 focus:border-gold/60 focus:outline-none cursor-pointer text-xs font-mono"
+              >
+                <option value="all">{isAr ? 'حالة المشروع: الكل' : 'Status: All'}</option>
+                <option value="published">{isAr ? 'منشور (Published)' : 'Published'}</option>
+                <option value="draft">{isAr ? 'مسودة (Draft)' : 'Draft'}</option>
+                <option value="featured">{isAr ? 'المميزة فقط (Featured)' : 'Featured'}</option>
+              </select>
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-black/40 border border-white/10 rounded-xs px-3 py-2 text-white/80 focus:border-gold/60 focus:outline-none cursor-pointer text-xs font-mono"
+              >
+                <option value="newest">{isAr ? 'ترتيب: الأحدث أولاً' : 'Sort: Newest'}</option>
+                <option value="oldest">{isAr ? 'ترتيب: الأقدم أولاً' : 'Sort: Oldest'}</option>
+                <option value="featured">{isAr ? 'المميزة أولاً' : 'Featured First'}</option>
+                <option value="title">{isAr ? 'أبجدياً (A-Z)' : 'Title (A-Z)'}</option>
+              </select>
+            </div>
+
+            {/* View Mode Toggle Buttons */}
+            <div className="flex items-center p-0.5 bg-black/50 border border-white/10 rounded-xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-2xs transition-colors cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-gold text-charcoal font-bold' : 'text-white/40 hover:text-white'
+                }`}
+                title={isAr ? 'عرض البطاقات' : 'Grid View'}
+              >
+                <LayoutGrid className="size-3.5" />
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={() => setViewMode('dual')}
+                className={`p-1.5 rounded-2xs transition-colors cursor-pointer ${
+                  viewMode === 'dual' ? 'bg-gold text-charcoal font-bold' : 'text-white/40 hover:text-white'
+                }`}
+                title={isAr ? 'عرض مزدوج متكامل' : 'Dual View (Cards & Registry)'}
+              >
+                <List className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`p-1.5 rounded-2xs transition-colors cursor-pointer ${
+                  viewMode === 'table' ? 'bg-gold text-charcoal font-bold' : 'text-white/40 hover:text-white'
+                }`}
+                title={isAr ? 'عرض جدول السجل' : 'Table Registry'}
+              >
+                <TableIcon className="size-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Lower Row: Manual Order & Sync Indicator */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-white/5 text-[11px] font-mono">
+          <div className="flex items-center gap-2 text-white/50">
+            <span>{isAr ? 'إعادة الترتيب اليدوي (Manual Order Active)' : 'Manual Ordering Active'}</span>
+            <span className="text-white/20">•</span>
+            <span className="text-gold/70 px-1.5 py-0.2 rounded-2xs bg-gold/10 border border-gold/20">
+              ATELIER-IM024-5024
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-white/40">
+            <span className="size-1.5 rounded-full bg-gold animate-pulse" />
+            <span>{isAr ? 'التحديث متزامن مع النسخة المطبوعة والموقع العام' : 'Sync active with digital monograph and web portfolio'}</span>
           </div>
         </div>
       </div>
 
-      {/* Projects Grid with UI/UX Pro Max Empty State */}
-      {filtered.length === 0 ? (
-        <div className="py-20 text-center border border-dashed border-white/10 rounded-xs bg-white/[0.015] flex flex-col items-center justify-center gap-3 animate-fade-in">
-          <FolderKanban className="size-10 text-white/20" strokeWidth={1} />
-          <p className="text-sm text-white/70 font-serif">
-            {isAr ? 'لا توجد مشاريع تطابق هذا البحث أو التصنيف' : 'No architectural projects match your filter'}
+      {/* ── VIEWPORT CONTENT: EMPTY STATE OR CARDS & REGISTRY ──────────────── */}
+      {sorted.length === 0 ? (
+        /* Empty State (Matching bottom card in reference Image 1) */
+        <div className="bg-[#0f0f13] border border-white/10 rounded-xs p-10 sm:p-14 text-center space-y-4 max-w-2xl mx-auto shadow-2xl animate-fade-in">
+          <div className="size-12 rounded-xs bg-gold/10 border border-gold/30 text-gold flex items-center justify-center mx-auto shadow-lg shadow-gold/10">
+            <Building2 className="size-6" strokeWidth={1.5} />
+          </div>
+          <div className="space-y-1">
+            <div className="text-[10px] font-mono text-gold/80 uppercase tracking-widest">
+              {isAr ? 'حالة الفهرس الفارغ (EMPTY REGISTRY STATE)' : 'EMPTY REGISTRY STATE'}
+            </div>
+            <h3 className="text-lg sm:text-xl font-serif text-white font-light">
+              {isAr ? 'لا توجد مشاريع مطابقة في هذا التصنيف' : 'No projects matching this filter'}
+            </h3>
+          </div>
+          <p className="text-white/50 text-xs leading-relaxed max-w-md mx-auto">
+            {isAr
+              ? 'ابدأ بإضافة أول مشروع معماري أو اسحب ملفات الـ CAD ومخططات الـ BIM إلى المعرض الرقمي للبدء في فهرسة المونوغراف.'
+              : 'Begin by creating an architectural entry or import CAD/BIM assets to index the studio monograph.'}
           </p>
-          <button
-            type="button"
-            onClick={() => { setSearchQuery(''); setFilterDiscipline('all'); }}
-            className="text-xs text-gold hover:underline transition-colors cursor-pointer"
-          >
-            {isAr ? 'إعادة ضبط البحث والتصنيفات' : 'Reset search & filters'}
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setIsCreating(true)}
+              className="px-5 py-2.5 rounded-xs bg-gold hover:bg-[#D4BC96] text-charcoal text-xs font-semibold eyebrow transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-gold/20"
+            >
+              <Plus className="size-3.5 stroke-[2.5]" />
+              <span>{isAr ? 'إضافة مشروع معماري جديد' : 'Create New Project'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('')
+                setFilterDiscipline('all')
+                setFilterStatus('all')
+              }}
+              className="px-4 py-2.5 rounded-xs border border-white/15 hover:border-white/30 text-white/80 hover:text-white text-xs font-mono transition-colors cursor-pointer"
+            >
+              {isAr ? 'إعادة ضبط البحث' : 'Reset Filters'}
+            </button>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((p) => (
-            <div
-              key={p.id || p.slug}
-              className="group bg-[#141311] border border-white/10 hover:border-gold/40 rounded-xs overflow-hidden transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/40">
-                  <img
-                    src={p.coverImage || p.cover || (p as any).image || '/images/hero-villa.png'}
-                    alt={p.title || (p as any).name || 'Project'}
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                  <div className="absolute top-3 start-3">
-                    <span className="px-2.5 py-1 rounded-2xs bg-black/70 backdrop-blur-md text-[10px] font-mono text-gold border border-white/10">
-                      {isAr ? (p.categoryAr || (p as any).typeAr || p.category || (p as any).type || 'الهندسة المعمارية') : (p.category || (p as any).type || 'Architecture')}
-                    </span>
-                  </div>
-                  {p.featured && (
-                    <div className="absolute top-3 end-3">
-                      <span className="px-2.5 py-1 rounded-2xs bg-gold text-charcoal text-[10px] font-semibold flex items-center gap-1">
-                        <Star className="size-3 fill-charcoal" />
-                        <span>{isAr ? 'مميز' : 'Featured'}</span>
-                      </span>
-                    </div>
-                  )}
-                  <div className="absolute bottom-3 start-3 end-3 text-white">
-                    <h3 className="font-serif text-base sm:text-lg font-light leading-tight group-hover:text-gold transition-colors">
-                      {isAr ? (p.titleAr || (p as any).nameAr || p.title || (p as any).name) : (p.title || (p as any).name)}
-                    </h3>
-                    <div className="flex items-center gap-3 text-xs text-white/60 mt-1 font-mono text-[11px]">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="size-3 text-gold/70" />
-                        {isAr ? (p.locationAr || p.location) : p.location}
-                      </span>
-                      <span>·</span>
-                      <span>{p.year}</span>
-                    </div>
-                  </div>
-                </div>
+        <div className="space-y-10">
+          {/* ── 1. ARCHITECTURAL CARDS GRID (AS IN IMAGE 1) ───────────────── */}
+          {(viewMode === 'grid' || viewMode === 'dual') && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-7">
+              {sorted.map((p) => {
+                const refCode = `REF-${p.year || '2024'}-${(p.slug || '').slice(0, 3).toUpperCase()}`
+                const isQuickActive = quickActionSlug === p.slug
 
-                <div className="p-4 space-y-3">
-                  <p className="text-white/60 text-xs line-clamp-2 leading-relaxed">
-                    {isAr ? (p.descriptionAr || p.description) : p.description}
-                  </p>
+                return (
+                  <div
+                    key={p.id || p.slug}
+                    className="group relative bg-[#0f0f13] border border-white/10 hover:border-gold/40 rounded-xs overflow-hidden transition-all duration-300 flex flex-col justify-between shadow-xl"
+                  >
+                    {/* ── CARD MEDIA HEADER ───────────────────────────────── */}
+                    <div className="relative aspect-[16/10] w-full bg-black/60 overflow-hidden select-none">
+                      <img
+                        src={p.coverImage || p.cover || (p as any).image || '/images/hero-villa.png'}
+                        alt={p.title || (p as any).name || 'Project'}
+                        className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-103"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
 
-                  {p.scope && p.scope.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {p.scope.slice(0, 3).map((s, idx) => (
-                        <span key={idx} className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-2xs text-white/70">
-                          {s}
+                      {/* Top Badges: Category & Featured */}
+                      <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2 z-10">
+                        {/* Featured Badge */}
+                        {p.featured ? (
+                          <span className="px-2.5 py-1 rounded-2xs bg-gold text-charcoal text-[10px] font-bold eyebrow flex items-center gap-1 shadow-md shadow-gold/20">
+                            <Star className="size-3 fill-charcoal" />
+                            <span>{isAr ? 'مميز (FEATURED)' : 'FEATURED'}</span>
+                          </span>
+                        ) : (
+                          <span />
+                        )}
+
+                        {/* Category Badge */}
+                        <span className="px-2.5 py-1 rounded-2xs bg-black/70 backdrop-blur-md text-[10px] font-mono text-white/90 border border-white/15">
+                          {isAr ? (p.categoryAr || (p as any).typeAr || p.category || 'الهندسة المعمارية') : (p.category || 'Architecture')}
                         </span>
-                      ))}
-                      {p.scope.length > 3 && (
-                        <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-2xs text-gold/70">
-                          +{p.scope.length - 3}
-                        </span>
+                      </div>
+
+                      {/* Bottom Image Overlay Details: Code & Titles & Live Status */}
+                      <div className="absolute bottom-3 inset-x-3.5 text-white z-10 space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-mono">
+                          <span className="text-gold/90 font-bold tracking-widest">{refCode}</span>
+                          <span className={`flex items-center gap-1 font-mono text-[10px] ${p.status === 'Draft' ? 'text-amber-400' : 'text-emerald-400'}`}>
+                            <span className={`size-1.5 rounded-full ${p.status === 'Draft' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                            <span>{p.status === 'Draft' ? (isAr ? 'مسودة' : 'Draft') : (isAr ? 'منشور' : 'Live')}</span>
+                          </span>
+                        </div>
+
+                        <h3 className="font-serif text-base sm:text-lg font-light leading-tight truncate text-white group-hover:text-gold transition-colors">
+                          {isAr ? (p.titleAr || (p as any).nameAr || p.title || (p as any).name) : (p.title || (p as any).name)}
+                        </h3>
+                        <div className="text-[10px] font-mono text-white/60 tracking-wider uppercase truncate">
+                          {p.title || (p as any).name}
+                        </div>
+                      </div>
+
+                      {/* ── QUICK ACTIONS OVERLAY (AS SHOWN IN IMAGE 1 CARD 1) ── */}
+                      {isQuickActive && (
+                        <div className="absolute inset-0 z-30 bg-black/85 backdrop-blur-md p-6 flex flex-col items-center justify-center text-center gap-4 animate-fade-in">
+                          <div className="space-y-0.5">
+                            <div className="text-[10px] font-mono text-gold uppercase tracking-widest">
+                              {isAr ? 'لوحة الإجراءات السريعة' : 'QUICK ACTIONS'}
+                            </div>
+                            <div className="text-white font-serif text-sm font-medium">
+                              {isAr ? (p.titleAr || p.title) : p.title}
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col w-full max-w-xs gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setQuickActionSlug(null)
+                                onEdit(p)
+                              }}
+                              className="w-full py-2 rounded-xs bg-gold hover:bg-[#D4BC96] text-charcoal font-semibold text-xs eyebrow transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                            >
+                              <Edit3 className="size-3.5" />
+                              <span>{isAr ? 'تعديل (EDIT)' : 'EDIT'}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(p.slug, isAr ? (p.titleAr || p.title) : p.title)}
+                              className="w-full py-2 rounded-xs bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/40 text-rose-300 font-semibold text-xs eyebrow transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                            >
+                              <Trash2 className="size-3.5" />
+                              <span>{isAr ? 'حذف (DELETE)' : 'DELETE'}</span>
+                            </button>
+
+                            <Link
+                              href={`/projects/${p.slug}`}
+                              target="_blank"
+                              className="w-full py-2 rounded-xs bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-mono transition-colors flex items-center justify-center gap-2"
+                            >
+                              <ExternalLink className="size-3 text-gold" />
+                              <span>{isAr ? 'معاينة حية في الموقع' : 'Live Preview'}</span>
+                            </Link>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setQuickActionSlug(null)}
+                            className="text-[11px] text-white/40 hover:text-white transition-colors cursor-pointer"
+                          >
+                            {isAr ? 'انقر هنا للإغلاق' : 'Click to close'}
+                          </button>
+                        </div>
                       )}
                     </div>
-                  )}
+
+                    {/* ── CARD BODY ───────────────────────────────────────── */}
+                    <div className="p-4 sm:p-5 space-y-3.5">
+                      {/* Location & Year Metadata */}
+                      <div className="flex items-center justify-between text-xs font-mono text-white/60">
+                        <span className="flex items-center gap-1.5 truncate">
+                          <MapPin className="size-3.5 text-gold shrink-0" />
+                          <span className="truncate">{isAr ? (p.locationAr || p.location) : p.location}</span>
+                        </span>
+                        <span className="flex items-center gap-1 shrink-0">
+                          <Calendar className="size-3.5 text-gold/70" />
+                          <span>{p.year}</span>
+                        </span>
+                      </div>
+
+                      {/* Narrative Text */}
+                      <p className="text-white/60 text-xs sm:text-[13px] line-clamp-2 leading-relaxed font-sans">
+                        {isAr ? (p.descriptionAr || p.description) : p.description}
+                      </p>
+
+                      {/* Scope & Discipline Chips */}
+                      {p.scope && p.scope.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {p.scope.slice(0, 4).map((s, idx) => (
+                            <span
+                              key={idx}
+                              className="text-[10px] font-mono bg-white/[0.04] border border-white/10 px-2 py-0.5 rounded-2xs text-white/70"
+                            >
+                              {s}
+                            </span>
+                          ))}
+                          {p.scope.length > 4 && (
+                            <span className="text-[10px] font-mono bg-white/[0.04] border border-white/10 px-2 py-0.5 rounded-2xs text-gold/80">
+                              +{p.scope.length - 4}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ── CARD FOOTER & ACTIONS ───────────────────────────── */}
+                    <div className="p-4 sm:p-5 pt-0 flex items-center justify-between border-t border-white/5 mt-1 text-xs">
+                      {/* Status indicator on the right */}
+                      <div className="text-[11px] font-mono text-white/40 flex items-center gap-1.5">
+                        <span className={`size-1.5 rounded-full ${p.status === 'Draft' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                        <span>{p.status === 'Draft' ? (isAr ? 'مسودة غير منشورة' : 'Unpublished Draft') : (isAr ? 'منشور في المعرض العام' : 'Public Portfolio')}</span>
+                      </div>
+
+                      {/* Action buttons on the left */}
+                      <div className="flex items-center gap-2">
+                        {/* 3-dots Quick Actions Toggle */}
+                        <button
+                          type="button"
+                          onClick={() => setQuickActionSlug(isQuickActive ? null : p.slug)}
+                          className="p-1.5 rounded-xs bg-white/5 hover:bg-white/15 text-white/60 hover:text-white transition-colors cursor-pointer"
+                          title={isAr ? 'الإجراءات السريعة' : 'Quick Actions'}
+                        >
+                          <MoreVertical className="size-3.5" />
+                        </button>
+
+                        {/* Preview */}
+                        <Link
+                          href={`/projects/${p.slug}`}
+                          target="_blank"
+                          className="px-2.5 py-1 rounded-xs bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-mono transition-colors flex items-center gap-1"
+                        >
+                          <Eye className="size-3 text-gold" />
+                          <span>{isAr ? 'معاينة' : 'View'}</span>
+                        </Link>
+
+                        {/* Edit Button (Gold) */}
+                        <button
+                          type="button"
+                          onClick={() => onEdit(p)}
+                          className="px-3.5 py-1 rounded-xs bg-gold hover:bg-[#D4BC96] text-charcoal font-semibold text-xs eyebrow transition-colors cursor-pointer flex items-center gap-1 shadow-sm shadow-gold/20"
+                        >
+                          <Edit3 className="size-3" />
+                          <span>{isAr ? 'تعديل المشروع' : 'Edit'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* ── 2. MONOGRAPH REGISTRY TABLE (AS IN IMAGE 1 SECTION 2) ──────── */}
+          {(viewMode === 'table' || viewMode === 'dual') && (
+            <div className="bg-[#0f0f13] border border-white/10 rounded-xs overflow-hidden shadow-2xl space-y-4 p-5 sm:p-6">
+              {/* Table Header Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="size-2 rounded-full bg-gold" />
+                  <h3 className="font-serif text-base sm:text-lg text-white font-medium">
+                    {isAr ? 'سجل المشروعات والمونوغراف التوثيقي' : 'Monograph Editorial & Projects Registry'}
+                  </h3>
+                  <span className="text-white/40 font-mono text-xs">
+                    ({sorted.length} {isAr ? 'حفظت جميعاً' : 'total items'})
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-mono">
+                  <button
+                    type="button"
+                    onClick={handleExportCSV}
+                    className="px-3 py-1.5 rounded-xs bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download className="size-3 text-gold" />
+                    <span>{isAr ? 'تصدير كشف البيانات CSV' : 'Export CSV'}</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="p-4 pt-0 flex items-center justify-between border-t border-white/5 mt-2 text-xs">
-                <Link
-                  href={`/projects/${p.slug}`}
-                  target="_blank"
-                  className="text-white/40 hover:text-white transition-colors flex items-center gap-1.5 text-xs eyebrow"
-                >
-                  <ExternalLink className="size-3" />
-                  <span>{isAr ? 'معاينة بالموقع' : 'Live View'}</span>
-                </Link>
+              {/* Table Responsive Wrapper */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-start text-xs font-mono">
+                  <thead>
+                    <tr className="border-b border-white/10 text-white/40 text-[11px] uppercase tracking-wider">
+                      <th className="py-3 px-3 text-start">#</th>
+                      <th className="py-3 px-3 text-start">{isAr ? 'المعاينة' : 'Preview'}</th>
+                      <th className="py-3 px-3 text-start">{isAr ? 'اسم المشروع والكود' : 'Project & Code'}</th>
+                      <th className="py-3 px-3 text-start">{isAr ? 'التصنيف' : 'Discipline'}</th>
+                      <th className="py-3 px-3 text-start">{isAr ? 'الموقع' : 'Location'}</th>
+                      <th className="py-3 px-3 text-start">{isAr ? 'السنة' : 'Year'}</th>
+                      <th className="py-3 px-3 text-center">{isAr ? 'الحالة' : 'Status'}</th>
+                      <th className="py-3 px-3 text-center">{isAr ? 'مميز' : 'Star'}</th>
+                      <th className="py-3 px-3 text-end">{isAr ? 'الإجراءات' : 'Actions'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {paginatedProjects.map((p, idx) => {
+                      const refCode = `REF-${p.year || '2024'}-${(p.slug || '').slice(0, 3).toUpperCase()}`
+                      const rowIndex = (tablePage - 1) * pageSize + idx + 1
 
-                <div className="flex items-center gap-2">
+                      return (
+                        <tr
+                          key={p.id || p.slug}
+                          className="hover:bg-white/[0.02] transition-colors group"
+                        >
+                          {/* Row Index */}
+                          <td className="py-3.5 px-3 text-white/40">
+                            {String(rowIndex).padStart(2, '0')}
+                          </td>
+
+                          {/* Thumbnail */}
+                          <td className="py-3.5 px-3">
+                            <div className="relative size-12 rounded-xs overflow-hidden bg-black/60 border border-white/10 shrink-0">
+                              <img
+                                src={p.coverImage || p.cover || (p as any).image || '/images/hero-villa.png'}
+                                alt="Thumb"
+                                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                              />
+                            </div>
+                          </td>
+
+                          {/* Project Name & Code */}
+                          <td className="py-3.5 px-3">
+                            <div className="space-y-0.5">
+                              <div className="font-serif text-sm font-medium text-white group-hover:text-gold transition-colors">
+                                {isAr ? (p.titleAr || (p as any).nameAr || p.title) : p.title}
+                              </div>
+                              <div className="text-[11px] text-white/50 flex items-center gap-2">
+                                <span className="text-gold/80 font-bold">{refCode}</span>
+                                <span className="text-white/20">·</span>
+                                <span className="uppercase text-[10px] text-white/40">{p.title || (p as any).name}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Category */}
+                          <td className="py-3.5 px-3 text-white/70">
+                            <span className="px-2 py-0.5 rounded-2xs bg-white/5 border border-white/10 text-[10px]">
+                              {isAr ? (p.categoryAr || (p as any).typeAr || p.category || 'الهندسة المعمارية') : (p.category || 'Architecture')}
+                            </span>
+                          </td>
+
+                          {/* Location */}
+                          <td className="py-3.5 px-3 text-white/60">
+                            {isAr ? (p.locationAr || p.location) : p.location}
+                          </td>
+
+                          {/* Year */}
+                          <td className="py-3.5 px-3 text-white/60">
+                            {p.year}
+                          </td>
+
+                          {/* Status Pill */}
+                          <td className="py-3.5 px-3 text-center">
+                            <span
+                              className={`px-2 py-0.5 rounded-2xs text-[10px] inline-flex items-center gap-1 ${
+                                p.status === 'Draft'
+                                  ? 'bg-amber-400/10 text-amber-400 border border-amber-400/20'
+                                  : 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
+                              }`}
+                            >
+                              <span className={`size-1 rounded-full ${p.status === 'Draft' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                              <span>{p.status === 'Draft' ? (isAr ? 'مسودة' : 'Draft') : (isAr ? 'منشور' : 'Live')}</span>
+                            </span>
+                          </td>
+
+                          {/* Star Featured Toggle */}
+                          <td className="py-3.5 px-3 text-center">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleFeatured(p)}
+                              className="p-1 rounded-xs hover:bg-white/10 transition-colors cursor-pointer text-white/30 hover:text-gold"
+                              title={p.featured ? (isAr ? 'إلغاء التمييز' : 'Unfeature') : (isAr ? 'تمييز في الواجهة' : 'Feature')}
+                            >
+                              <Star
+                                className={`size-3.5 ${p.featured ? 'text-gold fill-gold' : 'text-white/30'}`}
+                              />
+                            </button>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3.5 px-3 text-end">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Link
+                                href={`/projects/${p.slug}`}
+                                target="_blank"
+                                className="p-1.5 rounded-xs text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+                                title={isAr ? 'معاينة' : 'Preview'}
+                              >
+                                <ExternalLink className="size-3.5" />
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => onEdit(p)}
+                                className="p-1.5 rounded-xs text-gold hover:text-[#D4BC96] hover:bg-gold/10 transition-colors cursor-pointer"
+                                title={isAr ? 'تعديل' : 'Edit'}
+                              >
+                                <Edit3 className="size-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(p.slug, isAr ? (p.titleAr || p.title) : p.title)}
+                                className="p-1.5 rounded-xs text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-colors cursor-pointer"
+                                title={isAr ? 'حذف' : 'Delete'}
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Table Footer & Pagination */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-white/5 text-xs font-mono text-white/40">
+                <div>
+                  {isAr
+                    ? `عرض ${(tablePage - 1) * pageSize + 1} إلى ${Math.min(tablePage * pageSize, sorted.length)} من أصل ${sorted.length} مشروعاً`
+                    : `Showing ${(tablePage - 1) * pageSize + 1} to ${Math.min(tablePage * pageSize, sorted.length)} of ${sorted.length}`}
+                </div>
+
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => onEdit(p)}
-                    className="px-3 py-1.5 rounded-xs bg-white/5 hover:bg-gold hover:text-charcoal text-ivory text-xs transition-colors eyebrow cursor-pointer flex items-center gap-1"
+                    disabled={tablePage === 1}
+                    onClick={() => setTablePage((p) => Math.max(1, p - 1))}
+                    className="px-2.5 py-1 rounded-2xs bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors cursor-pointer"
                   >
-                    <Edit3 className="size-3" />
-                    <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                    {isAr ? 'السابق' : 'Prev'}
                   </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+                    <button
+                      key={pg}
+                      type="button"
+                      onClick={() => setTablePage(pg)}
+                      className={`px-2.5 py-1 rounded-2xs transition-colors cursor-pointer ${
+                        tablePage === pg ? 'bg-gold text-charcoal font-bold' : 'bg-white/5 hover:bg-white/10 text-white/70'
+                      }`}
+                    >
+                      {pg}
+                    </button>
+                  ))}
                   <button
                     type="button"
-                    onClick={() => handleDelete(p.slug, isAr ? (p.titleAr || p.title) : p.title)}
-                    className="p-1.5 rounded-xs text-red-400 hover:text-red-300 hover:bg-red-950/30 transition-colors cursor-pointer"
-                    title={isAr ? 'حذف' : 'Delete'}
+                    disabled={tablePage === totalPages}
+                    onClick={() => setTablePage((p) => Math.min(totalPages, p + 1))}
+                    className="px-2.5 py-1 rounded-2xs bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors cursor-pointer"
                   >
-                    <Trash2 className="size-3.5" />
+                    {isAr ? 'التالي' : 'Next'}
                   </button>
                 </div>
               </div>
             </div>
-          ))}
+          )}
         </div>
       )}
 
-      {/* Project Add / Edit Modal */}
+      {/* ── PROJECT ADD / EDIT FULL WORKSTATION MODAL ─────────────────────── */}
       {(isCreating || editingProject) && (
         <ProjectModal
           project={editingProject}
@@ -1384,7 +1941,7 @@ function ProjectsTab({
             setIsCreating(false)
             onCloseEdit()
             if (showToast) {
-              showToast(isAr ? 'تم حفظ المشروع وتحديثه في الموقع بنجاح!' : 'Project saved and live on site!')
+              showToast(isAr ? 'تم حفظ وتحديث المشروع في المونوغراف والموقع بنجاح!' : 'Project saved & live on site!')
             }
             onRefresh()
           }}
