@@ -934,6 +934,7 @@ function OverviewTab({
   settings: SiteSettings
   onNavigate: (tab: Tab) => void
   onEditProject: (p: ProjectData) => void
+  onNewProject: () => void
   isAr: boolean
 }) {
   const featuredCount = projects.filter((p) => p.featured).length
@@ -961,7 +962,8 @@ function OverviewTab({
           </div>
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <button
-              onClick={() => onNavigate('projects')}
+              type="button"
+              onClick={onNewProject}
               className="px-4 py-2.5 rounded-xs bg-gold text-charcoal text-xs font-semibold eyebrow hover:bg-[#D4BC96] transition-colors cursor-pointer flex items-center gap-2 shadow-lg shadow-gold/10"
             >
               <Plus className="size-3.5" />
@@ -1132,6 +1134,9 @@ function ProjectsTab({
   isAr,
   showToast,
   askConfirm,
+  isCreating: isCreatingProp,
+  onOpenCreate,
+  onCloseCreate,
 }: {
   projects: ProjectData[]
   onRefresh: () => void
@@ -1141,14 +1146,26 @@ function ProjectsTab({
   isAr: boolean
   showToast?: (message: string, type?: 'success' | 'error' | 'info') => void
   askConfirm?: (title: string, message: string, onConfirm: () => void, confirmLabel?: string) => void
+  isCreating?: boolean
+  onOpenCreate?: () => void
+  onCloseCreate?: () => void
 }) {
   const [filterDiscipline, setFilterDiscipline] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'draft' | 'featured'>('all')
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'featured' | 'title'>('newest')
   const [searchQuery, setSearchQuery] = useState('')
-  const [viewMode, setViewMode] = useState<'dual' | 'grid' | 'table'>('dual')
+  const [viewMode, setViewMode] = useState<'dual' | 'grid' | 'table'>('grid')
   const [quickActionSlug, setQuickActionSlug] = useState<string | null>(null)
-  const [isCreating, setIsCreating] = useState(false)
+  const [isCreatingLocal, setIsCreatingLocal] = useState(false)
+  const isCreating = isCreatingProp !== undefined ? isCreatingProp : isCreatingLocal
+  const handleOpenCreate = () => {
+    if (onOpenCreate) onOpenCreate()
+    else setIsCreatingLocal(true)
+  }
+  const handleCloseCreate = () => {
+    if (onCloseCreate) onCloseCreate()
+    else setIsCreatingLocal(false)
+  }
   const [isDeleting, setIsDeleting] = useState(false)
   const [tablePage, setTablePage] = useState(1)
   const pageSize = 6
@@ -1345,7 +1362,7 @@ function ProjectsTab({
             {/* Add New Project Gold Button */}
             <button
               type="button"
-              onClick={() => setIsCreating(true)}
+              onClick={handleOpenCreate}
               className="px-5 py-2.5 rounded-xs bg-gold hover:bg-[#D4BC96] text-charcoal text-xs font-semibold eyebrow transition-all cursor-pointer flex items-center gap-2 shadow-lg shadow-gold/20"
             >
               <Plus className="size-3.5 stroke-[2.5]" />
@@ -2009,11 +2026,11 @@ function ProjectsTab({
         <ProjectModal
           project={editingProject}
           onClose={() => {
-            setIsCreating(false)
+            handleCloseCreate()
             onCloseEdit()
           }}
           onSaved={() => {
-            setIsCreating(false)
+            handleCloseCreate()
             onCloseEdit()
             if (showToast) {
               showToast(isAr ? 'تم حفظ وتحديث المشروع في المونوغراف والموقع بنجاح!' : 'Project saved & live on site!')
@@ -2085,6 +2102,7 @@ function ProjectModal({
 
   // Initial gallery images
   const initialGallery = () => {
+    if (!project) return []
     if (Array.isArray((project as any)?.gallery) && (project as any).gallery.length > 0) {
       return (project as any).gallery
     }
@@ -2102,13 +2120,6 @@ function ProjectModal({
         }
       })
     }
-    if (list.length === 0) {
-      return [
-        { url: '/images/service-interior-design.jpg', caption: isAr ? 'صالة الارتفاع المزدوج' : 'Double Height Living' },
-        { url: '/images/detail-courtyard.png', caption: isAr ? 'واجهة الحجر المشطد' : 'Honed Stone Façade' },
-        { url: '/images/hero-villa.png', caption: isAr ? 'الفناء المائي والتدفق' : 'Water Courtyard Flow' },
-      ]
-    }
     return list
   }
 
@@ -2116,23 +2127,23 @@ function ProjectModal({
 
   // Form State
   const [formData, setFormData] = useState({
-    title: project?.title || (project as any)?.name || 'Najd Monolith Residence',
-    titleAr: project?.titleAr || (project as any)?.nameAr || (project as any)?.title || 'فيلا حجر نجد التكعيبية',
-    slug: project?.slug || 'najd-monolith-villa',
+    title: project?.title || (project as any)?.name || '',
+    titleAr: project?.titleAr || (project as any)?.nameAr || (project as any)?.title || '',
+    slug: project?.slug || '',
     category: project?.category || (project as any)?.type || (project?.disciplines && project.disciplines[0]) || 'Ultra-Luxury Residential',
     categoryAr: project?.categoryAr || (project as any)?.typeAr || 'سكني فاخر',
     discipline: project?.discipline || (project?.disciplines && project.disciplines[0]?.toLowerCase()) || 'architecture',
-    location: project?.location || 'Riyadh, Wadi Hanifah — Saudi Arabia',
-    locationAr: project?.locationAr || 'الرياض، وادي حنيفة — المملكة العربية السعودية',
-    year: project?.year || '2024 (مكتمل التسليم)',
-    area: project?.area || '2,850 م²',
-    client: project?.client || 'Private Client',
-    description: project?.description || 'Anchored into the limestone escarpments of Wadi Hanifah, the Najd Monolith Residence articulates a rigorous dialogue between solid local travertine stone and floor-to-ceiling glass permeability. Dynamic cantilevered volumes extend into the horizon, delivering thermal mass protection while opening deep interior vistas toward the valley floor.',
-    descriptionAr: project?.descriptionAr || 'ترتكز كتلة فيلا حجر نجد على حوار عميق بين صلابة حجر الرياض التكعيبي وخفة الامتدادات الزجاجية الشفافة المطلة على تضاريس وادي حنيفة. تم تشكيل المبنى عبر كتل كابولية بارزة توفر ظلالاً مدروسة لحماية الفناء الداخلي والمسطحات المائية من شمس الصحراء الحارقة، مع فتح فضاءات مزدوجة الارتفاع تسمح بنفاذ الضوء الخافت بعفوية متغيرة على مدار اليوم، مشكلة صرحاً معمارياً معاصراً متجذراً في إرث المكان الجيولوجي.',
-    shortDescription: (project as any)?.shortDescription || project?.tagline || 'A brutalist desert sanctuary sculpting light, mass, and shadow in Wadi Hanifah.',
-    shortDescriptionAr: (project as any)?.shortDescriptionAr || (project as any)?.taglineAr || 'إعادة تأويل معاصر للهندسة الطبوغرافية في وادي حنيفة بحجر الرياض التكعيبي والمسطحات المائية.',
+    location: project?.location || '',
+    locationAr: project?.locationAr || '',
+    year: project?.year || new Date().getFullYear().toString(),
+    area: project?.area || '',
+    client: project?.client || '',
+    description: project?.description || '',
+    descriptionAr: project?.descriptionAr || '',
+    shortDescription: (project as any)?.shortDescription || project?.tagline || '',
+    shortDescriptionAr: (project as any)?.shortDescriptionAr || (project as any)?.taglineAr || '',
     coverImage: project?.coverImage || (project as any)?.cover || (project as any)?.image || '/images/hero-villa.png',
-    featured: project?.featured ?? true,
+    featured: project?.featured ?? false,
     status: (project?.status === 'Draft' ? 'draft' : 'published') as 'published' | 'draft',
     order: (project as any)?.order || '01',
     privacy: 'public',
@@ -2142,7 +2153,7 @@ function ProjectModal({
   const handleTitleChange = (val: string) => {
     setFormData((prev) => {
       const updates: any = { title: val }
-      if (!isEditing && (!prev.slug || prev.slug === 'najd-monolith-villa')) {
+      if (!isEditing) {
         updates.slug = val
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
@@ -2152,31 +2163,42 @@ function ProjectModal({
     })
   }
 
-  // File Upload Handler
-  const handleFileUpload = async (file: File, target: 'cover' | 'gallery') => {
+  // File Upload Handler (Single or Multiple)
+  const handleFileUpload = async (fileOrFiles: File | FileList | File[], target: 'cover' | 'gallery') => {
     setUploading(true)
+    const files = (fileOrFiles as FileList).length !== undefined
+      ? Array.from(fileOrFiles as FileList)
+      : Array.isArray(fileOrFiles)
+      ? fileOrFiles
+      : [fileOrFiles as File]
+
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: fd,
-        credentials: 'include',
-      })
-      const data = await res.json().catch(() => ({}))
-      if (data.success && data.url) {
-        if (target === 'cover') {
-          setFormData((prev) => ({ ...prev, coverImage: data.url }))
-          if (showToast) showToast(isAr ? 'تم رفع صورة الغلاف بنجاح' : 'Cover image uploaded successfully')
+      for (const file of files) {
+        const fd = new FormData()
+        fd.append('file', file)
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: fd,
+          credentials: 'include',
+        })
+        const data = await res.json().catch(() => ({}))
+        if (data.success && data.url) {
+          if (target === 'cover') {
+            setFormData((prev) => ({ ...prev, coverImage: data.url }))
+            if (showToast) showToast(isAr ? 'تم رفع صورة الغلاف بنجاح' : 'Cover image uploaded successfully')
+            break
+          } else {
+            setGalleryImages((prev) => [
+              ...prev,
+              { url: data.url, caption: isAr ? `لقطة تفصيلية 0${prev.length + 1}` : `Detail View 0${prev.length + 1}` },
+            ])
+          }
         } else {
-          setGalleryImages((prev) => [
-            ...prev,
-            { url: data.url, caption: isAr ? `لقطة تفصيلية 0${prev.length + 1}` : `Detail View 0${prev.length + 1}` },
-          ])
-          if (showToast) showToast(isAr ? 'تمت إضافة الصورة إلى المعرض' : 'Image added to monograph gallery')
+          if (showToast) showToast(data.error || (isAr ? 'فشل رفع الصورة' : 'Failed to upload image'), 'error')
         }
-      } else {
-        if (showToast) showToast(data.error || (isAr ? 'فشل رفع الصورة' : 'Failed to upload image'), 'error')
+      }
+      if (target === 'gallery' && files.length > 1 && showToast) {
+        showToast(isAr ? `تمت إضافة ${files.length} صور إلى المعرض` : `Added ${files.length} images to gallery`)
       }
     } catch {
       if (showToast) showToast(isAr ? 'خطأ أثناء رفع الصورة' : 'Upload failed', 'error')
@@ -2333,7 +2355,7 @@ function ProjectModal({
           <div className="hidden sm:block">
             <div className="text-white text-xs font-medium tracking-wide flex items-center gap-2">
               <span>{isAr ? 'م. طارق الحازمي' : 'Dr. Tareq Al-Hazmi'}</span>
-              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="size-1.5 rounded-full bg-gold animate-pulse" />
             </div>
             <div className="text-[10px] font-mono text-white/40 tracking-wider">
               SENIOR LEAD ARCHITECT · ATELIER V
@@ -2719,7 +2741,7 @@ function ProjectModal({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
                   <label>{isAr ? 'المسار التعريفي للرابط (SLUG)' : 'Canonical URL Slug'}</label>
-                  <span className="text-emerald-400 font-mono text-[10px] px-2 py-0.5 rounded-2xs bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1">
+                  <span className="text-white/80 font-mono text-[10px] px-2 py-0.5 rounded-2xs bg-white/10 border border-white/20 flex items-center gap-1">
                     <Check className="size-2.5" />
                     <span>{isAr ? 'متاح ورابط فريد' : 'Unique & Available'}</span>
                   </span>
@@ -2741,7 +2763,7 @@ function ProjectModal({
                     className="px-3 py-2.5 bg-white/[0.04] hover:bg-white/10 border border-s-0 border-white/10 text-white/60 hover:text-white rounded-e-xs transition-colors cursor-pointer"
                     title={isAr ? 'نسخ الرابط' : 'Copy link'}
                   >
-                    {copiedSlug ? <CheckCheck className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
+                    {copiedSlug ? <CheckCheck className="size-3.5 text-gold" /> : <Copy className="size-3.5" />}
                   </button>
                 </div>
               </div>
@@ -2780,9 +2802,9 @@ function ProjectModal({
 
                   {/* Top Success Badge */}
                   <div className="absolute top-3 start-3 z-10">
-                    <span className="px-2.5 py-1 rounded-xs bg-black/80 backdrop-blur-md border border-emerald-500/30 text-emerald-400 font-mono text-[11px] flex items-center gap-1.5 shadow-lg">
-                      <span className="size-1.5 rounded-full bg-emerald-400" />
-                      <span>{isAr ? 'تم الرفع بنجاح (3.6 MB)' : 'Loaded Successfully (3.6 MB)'}</span>
+                    <span className="px-2.5 py-1 rounded-xs bg-black/80 backdrop-blur-md border border-white/20 text-white/90 font-mono text-[11px] flex items-center gap-1.5 shadow-lg">
+                      <span className="size-1.5 rounded-full bg-white/70" />
+                      <span>{isAr ? 'صورة الغلاف النشطة' : 'Active Cover Aperture'}</span>
                     </span>
                   </div>
 
@@ -2862,10 +2884,12 @@ function ProjectModal({
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       className="hidden"
                       onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) handleFileUpload(file, 'gallery')
+                        if (e.target.files && e.target.files.length > 0) {
+                          handleFileUpload(e.target.files, 'gallery')
+                        }
                       }}
                     />
                   </label>
@@ -2883,11 +2907,11 @@ function ProjectModal({
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
 
-                      {/* Top Delete Button */}
+                      {/* Top Delete Button (Monochromatic) */}
                       <button
                         type="button"
                         onClick={() => removeGalleryImage(idx)}
-                        className="absolute top-1.5 end-1.5 size-6 rounded-2xs bg-black/70 hover:bg-rose-900/80 text-white/70 hover:text-white flex items-center justify-center transition-colors cursor-pointer opacity-0 group-hover:opacity-100 z-10"
+                        className="absolute top-1.5 end-1.5 size-6 rounded-2xs bg-black/80 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-colors cursor-pointer opacity-0 group-hover:opacity-100 z-10"
                         title={isAr ? 'حذف من المعرض' : 'Delete'}
                       >
                         <Trash2 className="size-3" />
@@ -4493,8 +4517,9 @@ export default function StudioGatewayPage() {
     impactMarkets: '3',
   })
 
-  // Selected project for editing
+  // Selected project for editing / creating
   const [editingProject, setEditingProject] = useState<ProjectData | null>(null)
+  const [isCreatingProject, setIsCreatingProject] = useState(false)
 
   // UI/UX Pro Max: Global Toast & Confirm Dialog State
   const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([])
@@ -4592,7 +4617,14 @@ export default function StudioGatewayPage() {
   }
 
   const handleEditProjectFromOverview = (p: ProjectData) => {
+    setIsCreatingProject(false)
     setEditingProject(p)
+    setTab('projects')
+  }
+
+  const handleNewProject = () => {
+    setEditingProject(null)
+    setIsCreatingProject(true)
     setTab('projects')
   }
 
@@ -4946,6 +4978,7 @@ export default function StudioGatewayPage() {
                 settings={settings}
                 onNavigate={navigateTab}
                 onEditProject={handleEditProjectFromOverview}
+                onNewProject={handleNewProject}
                 isAr={isAr}
               />
             )}
@@ -4954,9 +4987,15 @@ export default function StudioGatewayPage() {
               <ProjectsTab
                 projects={projects}
                 onRefresh={loadAllData}
-                onEdit={(p) => setEditingProject(p)}
+                onEdit={(p) => {
+                  setIsCreatingProject(false)
+                  setEditingProject(p)
+                }}
                 editingProject={editingProject}
                 onCloseEdit={() => setEditingProject(null)}
+                isCreating={isCreatingProject}
+                onOpenCreate={handleNewProject}
+                onCloseCreate={() => setIsCreatingProject(false)}
                 isAr={isAr}
                 showToast={showToast}
                 askConfirm={askConfirm}
