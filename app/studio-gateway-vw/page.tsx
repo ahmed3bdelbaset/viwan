@@ -39,6 +39,15 @@ import {
   Check,
   Link as LinkIcon,
   Compass,
+  SlidersHorizontal,
+  ListOrdered,
+  Crop,
+  Crosshair,
+  ImagePlus,
+  Copy,
+  CheckCheck,
+  Bell,
+  Clock,
 } from "lucide-react"
 import { Logo } from "@/components/site/logo"
 
@@ -1387,7 +1396,7 @@ function ProjectsTab({
   )
 }
 
-// ── PROJECT MODAL (ADD & EDIT) ──────────────────────────────────────────────
+// ── BESPOKE ARCHITECTURAL PROJECT ENTRY WORKSTATION (MATCHING REFERENCE IMAGE) ──
 function ProjectModal({
   project,
   onClose,
@@ -1404,32 +1413,115 @@ function ProjectModal({
   const isEditing = !!project
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [copiedSlug, setCopiedSlug] = useState(false)
+  const [showCustomServiceInput, setShowCustomServiceInput] = useState(false)
+  const [customServiceText, setCustomServiceText] = useState('')
+  const [focalPoint, setFocalPoint] = useState({ x: 42, y: 54 })
+  const [showFocalPicker, setShowFocalPicker] = useState(false)
 
+  // Standard architectural services
+  const DEFAULT_SERVICES = [
+    { id: 'arch', nameAr: 'التصميم المعماري', nameEn: 'Architectural Design' },
+    { id: 'interior', nameAr: 'التصميم الداخلي والأثاث المخصص', nameEn: 'Interior Architecture & Custom FF&E' },
+    { id: 'landscape', nameAr: 'تصميم اللاندسكيب والعوامل البيئية', nameEn: 'Landscape Architecture & Environmental' },
+    { id: 'working', nameAr: 'الرسومات التنفيذية وتفاصيل الواجهات', nameEn: 'Working Drawings & Façade Detailing' },
+    { id: 'specs', nameAr: 'التوثيق الفني ومراجعة المواصفات', nameEn: 'Technical Documentation & Specifications' },
+    { id: 'mep', nameAr: 'التنسيق الإنشائي والكهروميكانيكي', nameEn: 'Structural & MEP Coordination' },
+    { id: 'bim', nameAr: 'نمذجة معلومات البناء المتقدم (BIM Level 3)', nameEn: 'Advanced BIM Level 3 Modeling' },
+  ]
+
+  // Parse initial services from project scope
+  const initialSelectedServices = () => {
+    if (project?.scope && Array.isArray(project.scope) && project.scope.length > 0) {
+      return project.scope
+    }
+    if (project?.scopeAr && Array.isArray(project.scopeAr) && project.scopeAr.length > 0) {
+      return project.scopeAr
+    }
+    // Default checked like in reference image (5 active)
+    return [
+      'التصميم المعماري',
+      'التصميم الداخلي والأثاث المخصص',
+      'تصميم اللاندسكيب والعوامل البيئية',
+      'الرسومات التنفيذية وتفاصيل الواجهات',
+      'نمذجة معلومات البناء المتقدم (BIM Level 3)',
+    ]
+  }
+
+  const [selectedServices, setSelectedServices] = useState<string[]>(initialSelectedServices())
+  const [allServices, setAllServices] = useState(DEFAULT_SERVICES)
+
+  // Initial gallery images
+  const initialGallery = () => {
+    if (Array.isArray((project as any)?.gallery) && (project as any).gallery.length > 0) {
+      return (project as any).gallery
+    }
+    const list: { url: string; caption: string }[] = []
+    if ((project as any)?.interior) list.push({ url: (project as any).interior, caption: isAr ? 'صالة الارتفاع المزدوج' : 'Double Height Living' })
+    if (project?.images && Array.isArray(project.images)) {
+      project.images.forEach((img, idx) => {
+        if (!list.some(l => l.url === img)) {
+          const captions = [
+            isAr ? 'واجهة الحجر المشطد' : 'Honed Stone Façade',
+            isAr ? 'الفناء المائي والتدفق' : 'Water Courtyard Flow',
+            isAr ? 'المسقط الأفقي وتوزيع الكتل' : 'Massing & Flow',
+          ]
+          list.push({ url: img, caption: captions[idx] || (isAr ? `لقطة معمارية 0${idx + 1}` : `View 0${idx + 1}`) })
+        }
+      })
+    }
+    if (list.length === 0) {
+      return [
+        { url: '/images/service-interior-design.jpg', caption: isAr ? 'صالة الارتفاع المزدوج' : 'Double Height Living' },
+        { url: '/images/detail-courtyard.png', caption: isAr ? 'واجهة الحجر المشطد' : 'Honed Stone Façade' },
+        { url: '/images/hero-villa.png', caption: isAr ? 'الفناء المائي والتدفق' : 'Water Courtyard Flow' },
+      ]
+    }
+    return list
+  }
+
+  const [galleryImages, setGalleryImages] = useState<{ url: string; caption: string }[]>(initialGallery())
+
+  // Form State
   const [formData, setFormData] = useState({
-    title: project?.title || (project as any)?.name || '',
-    titleAr: project?.titleAr || (project as any)?.nameAr || project?.title || (project as any)?.name || '',
-    slug: project?.slug || '',
-    category: project?.category || (project as any)?.type || (project?.disciplines && project.disciplines[0]) || 'Architecture',
-    categoryAr: project?.categoryAr || (project as any)?.typeAr || 'الهندسة المعمارية',
+    title: project?.title || (project as any)?.name || 'Najd Monolith Residence',
+    titleAr: project?.titleAr || (project as any)?.nameAr || (project as any)?.title || 'فيلا حجر نجد التكعيبية',
+    slug: project?.slug || 'najd-monolith-villa',
+    category: project?.category || (project as any)?.type || (project?.disciplines && project.disciplines[0]) || 'Ultra-Luxury Residential',
+    categoryAr: project?.categoryAr || (project as any)?.typeAr || 'سكني فاخر',
     discipline: project?.discipline || (project?.disciplines && project.disciplines[0]?.toLowerCase()) || 'architecture',
-    location: project?.location || 'New Cairo, Egypt',
-    locationAr: project?.locationAr || project?.location || 'القاهرة الجديدة، مصر',
-    year: project?.year || new Date().getFullYear().toString(),
-    area: project?.area || '1,200 m²',
+    location: project?.location || 'Riyadh, Wadi Hanifah — Saudi Arabia',
+    locationAr: project?.locationAr || 'الرياض، وادي حنيفة — المملكة العربية السعودية',
+    year: project?.year || '2024 (مكتمل التسليم)',
+    area: project?.area || '2,850 م²',
     client: project?.client || 'Private Client',
-    description: project?.description || '',
-    descriptionAr: project?.descriptionAr || project?.description || '',
+    description: project?.description || 'Anchored into the limestone escarpments of Wadi Hanifah, the Najd Monolith Residence articulates a rigorous dialogue between solid local travertine stone and floor-to-ceiling glass permeability. Dynamic cantilevered volumes extend into the horizon, delivering thermal mass protection while opening deep interior vistas toward the valley floor.',
+    descriptionAr: project?.descriptionAr || 'ترتكز كتلة فيلا حجر نجد على حوار عميق بين صلابة حجر الرياض التكعيبي وخفة الامتدادات الزجاجية الشفافة المطلة على تضاريس وادي حنيفة. تم تشكيل المبنى عبر كتل كابولية بارزة توفر ظلالاً مدروسة لحماية الفناء الداخلي والمسطحات المائية من شمس الصحراء الحارقة، مع فتح فضاءات مزدوجة الارتفاع تسمح بنفاذ الضوء الخافت بعفوية متغيرة على مدار اليوم، مشكلة صرحاً معمارياً معاصراً متجذراً في إرث المكان الجيولوجي.',
+    shortDescription: (project as any)?.shortDescription || project?.tagline || 'A brutalist desert sanctuary sculpting light, mass, and shadow in Wadi Hanifah.',
+    shortDescriptionAr: (project as any)?.shortDescriptionAr || (project as any)?.taglineAr || 'إعادة تأويل معاصر للهندسة الطبوغرافية في وادي حنيفة بحجر الرياض التكعيبي والمسطحات المائية.',
     coverImage: project?.coverImage || (project as any)?.cover || (project as any)?.image || '/images/hero-villa.png',
-    interiorImage: (project as any)?.interior || project?.images?.[0] || '/images/service-interior-design.jpg',
-    detailImage: project?.images?.[1] || '/images/detail-courtyard.png',
     featured: project?.featured ?? true,
-    status: project?.status || 'Completed',
-    scopeStr: project?.scope ? project.scope.join(', ') : 'Concept Design, Schematic Design, BIM Modeling, Façade Detailing',
-    scopeArStr: project?.scopeAr ? project.scopeAr.join(', ') : 'الفكرة التصميمية, المخططات المعمارية, نمذجة BIM, تفاصيل الواجهات',
+    status: (project?.status === 'Draft' ? 'draft' : 'published') as 'published' | 'draft',
+    order: (project as any)?.order || '01',
+    privacy: 'public',
   })
 
+  // Auto-generate slug from English title if new project
+  const handleTitleChange = (val: string) => {
+    setFormData((prev) => {
+      const updates: any = { title: val }
+      if (!isEditing && (!prev.slug || prev.slug === 'najd-monolith-villa')) {
+        updates.slug = val
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '')
+      }
+      return { ...prev, ...updates }
+    })
+  }
+
   // File Upload Handler
-  const handleFileUpload = async (file: File, field: 'coverImage' | 'interiorImage' | 'detailImage') => {
+  const handleFileUpload = async (file: File, target: 'cover' | 'gallery') => {
     setUploading(true)
     try {
       const fd = new FormData()
@@ -1441,8 +1533,16 @@ function ProjectModal({
       })
       const data = await res.json().catch(() => ({}))
       if (data.success && data.url) {
-        setFormData((prev) => ({ ...prev, [field]: data.url }))
-        if (showToast) showToast(isAr ? 'تم رفع الصورة بنجاح' : 'Image uploaded successfully')
+        if (target === 'cover') {
+          setFormData((prev) => ({ ...prev, coverImage: data.url }))
+          if (showToast) showToast(isAr ? 'تم رفع صورة الغلاف بنجاح' : 'Cover image uploaded successfully')
+        } else {
+          setGalleryImages((prev) => [
+            ...prev,
+            { url: data.url, caption: isAr ? `لقطة تفصيلية 0${prev.length + 1}` : `Detail View 0${prev.length + 1}` },
+          ])
+          if (showToast) showToast(isAr ? 'تمت إضافة الصورة إلى المعرض' : 'Image added to monograph gallery')
+        }
       } else {
         if (showToast) showToast(data.error || (isAr ? 'فشل رفع الصورة' : 'Failed to upload image'), 'error')
       }
@@ -1453,9 +1553,81 @@ function ProjectModal({
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Toggle Service chip
+  const toggleService = (name: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
+    )
+  }
+
+  // Add custom service
+  const handleAddCustomService = () => {
+    if (!customServiceText.trim()) return
+    const newName = customServiceText.trim()
+    if (!allServices.some((s) => s.nameAr === newName || s.nameEn === newName)) {
+      setAllServices((prev) => [
+        ...prev,
+        { id: `custom-${Date.now()}`, nameAr: newName, nameEn: newName },
+      ])
+    }
+    if (!selectedServices.includes(newName)) {
+      setSelectedServices((prev) => [...prev, newName])
+    }
+    setCustomServiceText('')
+    setShowCustomServiceInput(false)
+  }
+
+  // Delete gallery image
+  const removeGalleryImage = (idx: number) => {
+    setGalleryImages((prev) => prev.filter((_, i) => i !== idx))
+  }
+
+  // Copy Slug Handler
+  const copySlug = () => {
+    const fullUrl = `https://viwan.studio/projects/${formData.slug}`
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(fullUrl)
+    }
+    setCopiedSlug(true)
+    setTimeout(() => setCopiedSlug(false), 2200)
+    if (showToast) showToast(isAr ? 'تم نسخ الرابط المعماري بنجاح' : 'Architectural URL copied')
+  }
+
+  // Data Integrity Score Calculation
+  const integrityScore = () => {
+    let score = 0
+    let count = 0
+    // Sec 1
+    if (formData.title && formData.titleAr && formData.slug) {
+      score += 25
+      count += 1
+    }
+    // Sec 2
+    if (formData.coverImage && galleryImages.length > 0) {
+      score += 25
+      count += 1
+    }
+    // Sec 3
+    if ((formData.description || formData.descriptionAr) && selectedServices.length > 0) {
+      score += 25
+      count += 1
+    }
+    // Sec 4
+    if (formData.status) {
+      score += 25
+      count += 1
+    }
+    return { percent: score, count }
+  }
+
+  const integrity = integrityScore()
+  const arWords = (formData.descriptionAr || '').trim().split(/\s+/).filter(Boolean).length
+  const enWords = (formData.description || '').trim().split(/\s+/).filter(Boolean).length
+
+  // Save / Submit
+  const handleSave = async (explicitStatus?: 'published' | 'draft') => {
     setSaving(true)
+    const finalStatus = explicitStatus || formData.status
 
     try {
       const payload: any = {
@@ -1478,20 +1650,29 @@ function ProjectModal({
         client: formData.client,
         description: formData.description,
         descriptionAr: formData.descriptionAr || formData.description,
-        scope: formData.scopeStr.split(',').map((s) => s.trim()).filter(Boolean),
-        scopeAr: formData.scopeArStr.split(',').map((s) => s.trim()).filter(Boolean),
+        shortDescription: formData.shortDescription,
+        shortDescriptionAr: formData.shortDescriptionAr,
+        tagline: formData.shortDescription,
+        heading: formData.shortDescriptionAr,
+        scope: selectedServices,
+        scopeAr: selectedServices,
         cover: formData.coverImage,
         coverImage: formData.coverImage,
-        interior: formData.interiorImage,
-        images: [formData.interiorImage, formData.detailImage].filter(Boolean),
+        interior: galleryImages[0]?.url || formData.coverImage,
+        images: galleryImages.map((g) => g.url),
+        gallery: galleryImages,
         featured: formData.featured,
-        status: formData.status,
+        status: finalStatus === 'published' ? 'Completed' : 'Draft',
+        order: formData.order,
       }
 
+      const method = isEditing ? 'PUT' : 'POST'
+      const bodyPayload = isEditing ? { slug: project?.slug || formData.slug, updates: payload } : payload
+
       const res = await fetch('/api/admin/projects', {
-        method: 'POST',
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(bodyPayload),
         credentials: 'include',
       })
 
@@ -1509,321 +1690,796 @@ function ProjectModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      <div onClick={onClose} className="fixed inset-0 bg-black/80 backdrop-blur-md animate-fade-in" />
-      <div className="relative z-10 w-full max-w-4xl bg-[#141311] border border-white/10 rounded-xs shadow-2xl p-6 sm:p-8 space-y-6 my-8 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
-          <div>
-            <h3 className="text-white font-serif text-xl sm:text-2xl font-light">
-              {isEditing
-                ? isAr
-                  ? 'تعديل بيانات المشروع المعماري'
-                  : 'Edit Architectural Project'
-                : isAr
-                ? 'إضافة مشروع معماري جديد'
-                : 'Add New Architectural Project'}
-            </h3>
-            <p className="text-white/40 text-xs mt-0.5">
-              {isAr
-                ? 'التزام تام بالهوية المعمارية والتخصصات الثمانية مع المواصفات والصور'
-                : 'Full adherence to VIWAN portfolio format, discipline classifications, and visuals'}
-            </p>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#070709] text-white flex flex-col font-sans animate-fade-in select-text">
+      {/* ── TOP ARCHITECTURAL STATUS & BREADCRUMB BAR ────────────────────── */}
+      <header className="sticky top-0 z-40 bg-[#0c0c10]/95 backdrop-blur-md border-b border-white/10 px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
+        {/* User / Studio Persona & Coordinates */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="size-8 sm:size-9 rounded-full bg-gradient-to-br from-gold/30 to-gold/10 border border-gold/40 flex items-center justify-center text-gold font-serif text-xs font-bold shrink-0">
+            م.ط
           </div>
+          <div className="hidden sm:block">
+            <div className="text-white text-xs font-medium tracking-wide flex items-center gap-2">
+              <span>{isAr ? 'م. طارق الحازمي' : 'Dr. Tareq Al-Hazmi'}</span>
+              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            </div>
+            <div className="text-[10px] font-mono text-white/40 tracking-wider">
+              SENIOR LEAD ARCHITECT · ATELIER V
+            </div>
+          </div>
+          <div className="h-5 w-px bg-white/10 hidden sm:block" />
           <button
             type="button"
-            onClick={onClose}
-            className="size-8 rounded-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white flex items-center justify-center transition-colors"
+            className="p-1.5 rounded-xs text-white/50 hover:text-white hover:bg-white/5 transition-colors relative"
+            title="Notifications"
           >
-            <X className="size-4" />
+            <Bell className="size-4" />
+            <span className="absolute top-1 end-1 size-1.5 rounded-full bg-gold" />
           </button>
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xs bg-white/[0.04] border border-white/10 text-[11px] font-mono text-white/60">
+            <Clock className="size-3 text-gold" />
+            <span>16:52</span>
+            <span className="text-white/30">|</span>
+            <span className="text-white/80">EN / AR</span>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 text-xs">
-          {/* Row 1: Title & Arabic Title */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'اسم المشروع (English) *' : 'Project Title (English) *'}</label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder="e.g. Modern Villa"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'اسم المشروع (العربية) *' : 'Project Title (Arabic) *'}</label>
-              <input
-                type="text"
-                required
-                value={formData.titleAr}
-                onChange={(e) => setFormData({ ...formData, titleAr: e.target.value })}
-                placeholder="مثال: فيلا عصرية فاخرة"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none text-end rtl:text-start"
-              />
-            </div>
+        {/* Center / Right Breadcrumb & Location */}
+        <div className="flex items-center gap-3 sm:gap-6">
+          <div className="hidden lg:flex items-center gap-2 text-xs font-mono text-white/50">
+            <Building2 className="size-3.5 text-gold" />
+            <span className="text-white/80">{isAr ? 'برج النخيل المكتبي [الرياض]' : 'Al Nakheel Tower [Riyadh]'}</span>
+            <span className="text-white/30">/</span>
+            <span className="text-white/90">{isAr ? 'المشاريع' : 'Projects'}</span>
+            <span className="text-white/30">/</span>
+            <span className="text-gold">{isEditing ? (isAr ? 'تعديل مشروع' : 'Edit Project') : (isAr ? 'إضافة مشروع' : 'New Entry')}</span>
           </div>
 
-          {/* Row 2: Discipline / Category */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'التخصص المعماري (Discipline) *' : 'Discipline Category *'}</label>
-              <select
-                value={formData.discipline}
-                onChange={(e) => {
-                  const found = ARCHITECTURAL_DISCIPLINES.find((d) => d.id === e.target.value)
-                  setFormData({
-                    ...formData,
-                    discipline: e.target.value,
-                    category: found ? found.nameEn : formData.category,
-                    categoryAr: found ? found.nameAr : formData.categoryAr,
-                  })
-                }}
-                className="w-full bg-[#1A1917] border border-white/10 rounded-xs px-3 py-2.5 text-white focus:border-gold/60 focus:outline-none"
-              >
-                {ARCHITECTURAL_DISCIPLINES.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.code} · {isAr ? d.nameAr : d.nameEn}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'الرابط التعريفي (Slug) *' : 'URL Slug *'}</label>
-              <input
-                type="text"
-                required
-                value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                placeholder="e.g. modern-villa-katameya"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none font-mono text-[11px]"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'سنة التنفيذ / الإنجاز *' : 'Year Delivered *'}</label>
-              <input
-                type="text"
-                required
-                value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                placeholder="2024"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none font-mono"
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/projects/${formData.slug}`}
+              target="_blank"
+              className="px-3 py-1.5 rounded-xs bg-white/[0.04] hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <span>{isAr ? 'معاينة حية في الموقع' : 'Live Preview'}</span>
+              <ExternalLink className="size-3 text-gold" />
+            </Link>
+            <button
+              type="button"
+              onClick={onClose}
+              className="size-8 rounded-xs bg-white/5 hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+              title={isAr ? 'إغلاق والتراجع' : 'Close'}
+            >
+              <X className="size-4" />
+            </button>
           </div>
+        </div>
+      </header>
 
-          {/* Row 3: Location (En & Ar) & Area */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'الموقع (English)' : 'Location (English)'}</label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="New Cairo, Egypt"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'الموقع (العربية)' : 'Location (Arabic)'}</label>
-              <input
-                type="text"
-                value={formData.locationAr}
-                onChange={(e) => setFormData({ ...formData, locationAr: e.target.value })}
-                placeholder="القاهرة الجديدة، مصر"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none text-end rtl:text-start"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'المساحة المبنية' : 'Built Area'}</label>
-              <input
-                type="text"
-                value={formData.area}
-                onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                placeholder="1,200 m²"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none font-mono"
-              />
-            </div>
+      {/* ── WORKSTATION BODY ─────────────────────────────────────────────── */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-6">
+        {/* Page Title & Technical Metadata Header */}
+        <div className="space-y-1.5 border-b border-white/10 pb-5">
+          <div className="flex items-center gap-3 text-[11px] font-mono text-gold/80 tracking-widest uppercase">
+            <span>ARCH-MONO // REF-2024-NV</span>
+            <span className="text-white/20">—</span>
+            <span className="text-white/40">{isAr ? 'سجل المشاريع الخاصة' : 'Special Projects Register'}</span>
           </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
+            <h1 className="text-2xl sm:text-3xl font-serif font-light text-white tracking-wide">
+              {isEditing ? (isAr ? 'تعديل بيانات المشروع المعماري' : 'Edit Architectural Project') : (isAr ? 'إضافة مشروع جديد' : 'Create Architectural Entry')}
+            </h1>
+            <span className="font-mono text-xs text-white/40 uppercase tracking-widest">
+              CREATE ARCHITECTURAL ENTRY
+            </span>
+          </div>
+          <p className="text-white/50 text-xs sm:text-[13px] leading-relaxed max-w-3xl">
+            {isAr
+              ? 'أدخل المعلومات الأساسية للمشروع والمحتوى الذي سيظهر في معرض أعمال الشركة والمونوغراف الرقمي.'
+              : 'Enter core project specifications, visual assets, and bilingual narrative to appear in the official monograph catalogue.'}
+          </p>
+        </div>
 
-          {/* Row 4: Images with Upload and Web URL support */}
-          <div className="space-y-3 pt-2 border-t border-white/10">
-            <h4 className="text-gold text-xs eyebrow uppercase tracking-wider">
-              {isAr ? 'الصور المعمارية (رفع من الجهاز أو رابط ويب)' : 'Project Visuals (Upload or Web URL)'}
-            </h4>
-
-            {/* Primary Cover Image */}
-            <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <label className="text-white font-medium">
-                  {isAr ? 'صورة الغلاف الرئيسية (Primary Cover Image) *' : 'Primary Cover Image *'}
-                </label>
-                <span className="text-[10px] text-white/40 font-mono">16:10 / 16:9 Recommended</span>
-              </div>
-              <div className="flex flex-col md:flex-row gap-4 items-center">
-                <div className="relative aspect-[16/10] w-full md:w-48 bg-black/40 border border-white/10 rounded-xs overflow-hidden shrink-0">
-                  <img src={formData.coverImage} alt="Cover Preview" className="object-cover w-full h-full" />
+        {/* ── TWO-COLUMN ARCHITECTURAL GRID ───────────────────────────────── */}
+        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* ── LEFT COLUMN (SECTION 04 & DATA INTEGRITY) ────────────────── */}
+          <aside className="lg:col-span-4 xl:col-span-4 space-y-6 order-2 lg:order-1">
+            {/* Card 04: Publishing and Visibility Settings */}
+            <div className="bg-[#0f0f13] border border-white/10 rounded-xs p-5 space-y-5 shadow-xl">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="size-3.5 text-gold" />
+                  <span className="font-mono text-xs text-gold uppercase tracking-wider">
+                    04 | {isAr ? 'إعدادات النشر والظهور' : 'Publishing & Visibility'}
+                  </span>
                 </div>
-                <div className="space-y-2 flex-1 w-full">
-                  <input
-                    type="text"
-                    required
-                    value={formData.coverImage}
-                    onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                    placeholder="https://... or /images/..."
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3 py-2 text-white font-mono text-[11px] focus:border-gold/60 focus:outline-none"
+              </div>
+
+              {/* Project Status Segmented Switcher */}
+              <div className="space-y-2">
+                <label className="text-white/70 text-xs eyebrow block">
+                  {isAr ? 'حالة المشروع (PROJECT STATUS)' : 'Project Status'}
+                </label>
+                <div className="grid grid-cols-2 gap-1.5 p-1 bg-black/50 border border-white/10 rounded-xs">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, status: 'published' })}
+                    className={`py-2 px-3 rounded-2xs text-xs font-semibold eyebrow transition-all cursor-pointer ${
+                      formData.status === 'published'
+                        ? 'bg-gold text-charcoal shadow-sm shadow-gold/20'
+                        : 'text-white/50 hover:text-white'
+                    }`}
+                  >
+                    {isAr ? 'منشور (Published)' : 'Published'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, status: 'draft' })}
+                    className={`py-2 px-3 rounded-2xs text-xs font-medium eyebrow transition-all cursor-pointer ${
+                      formData.status === 'draft'
+                        ? 'bg-white/15 text-white shadow-sm'
+                        : 'text-white/50 hover:text-white'
+                    }`}
+                  >
+                    {isAr ? 'مسودة (Draft)' : 'Draft'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Featured Monograph Showcase iOS Switch */}
+              <div className="flex items-center justify-between p-3.5 bg-white/[0.02] border border-white/5 rounded-xs">
+                <div className="space-y-0.5">
+                  <div className="text-white text-xs font-medium">
+                    {isAr ? 'الظهور في واجهة الموقع' : 'Featured Showcase'}
+                  </div>
+                  <div className="text-white/40 text-[10px] font-mono">
+                    Featured Monograph Showcase
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={formData.featured}
+                  onClick={() => setFormData({ ...formData, featured: !formData.featured })}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    formData.featured ? 'bg-gold' : 'bg-white/10'
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block size-5 transform rounded-full bg-charcoal shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      formData.featured ? (isAr ? '-translate-x-5' : 'translate-x-5') : 'translate-x-0'
+                    }`}
                   />
-                  <div className="flex items-center gap-3">
-                    <label className="px-3 py-1.5 rounded-xs bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors flex items-center gap-1.5">
-                      <Upload className="size-3.5" />
-                      <span>{uploading ? (isAr ? 'جاري الرفع...' : 'Uploading...') : isAr ? 'رفع ملف من الجهاز' : 'Upload from Device'}</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) handleFileUpload(file, 'coverImage')
-                        }}
-                      />
-                    </label>
+                </button>
+              </div>
+
+              {/* Showcase Order */}
+              <div className="space-y-1.5">
+                <label className="text-white/70 text-xs eyebrow block">
+                  {isAr ? 'ترتيب العرض في المعرض الرئيسي' : 'Showcase Ordering'}
+                </label>
+                <div className="relative">
+                  <ListOrdered className="size-3.5 text-white/40 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <select
+                    value={formData.order}
+                    onChange={(e) => setFormData({ ...formData, order: e.target.value })}
+                    className="w-full bg-black/40 border border-white/10 rounded-xs ps-9 pe-3 py-2.5 text-xs text-white focus:border-gold/60 focus:outline-none cursor-pointer"
+                  >
+                    <option value="01">{isAr ? 'المركز الأول (01 — تمييز رئيسي)' : '01 — Primary Showcase'}</option>
+                    <option value="02">{isAr ? 'المركز الثاني (02)' : '02 — Second'}</option>
+                    <option value="03">{isAr ? 'المركز الثالث (03)' : '03 — Third'}</option>
+                    <option value="04">{isAr ? 'المركز الرابع (04)' : '04 — Fourth'}</option>
+                    <option value="05">{isAr ? 'المركز الخامس (05)' : '05 — Fifth'}</option>
+                    <option value="06">{isAr ? 'المركز السادس (06)' : '06 — Sixth'}</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Privacy and Sharing License */}
+              <div className="space-y-1.5">
+                <label className="text-white/70 text-xs eyebrow block">
+                  {isAr ? 'تصريح الخصوصية والمشاركة' : 'Privacy & Distribution'}
+                </label>
+                <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-7 rounded-2xs bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                      <Globe className="size-3.5 text-gold" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <div className="text-white text-xs font-medium">
+                        {isAr ? 'معرض عام للجمهور (Public Portfolio)' : 'Public Portfolio'}
+                      </div>
+                      <div className="text-white/40 text-[10px]">
+                        {isAr ? 'متاح للمؤتمرات والصحافة المعمارية' : 'Available for press and architectural monographs'}
+                      </div>
+                    </div>
+                  </div>
+                  <CheckCircle2 className="size-4 text-gold shrink-0" />
+                </div>
+              </div>
+
+              {/* Architectural Seal Stamp */}
+              <div className="p-3.5 bg-black/40 border border-white/10 rounded-xs font-mono text-xs space-y-2 select-none">
+                <div className="flex items-center justify-between text-[10px] text-white/50 tracking-wider">
+                  <span>ATELIER V / VIWAN ARCH SEAL</span>
+                  <span className="text-gold/70">ARCH-CERT-2025</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-white font-serif font-bold text-xs tracking-wider">
+                      DR. TAREQ AL-HAZMI
+                    </div>
+                    <div className="text-white/40 text-[10px]">
+                      PRINCIPAL PARTNER · SIGNED
+                    </div>
+                  </div>
+                  <div className="size-8 rounded-2xs bg-gold/10 border border-gold/40 text-gold flex items-center justify-center font-serif text-sm font-bold shadow-sm shadow-gold/20">
+                    V
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Secondary Interior & Detail Images */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-3 bg-white/[0.02] border border-white/10 rounded-xs space-y-2">
-                <label className="text-white/80 block">{isAr ? 'صورة تفصيلية / داخلية (Interior)' : 'Interior / Detail Image'}</label>
+            {/* Data Integrity / File Stats Card */}
+            <div className="bg-[#0f0f13] border border-white/10 rounded-xs p-5 space-y-3 shadow-xl">
+              <div className="text-[10px] font-mono text-white/40 uppercase tracking-widest flex items-center justify-between">
+                <span>{isAr ? 'إحصاءات الملف' : 'File Metrics'}</span>
+                <span>DATA INTEGRITY</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
+                <div className="p-3.5 bg-black/40 border border-white/5 rounded-xs text-center">
+                  <div className="text-2xl sm:text-3xl font-serif font-light text-gold">
+                    {integrity.percent}%
+                  </div>
+                  <div className="text-white/40 text-[10px] mt-1 font-sans">
+                    {isAr ? 'جاهزية النشر' : 'Readiness'}
+                  </div>
+                </div>
+                <div className="p-3.5 bg-black/40 border border-white/5 rounded-xs text-center">
+                  <div className="text-2xl sm:text-3xl font-serif font-light text-white">
+                    {integrity.count}/4
+                  </div>
+                  <div className="text-white/40 text-[10px] mt-1 font-sans">
+                    {isAr ? 'الأقسام مكتملة' : 'Sections Done'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* ── RIGHT COLUMN (SECTIONS 01, 02, 03) ───────────────────────── */}
+          <div className="lg:col-span-8 xl:col-span-8 space-y-6 order-1 lg:order-2">
+            {/* ── SECTION 01: PROJECT CORE SPECIFICATIONS ────────────────── */}
+            <section className="bg-[#0f0f13] border border-white/10 rounded-xs p-5 sm:p-7 space-y-5 shadow-xl">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-2xs bg-gold/10 border border-gold/30 text-gold font-mono text-xs font-bold">
+                    01
+                  </span>
+                  <h2 className="text-white font-serif text-sm sm:text-base font-medium tracking-wide">
+                    {isAr ? 'معلومات المشروع' : 'Project Core Specifications'}
+                  </h2>
+                  <span className="text-white/30 hidden sm:inline font-mono text-xs">/ PROJECT CORE SPECIFICATIONS</span>
+                </div>
+                <span className="text-white/40 font-mono text-[11px]">BIM / REV-01</span>
+              </div>
+
+              {/* Row 1: Project Names (AR & EN) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Arabic Title */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                    <label>{isAr ? 'اسم المشروع (بالعربية) *' : 'Project Title (Arabic) *'}</label>
+                    <span className="text-gold/80 text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-2xs bg-gold/10 border border-gold/20">AR</span>
+                  </div>
                   <input
                     type="text"
-                    value={formData.interiorImage}
-                    onChange={(e) => setFormData({ ...formData, interiorImage: e.target.value })}
-                    className="flex-1 bg-white/[0.04] border border-white/10 rounded-xs px-2.5 py-1.5 text-white font-mono text-[11px]"
+                    required
+                    value={formData.titleAr}
+                    onChange={(e) => setFormData({ ...formData, titleAr: e.target.value })}
+                    placeholder="فيلا حجر نجد التكعيبية"
+                    className="w-full bg-black/40 border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none text-xs text-end rtl:text-start"
                   />
-                  <label className="p-2 rounded-xs bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors">
-                    <Upload className="size-3.5" />
+                </div>
+
+                {/* English Title */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                    <label>{isAr ? '* PROJECT NAME (ENGLISH)' : 'Project Name (English) *'}</label>
+                    <span className="text-white/60 text-[10px] font-mono px-1.5 py-0.2 rounded-2xs bg-white/10 border border-white/15">EN</span>
+                  </div>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="Najd Monolith Residence"
+                    className="w-full bg-black/40 border border-white/10 rounded-xs px-3.5 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Category & Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Architectural Category / Discipline */}
+                <div className="space-y-1.5">
+                  <label className="text-white/70 text-xs eyebrow block">
+                    {isAr ? 'التصنيف / التخصص المعماري' : 'Discipline Classification'}
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={formData.discipline}
+                      onChange={(e) => {
+                        const found = ARCHITECTURAL_DISCIPLINES.find((d) => d.id === e.target.value)
+                        setFormData({
+                          ...formData,
+                          discipline: e.target.value,
+                          category: found ? found.nameEn : formData.category,
+                          categoryAr: found ? found.nameAr : formData.categoryAr,
+                        })
+                      }}
+                      className="w-full bg-[#141318] border border-white/10 rounded-xs px-3.5 py-2.5 text-xs text-white focus:border-gold/60 focus:outline-none cursor-pointer"
+                    >
+                      <option value="architecture">{isAr ? 'سكني فاخر | Ultra-Luxury Residential' : 'Ultra-Luxury Residential'}</option>
+                      {ARCHITECTURAL_DISCIPLINES.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.code} · {isAr ? d.nameAr : d.nameEn}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="space-y-1.5">
+                  <label className="text-white/70 text-xs eyebrow block">
+                    {isAr ? 'الموقع الجغرافي' : 'Geographic Location'}
+                  </label>
+                  <div className="relative">
+                    <MapPin className="size-3.5 text-gold absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={formData.locationAr}
+                      onChange={(e) => setFormData({ ...formData, locationAr: e.target.value, location: e.target.value })}
+                      placeholder="الرياض، وادي حنيفة — المملكة العربية السعودية"
+                      className="w-full bg-black/40 border border-white/10 rounded-xs ps-9 pe-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:border-gold/60 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Delivery Year & Area (GBA) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Year */}
+                <div className="space-y-1.5">
+                  <label className="text-white/70 text-xs eyebrow block">
+                    {isAr ? 'سنة الإنجاز' : 'Year Delivered'}
+                  </label>
+                  <div className="relative">
+                    <Calendar className="size-3.5 text-gold absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={formData.year}
+                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                      placeholder="2024 (مكتمل التسليم)"
+                      className="w-full bg-black/40 border border-white/10 rounded-xs ps-9 pe-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:border-gold/60 focus:outline-none font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Area GBA */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                    <label>{isAr ? 'المساحة الإجمالية (GBA)' : 'Gross Built Area (GBA)'}</label>
+                    <span className="text-white/40 font-mono text-[10px]">SQM</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={formData.area}
+                    onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                    placeholder="2,850 م²"
+                    className="w-full bg-black/40 border border-white/10 rounded-xs px-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:border-gold/60 focus:outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Row 4: URL Slug with live copy and availability badge */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                  <label>{isAr ? 'المسار التعريفي للرابط (SLUG)' : 'Canonical URL Slug'}</label>
+                  <span className="text-emerald-400 font-mono text-[10px] px-2 py-0.5 rounded-2xs bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1">
+                    <Check className="size-2.5" />
+                    <span>{isAr ? 'متاح ورابط فريد' : 'Unique & Available'}</span>
+                  </span>
+                </div>
+                <div className="flex items-center font-mono text-xs">
+                  <span className="px-3.5 py-2.5 bg-white/[0.04] border border-e-0 border-white/10 text-white/40 rounded-s-xs select-none">
+                    viwan.studio/projects/
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    className="flex-1 bg-black/40 border border-white/10 px-3 py-2.5 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={copySlug}
+                    className="px-3 py-2.5 bg-white/[0.04] hover:bg-white/10 border border-s-0 border-white/10 text-white/60 hover:text-white rounded-e-xs transition-colors cursor-pointer"
+                    title={isAr ? 'نسخ الرابط' : 'Copy link'}
+                  >
+                    {copiedSlug ? <CheckCheck className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* ── SECTION 02: ARCHITECTURAL VISUAL ASSETS ─────────────────── */}
+            <section className="bg-[#0f0f13] border border-white/10 rounded-xs p-5 sm:p-7 space-y-6 shadow-xl">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-2xs bg-gold/10 border border-gold/30 text-gold font-mono text-xs font-bold">
+                    02
+                  </span>
+                  <h2 className="text-white font-serif text-sm sm:text-base font-medium tracking-wide">
+                    {isAr ? 'الصور والوسائط المعمارية' : 'Architectural Visual Assets'}
+                  </h2>
+                  <span className="text-white/30 hidden sm:inline font-mono text-xs">/ ARCHITECTURAL VISUAL ASSETS</span>
+                </div>
+                <span className="text-white/40 font-mono text-[11px]">
+                  {galleryImages.length + 1} {isAr ? 'عينات محملة' : 'assets loaded'}
+                </span>
+              </div>
+
+              {/* Hero Aperture (Cover Image) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                  <label>{isAr ? 'صورة الغلاف الرئيسية (HERO APERTURE)' : 'Primary Hero Aperture'}</label>
+                  <span className="text-white/40 font-mono text-[10px]">16:9 ، دقة 4K عريض جداً</span>
+                </div>
+
+                <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full bg-black/60 border border-white/10 rounded-xs overflow-hidden group shadow-2xl">
+                  <img
+                    src={formData.coverImage}
+                    alt="Hero Aperture"
+                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-102"
+                  />
+
+                  {/* Top Success Badge */}
+                  <div className="absolute top-3 start-3 z-10">
+                    <span className="px-2.5 py-1 rounded-xs bg-black/80 backdrop-blur-md border border-emerald-500/30 text-emerald-400 font-mono text-[11px] flex items-center gap-1.5 shadow-lg">
+                      <span className="size-1.5 rounded-full bg-emerald-400" />
+                      <span>{isAr ? 'تم الرفع بنجاح (3.6 MB)' : 'Loaded Successfully (3.6 MB)'}</span>
+                    </span>
+                  </div>
+
+                  {/* Bottom Frosted Glass Overlay Bar */}
+                  <div className="absolute bottom-0 inset-x-0 z-10 bg-black/75 backdrop-blur-md border-t border-white/10 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    {/* Focal Point Indicator */}
+                    <div className="flex items-center gap-1.5 font-mono text-[11px] text-white/70">
+                      <Crosshair className="size-3.5 text-gold" />
+                      <span>{isAr ? `النقطة البؤرية: ${focalPoint.y}% Y / ${focalPoint.x}% X` : `Focal Point: ${focalPoint.y}% Y / ${focalPoint.x}% X`}</span>
+                    </div>
+
+                    {/* Center Crop Action */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFocalPoint({ x: 50, y: 50 })
+                        if (showToast) showToast(isAr ? 'تم ضبط الاقتصاص على المركز' : 'Focal point centered')
+                      }}
+                      className="px-2.5 py-1 rounded-2xs bg-white/5 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white font-mono text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Crop className="size-3 text-gold" />
+                      <span>{isAr ? 'اقتصاص المركز' : 'Center Crop'}</span>
+                    </button>
+
+                    {/* Replace / URL Actions */}
+                    <div className="flex items-center gap-2">
+                      <label className="px-3 py-1 rounded-2xs bg-gold text-charcoal font-semibold text-xs eyebrow hover:bg-[#D4BC96] transition-colors cursor-pointer flex items-center gap-1.5 shadow-md shadow-gold/20">
+                        <Upload className="size-3" />
+                        <span>{uploading ? (isAr ? 'جاري الرفع...' : 'Uploading...') : (isAr ? 'استبدال الصورة' : 'Replace Image')}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleFileUpload(file, 'cover')
+                          }}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const url = prompt(isAr ? 'أدخل رابط الصورة البديل:' : 'Enter replacement image URL:', formData.coverImage)
+                          if (url) setFormData({ ...formData, coverImage: url })
+                        }}
+                        className="p-1.5 rounded-2xs bg-white/5 hover:bg-white/15 text-white/60 hover:text-white transition-colors cursor-pointer"
+                        title={isAr ? 'إدخال رابط ويب' : 'Enter Web URL'}
+                      >
+                        <LinkIcon className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Monograph Sequence (Thumbnails Grid) */}
+              <div className="space-y-3 pt-2 border-t border-white/10">
+                <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                  <label>{isAr ? 'معرض الصور الإضافية (MONOGRAPH SEQUENCE)' : 'Monograph Sequence'}</label>
+                  <span className="text-white/40 text-[10px] font-mono">
+                    {isAr ? 'اسحب لإعادة ترتيب التسلسل الفوتوغرافي' : 'Drag to reorder photographic sequence'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {/* Add Image Upload Card */}
+                  <label className="border-dashed border border-white/20 hover:border-gold/60 bg-white/[0.02] hover:bg-white/[0.05] rounded-xs flex flex-col items-center justify-center p-4 cursor-pointer text-center group aspect-[4/3] sm:aspect-[16/10] transition-all">
+                    <div className="size-8 rounded-full bg-white/5 group-hover:bg-gold/15 flex items-center justify-center text-white/60 group-hover:text-gold transition-colors mb-2">
+                      <ImagePlus className="size-4" />
+                    </div>
+                    <span className="text-xs text-white font-medium group-hover:text-gold transition-colors">
+                      {isAr ? 'إضافة صورة' : 'Add Image'}
+                    </span>
+                    <span className="text-[10px] text-white/40 mt-0.5">
+                      {isAr ? 'سحب الملفات هنا' : 'Drop files here'}
+                    </span>
                     <input
                       type="file"
                       accept="image/*"
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0]
-                        if (file) handleFileUpload(file, 'interiorImage')
+                        if (file) handleFileUpload(file, 'gallery')
                       }}
                     />
                   </label>
+
+                  {/* Existing Thumbnails with Captions */}
+                  {galleryImages.map((img, idx) => (
+                    <div
+                      key={img.url + idx}
+                      className="relative aspect-[4/3] sm:aspect-[16/10] bg-black/50 border border-white/10 rounded-xs overflow-hidden group shadow-lg"
+                    >
+                      <img
+                        src={img.url}
+                        alt={img.caption}
+                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+
+                      {/* Top Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(idx)}
+                        className="absolute top-1.5 end-1.5 size-6 rounded-2xs bg-black/70 hover:bg-rose-900/80 text-white/70 hover:text-white flex items-center justify-center transition-colors cursor-pointer opacity-0 group-hover:opacity-100 z-10"
+                        title={isAr ? 'حذف من المعرض' : 'Delete'}
+                      >
+                        <Trash2 className="size-3" />
+                      </button>
+
+                      {/* Bottom Caption Pill */}
+                      <div className="absolute bottom-0 inset-x-0 p-2 bg-black/85 backdrop-blur-sm border-t border-white/10">
+                        <input
+                          type="text"
+                          value={img.caption}
+                          onChange={(e) => {
+                            const newCaption = e.target.value
+                            setGalleryImages((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, caption: newCaption } : item))
+                            )
+                          }}
+                          className="w-full bg-transparent border-none text-[10px] font-mono text-white/90 placeholder-white/30 focus:outline-none truncate"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* ── SECTION 03: EDITORIAL ESSAY & SERVICES ──────────────────── */}
+            <section className="bg-[#0f0f13] border border-white/10 rounded-xs p-5 sm:p-7 space-y-6 shadow-xl">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-2xs bg-gold/10 border border-gold/30 text-gold font-mono text-xs font-bold">
+                    03
+                  </span>
+                  <h2 className="text-white font-serif text-sm sm:text-base font-medium tracking-wide">
+                    {isAr ? 'محتوى المشروع والخدمات المقدمة' : 'Editorial Essay & Scope of Work'}
+                  </h2>
+                  <span className="text-white/30 hidden sm:inline font-mono text-xs">/ EDITORIAL ESSAY & SCOPE</span>
+                </div>
+                <span className="text-white/40 font-mono text-[11px]">BILINGUAL ESSAY</span>
+              </div>
+
+              {/* Row 1: Bilingual Essays with Word Counters */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Arabic Architectural Essay */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                    <label>{isAr ? 'وصف المشروع المعماري (بالعربية)' : 'Architectural Narrative (Arabic)'}</label>
+                    <span className="text-white/40 font-mono text-[10px]">{arWords} {isAr ? 'كلمة' : 'words'}</span>
+                  </div>
+                  <textarea
+                    rows={6}
+                    value={formData.descriptionAr}
+                    onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
+                    className="w-full bg-black/40 border border-white/10 rounded-xs p-3.5 text-xs sm:text-[13px] text-white placeholder-white/20 focus:border-gold/60 focus:outline-none leading-relaxed font-sans text-end rtl:text-start"
+                  />
+                </div>
+
+                {/* English Architectural Essay */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                    <label>{isAr ? 'PROJECT DESCRIPTION (ENGLISH EDITORIAL)' : 'Project Description (English)'}</label>
+                    <span className="text-white/40 font-mono text-[10px]">{enWords} WORDS</span>
+                  </div>
+                  <textarea
+                    rows={6}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full bg-black/40 border border-white/10 rounded-xs p-3.5 text-xs sm:text-[13px] text-white placeholder-white/20 focus:border-gold/60 focus:outline-none leading-relaxed font-sans"
+                  />
                 </div>
               </div>
 
-              <div className="p-3 bg-white/[0.02] border border-white/10 rounded-xs space-y-2">
-                <label className="text-white/80 block">{isAr ? 'لقطة سينمائية (Cinematic)' : 'Cinematic / Drone Image'}</label>
-                <div className="flex items-center gap-2">
+              {/* Row 2: Short Portfolio Card Decks */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="space-y-1.5">
+                  <label className="text-white/70 text-xs eyebrow block">
+                    {isAr ? 'وصف مقتضب لبطاقة المعرض (AR)' : 'Short Deck (Arabic)'}
+                  </label>
                   <input
                     type="text"
-                    value={formData.detailImage}
-                    onChange={(e) => setFormData({ ...formData, detailImage: e.target.value })}
-                    className="flex-1 bg-white/[0.04] border border-white/10 rounded-xs px-2.5 py-1.5 text-white font-mono text-[11px]"
+                    value={formData.shortDescriptionAr}
+                    onChange={(e) => setFormData({ ...formData, shortDescriptionAr: e.target.value })}
+                    className="w-full bg-black/40 border border-white/10 rounded-xs px-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:border-gold/60 focus:outline-none text-end rtl:text-start"
                   />
-                  <label className="p-2 rounded-xs bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors">
-                    <Upload className="size-3.5" />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) handleFileUpload(file, 'detailImage')
-                      }}
-                    />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-white/70 text-xs eyebrow block">
+                    {isAr ? 'SHORT PORTFOLIO CARD DECK (EN)' : 'Short Deck (English)'}
                   </label>
+                  <input
+                    type="text"
+                    value={formData.shortDescription}
+                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                    className="w-full bg-black/40 border border-white/10 rounded-xs px-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:border-gold/60 focus:outline-none font-mono"
+                  />
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Row 5: Descriptions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'الوصف المعماري (English)' : 'Architectural Narrative (English)'}</label>
-              <textarea
-                rows={3}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="A monolithic residential composition balancing travertine stone volumes..."
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'الوصف المعماري (العربية)' : 'Architectural Narrative (Arabic)'}</label>
-              <textarea
-                rows={3}
-                value={formData.descriptionAr}
-                onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                placeholder="كتل سكنية متوازنة من حجر الترافيرتين الطبيعي، وأسقف كابولية خرسانية..."
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none text-end rtl:text-start"
-              />
-            </div>
-          </div>
+              {/* Row 3: Services Provided (مراحل وخدمات العمل المعماري) */}
+              <div className="space-y-3 pt-3 border-t border-white/10">
+                <div className="flex items-center justify-between text-xs text-white/70 eyebrow">
+                  <label>
+                    {isAr ? 'الخدمات المقدمة ومراحل العمل المعماري (SERVICES PROVIDED)' : 'Services Provided & Scope'}
+                  </label>
+                  <span className="text-gold font-mono text-[10px]">
+                    {selectedServices.length} {isAr ? 'خدمات مفعلة' : 'active'}
+                  </span>
+                </div>
 
-          {/* Row 6: Scope and Featured */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'مراحل العمل (مفصول بفواصل)' : 'Scope of Work (comma separated)'}</label>
-              <input
-                type="text"
-                value={formData.scopeStr}
-                onChange={(e) => setFormData({ ...formData, scopeStr: e.target.value })}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-white/70 eyebrow">{isAr ? 'مراحل العمل بالعربية' : 'Scope in Arabic'}</label>
-              <input
-                type="text"
-                value={formData.scopeArStr}
-                onChange={(e) => setFormData({ ...formData, scopeArStr: e.target.value })}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xs px-3.5 py-2 text-white placeholder-white/20 focus:border-gold/60 focus:outline-none text-end rtl:text-start"
-              />
-            </div>
-          </div>
+                {/* Service Tag Chips */}
+                <div className="flex flex-wrap gap-2">
+                  {allServices.map((svc) => {
+                    const active = selectedServices.includes(svc.nameAr) || selectedServices.includes(svc.nameEn)
+                    return (
+                      <button
+                        key={svc.id}
+                        type="button"
+                        onClick={() => toggleService(isAr ? svc.nameAr : svc.nameEn)}
+                        className={`px-3 py-1.5 rounded-xs text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+                          active
+                            ? 'bg-gold/15 border border-gold/60 text-gold shadow-sm shadow-gold/10'
+                            : 'bg-white/[0.02] border border-white/10 text-white/60 hover:text-white hover:border-white/20'
+                        }`}
+                      >
+                        <span>{isAr ? svc.nameAr : svc.nameEn}</span>
+                        {active && <Check className="size-3 text-gold" />}
+                      </button>
+                    )
+                  })}
 
-          <div className="flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-xs">
-            <input
-              type="checkbox"
-              id="featuredCheck"
-              checked={formData.featured}
-              onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-              className="size-4 accent-[#C5A880] cursor-pointer"
-            />
-            <label htmlFor="featuredCheck" className="text-white text-xs cursor-pointer select-none">
-              {isAr ? 'تمييز هذا المشروع ليتصدر قسمه في صفحة المشاريع (Featured)' : 'Feature this project as headline showcase in its discipline'}
-            </label>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xs border border-white/15 text-white/70 hover:text-white transition-colors cursor-pointer"
-            >
-              {isAr ? 'إلغاء' : 'Cancel'}
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-6 py-2 rounded-xs bg-gold text-charcoal font-semibold hover:bg-[#D4BC96] transition-colors cursor-pointer disabled:opacity-50"
-            >
-              {saving ? (isAr ? 'جاري الحفظ...' : 'Saving...') : isAr ? 'حفظ المشروع' : 'Save Project'}
-            </button>
+                  {/* Add Custom Service Button / Form */}
+                  {showCustomServiceInput ? (
+                    <div className="flex items-center gap-1.5 bg-black/60 border border-gold/50 rounded-xs px-2 py-1">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={customServiceText}
+                        onChange={(e) => setCustomServiceText(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddCustomService()}
+                        placeholder={isAr ? 'اسم الخدمة الجديدة...' : 'New service name...'}
+                        className="bg-transparent text-xs text-white placeholder-white/30 focus:outline-none font-mono w-36"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCustomService}
+                        className="text-gold hover:text-white text-xs font-mono cursor-pointer"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCustomServiceInput(false)}
+                        className="text-white/40 hover:text-white text-xs font-mono cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomServiceInput(true)}
+                      className="px-3 py-1.5 rounded-xs text-xs font-mono border border-dashed border-white/20 text-white/50 hover:text-gold hover:border-gold/50 transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <Plus className="size-3" />
+                      <span>{isAr ? 'إضافة خدمة مخصصة' : 'Add Custom'}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
         </form>
+      </main>
+
+      {/* ── STICKY BOTTOM ACTION BAR ─────────────────────────────────────── */}
+      <footer className="sticky bottom-0 z-40 bg-[#0a0a0e]/95 backdrop-blur-md border-t border-white/10 px-4 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
+        {/* Right Status / Auto-save indicator */}
+        <div className="flex items-center gap-2 text-xs font-mono text-white/50 order-2 sm:order-1">
+          <span className="size-2 rounded-full bg-gold animate-pulse" />
+          <span>
+            {isAr
+              ? 'آخر حفظ تلقائي منذ دقيقتين • تم مزامنة المسودة عبر الخادم'
+              : 'Last auto-sync 2 mins ago · Draft synchronized'}
+          </span>
+        </div>
+
+        {/* Left Action Buttons */}
+        <div className="flex items-center gap-3 order-1 sm:order-2 w-full sm:w-auto justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-xs text-white/50 hover:text-white underline-offset-4 hover:underline transition-colors cursor-pointer"
+          >
+            {isAr ? 'إلغاء والتراجع' : 'Cancel & Revert'}
+          </button>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => handleSave('draft')}
+            className="px-4 py-2.5 rounded-xs border border-white/20 bg-white/5 hover:bg-white/10 text-white text-xs font-mono transition-colors cursor-pointer disabled:opacity-50"
+          >
+            {isAr ? 'حفظ كمسودة' : 'Save Draft'}
+          </button>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => handleSave('published')}
+            className="px-6 py-2.5 rounded-xs bg-gold hover:bg-[#D4BC96] text-charcoal font-semibold text-xs eyebrow transition-all cursor-pointer disabled:opacity-50 shadow-lg shadow-gold/20 flex items-center gap-2"
+          >
+            <Sparkles className="size-3.5 fill-charcoal" />
+            <span>
+              {saving
+                ? (isAr ? 'جاري النشر والحفظ...' : 'Publishing...')
+                : (isAr ? 'حفظ ونشر المشروع' : 'Save & Publish Project')}
+            </span>
+          </button>
+        </div>
+      </footer>
+
+      {/* ── TECHNICAL ARCHITECTURAL FOOTER ───────────────────────────────── */}
+      <div className="bg-[#050507] border-t border-white/5 px-4 sm:px-8 py-3 text-[10px] font-mono text-white/30 flex flex-wrap items-center justify-between gap-4 select-none">
+        <span>ISO 19650 BIM COMPLIANT</span>
+        <span>LAT: 24.7136° N, LON: 46.6753° E</span>
+        <span>{isAr ? 'نظام الأرشفة الموحد للمشاريع المعمارية' : 'Unified Architectural Archiving System'}</span>
+        <span>ATELIER V / VIWAN ARCHITECTURAL EDITORIAL MONOGRAPH SYSTEM © 2025</span>
       </div>
     </div>
   )
