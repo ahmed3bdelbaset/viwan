@@ -219,7 +219,6 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
 
   const inputStyle = {
     WebkitBoxShadow: "0 0 0 1000px #161513 inset",
-    WebkitTextFillColor: "#FAF8F5",
   }
 
   return (
@@ -432,9 +431,9 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
-                      placeholder="admin@viwan.studio"
+                      placeholder="example@email.com"
                       style={inputStyle}
-                      className="w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
+                      className="studio-login-input w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
                     />
                     <Mail className="size-4 text-white/30 absolute end-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
@@ -461,7 +460,7 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
                       required
                       placeholder="••••••••••••"
                       style={inputStyle}
-                      className="w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
+                      className="studio-login-input w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
                     />
                     <button
                       type="button"
@@ -519,9 +518,9 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
-                      placeholder="admin@viwan.studio"
+                      placeholder="example@email.com"
                       style={inputStyle}
-                      className="w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
+                      className="studio-login-input w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
                     />
                     <Mail className="size-4 text-white/30 absolute end-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
@@ -584,7 +583,7 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
                     required
                     placeholder="000000"
                     style={inputStyle}
-                    className="w-full bg-[#161513] border border-gold/40 text-gold text-2xl tracking-[0.5em] text-center font-mono py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200"
+                    className="studio-login-input w-full bg-[#161513] border border-gold/40 text-gold text-2xl tracking-[0.5em] text-center font-mono py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-gold/25"
                   />
                 </div>
 
@@ -664,7 +663,7 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
                       required
                       placeholder="••••••••••••"
                       style={inputStyle}
-                      className="w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200"
+                      className="studio-login-input w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
                     />
                     <button
                       type="button"
@@ -687,7 +686,7 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
                     required
                     placeholder="••••••••••••"
                     style={inputStyle}
-                    className="w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200"
+                    className="studio-login-input w-full bg-[#161513] border border-white/15 text-white text-xs sm:text-sm px-4 py-3 rounded-xs focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all duration-200 placeholder:text-white/20"
                   />
                 </div>
 
@@ -732,17 +731,8 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
             )}
           </div>
         </div>
-
-        {/* Bottom Security Assurance */}
-        <div className="relative z-10 text-center mt-6">
-            <p className="text-[11px] text-white/30 tracking-wider eyebrow">
-              {isAr
-                ? "اتصال مشفر وآمن بتقنية TLS 1.3 · معتمد من استوديو إيوان"
-                : "256-BIT ENCRYPTED SESSION · VIWAN STUDIO SECURITY"}
-            </p>
-          </div>
-        </div>
-      </main>
+      </div>
+    </main>
 
       {/* Footer */}
       <footer className="container-viwan py-6 text-center relative z-20 text-[11px] text-ivory/40 eyebrow">

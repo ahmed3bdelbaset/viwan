@@ -465,3 +465,21 @@ html[data-scroll-dir="up"] .reveal:not(.is-visible) {
     page-break-inside: avoid !important;
   }
 }
+
+/* Studio Gateway Login Inputs & Autofill */
+.studio-login-input::placeholder {
+  color: rgba(250, 248, 245, 0.22) !important;
+  -webkit-text-fill-color: rgba(250, 248, 245, 0.22) !important;
+  opacity: 1 !important;
+}
+
+.studio-login-input:-webkit-autofill,
+.studio-login-input:-webkit-autofill:hover, 
+.studio-login-input:-webkit-autofill:focus,
+.studio-login-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #161513 inset !important;
+  -webkit-text-fill-color: #FAF8F5 !important;
+  caret-color: #FAF8F5 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
