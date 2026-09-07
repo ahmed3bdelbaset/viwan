@@ -4,8 +4,66 @@ import { PROJECTS as INITIAL_PROJECTS, Project } from './projects'
 import { JOBS as INITIAL_JOBS, Job } from './jobs'
 import { CONTACT as INITIAL_CONTACT } from './site'
 
-const DATA_DIR = path.join(process.cwd(), 'data')
-const DB_FILE = path.join(DATA_DIR, 'db.json')
+export function getStorageDir(): string {
+  if (process.env.STORAGE_PATH) {
+    return path.resolve(process.env.STORAGE_PATH)
+  }
+  if (process.env.RAILWAY_VOLUME_MOUNT_PATH) {
+    return path.resolve(process.env.RAILWAY_VOLUME_MOUNT_PATH)
+  }
+  // Check if running on Linux/Railway container with standard /app/data mount
+  if (process.platform !== 'win32' && fs.existsSync('/app/data')) {
+    return '/app/data'
+  }
+  return path.join(process.cwd(), 'data')
+}
+
+export function getDbFilePath(): string {
+  return path.join(getStorageDir(), 'db.json')
+}
+
+export function getUploadsDir(): string {
+  const dir = path.join(getStorageDir(), 'uploads')
+  if (!fs.existsSync(dir)) {
+    try {
+      fs.mkdirSync(dir, { recursive: true })
+    } catch (e) {
+      console.error('Failed to create uploads directory:', e)
+    }
+  }
+  return dir
+}
+
+export function ensureDbFile(): string {
+  const storageDir = getStorageDir()
+  if (!fs.existsSync(/*turbopackIgnore: true*/ storageDir)) {
+    try {
+      fs.mkdirSync(storageDir, { recursive: true })
+    } catch (e) {
+      console.error('Failed to create storage directory:', e)
+    }
+  }
+
+  const dbFile = getDbFilePath()
+  if (!fs.existsSync(/*turbopackIgnore: true*/ dbFile)) {
+    const starterFile = path.join(process.cwd(), 'data', 'db.json')
+    if (fs.existsSync(starterFile) && path.resolve(starterFile) !== path.resolve(dbFile)) {
+      try {
+        fs.copyFileSync(starterFile, dbFile)
+        console.log(`[STORAGE] Copied repository db.json into persistent volume: ${dbFile}`)
+        return dbFile
+      } catch (err) {
+        console.error('[STORAGE] Error copying starter db.json:', err)
+      }
+    }
+    const initial = getInitialData()
+    fs.writeFileSync(dbFile, JSON.stringify(initial, null, 2), 'utf-8')
+    console.log(`[STORAGE] Initialized new persistent db.json at: ${dbFile}`)
+  }
+
+  return dbFile
+}
+
 
 export interface ContactSubmission {
   id: string
@@ -759,18 +817,10 @@ function getInitialData(): DatabaseSchema {
 }
 
 export function readDb(): DatabaseSchema {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true })
-  }
-
-  if (!fs.existsSync(DB_FILE)) {
-    const initial = getInitialData()
-    fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), 'utf-8')
-    return initial
-  }
+  const dbFile = ensureDbFile()
 
   try {
-    const content = fs.readFileSync(DB_FILE, 'utf-8')
+    const content = fs.readFileSync(dbFile, 'utf-8')
     const data = JSON.parse(content) as DatabaseSchema
     let changed = false
 
@@ -804,7 +854,7 @@ export function readDb(): DatabaseSchema {
     }
 
     if (changed) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8')
+      fs.writeFileSync(dbFile, JSON.stringify(data, null, 2), 'utf-8')
     }
 
     return data
@@ -815,8 +865,7 @@ export function readDb(): DatabaseSchema {
 }
 
 export function writeDb(data: DatabaseSchema): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true })
-  }
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8')
+  const dbFile = ensureDbFile()
+  fs.writeFileSync(dbFile, JSON.stringify(data, null, 2), 'utf-8')
 }
+

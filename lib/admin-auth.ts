@@ -1,8 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 
-// Database path for persistent admin password storage
-const DB_PATH = path.join(process.cwd(), 'data', 'db.json')
+import { ensureDbFile } from './db'
+
+// Database path for persistent admin password storage (resolves Railway volume or local data dir)
+const getDbPath = () => ensureDbFile()
 
 export const VALID_ADMIN_EMAILS = [
   process.env.ADMIN_EMAIL?.toLowerCase(),
@@ -33,8 +35,9 @@ if (process.env.NODE_ENV !== 'production') globalForAuth.viwanOtpStore = otpStor
 // Read current password from db.json or fallback
 export function getAdminPassword(email?: string): string {
   try {
-    if (fs.existsSync(DB_PATH)) {
-      const raw = fs.readFileSync(DB_PATH, 'utf-8')
+    const dbPath = getDbPath()
+    if (fs.existsSync(dbPath)) {
+      const raw = fs.readFileSync(dbPath, 'utf-8')
       const data = JSON.parse(raw)
       if (email && Array.isArray(data.admins)) {
         const found = data.admins.find((a: any) => a.email?.toLowerCase() === email.trim().toLowerCase())
@@ -53,9 +56,10 @@ export function getAdminPassword(email?: string): string {
 // Update admin password in db.json
 export function setAdminPassword(newPassword: string, email?: string): boolean {
   try {
+    const dbPath = getDbPath()
     let data: Record<string, any> = {}
-    if (fs.existsSync(DB_PATH)) {
-      const raw = fs.readFileSync(DB_PATH, 'utf-8')
+    if (fs.existsSync(dbPath)) {
+      const raw = fs.readFileSync(dbPath, 'utf-8')
       data = JSON.parse(raw)
     }
     if (!data.adminAuth) {
@@ -72,7 +76,7 @@ export function setAdminPassword(newPassword: string, email?: string): boolean {
       }
     }
 
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8')
+    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8')
     return true
   } catch (err) {
     console.error('Error saving new admin password to db.json:', err)
@@ -87,8 +91,9 @@ export function isAuthorizedAdminEmail(email: string): boolean {
 
   // Also check if any additional admin email is registered in db.json
   try {
-    if (fs.existsSync(DB_PATH)) {
-      const raw = fs.readFileSync(DB_PATH, 'utf-8')
+    const dbPath = getDbPath()
+    if (fs.existsSync(dbPath)) {
+      const raw = fs.readFileSync(dbPath, 'utf-8')
       const data = JSON.parse(raw)
       if (Array.isArray(data.adminAuth?.emails)) {
         if (data.adminAuth.emails.map((e: string) => e.toLowerCase()).includes(cleanEmail)) {
