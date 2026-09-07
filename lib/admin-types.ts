@@ -1,3 +1,19 @@
+export type LifecycleStage =
+  | 'concept'
+  | 'schematic'
+  | 'development'
+  | 'bim_coordination'
+  | 'approvals'
+  | 'tender'
+  | 'procurement'
+  | 'supervision'
+  | 'handover';
+
+export interface FocalPoint {
+  x: number;
+  y: number;
+}
+
 export interface Project {
   id: string;
   code: string;
@@ -30,6 +46,9 @@ export interface Project {
   lat: number;
   lng: number;
   display_order: number;
+  lifecycle_stage?: LifecycleStage;
+  focal_point?: FocalPoint;
+  as_built_image?: string;
 }
 
 export interface InsightArticle {

@@ -12,8 +12,11 @@ import {
   ArrowRight,
   PenTool,
   Upload,
-  Plus
+  Plus,
+  Layers,
+  Compass
 } from 'lucide-react';
+import { SpatialMapWidget } from '@/components/ui/SpatialMapWidget';
 
 export default function AdminDashboardOverviewPage() {
   const [projectsCount, setProjectsCount] = useState(124);
@@ -195,6 +198,13 @@ export default function AdminDashboardOverviewPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. SPATIAL REGIONAL DISTRIBUTION & GFA TELEMETRY */}
+      {/* ========================================================================= */}
+      <div className="pt-2">
+        <SpatialMapWidget isRtl={isRtl} />
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { AuthService } from '@/lib/auth';
 import { AdminUser } from '@/lib/types';
 import { AdminLanguageProvider, useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { ViwanModalProvider, useViwanModal } from '@/components/ui/ViwanModalProvider';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -23,7 +24,8 @@ import {
   X,
   ExternalLink,
   Globe,
-  Users
+  Users,
+  Command
 } from 'lucide-react';
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
@@ -205,7 +207,22 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="flex items-center space-x-5 rtl:space-x-reverse">
+          <div className="flex items-center space-x-3 sm:space-x-4 rtl:space-x-reverse">
+            {/* Command Palette Quick Shortcut */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('viwan_open_command_palette'))}
+              className="border border-[#E7E2D8] bg-white hover:border-gold px-3 py-1.5 text-xs text-stone-600 hover:text-charcoal flex items-center space-x-2 rtl:space-x-reverse shadow-sm transition-colors group"
+              title={isRtl ? 'لوحة الأوامر السريعة (Ctrl+K)' : 'Command Palette (Ctrl+K)'}
+            >
+              <Command className="w-3.5 h-3.5 text-gold group-hover:scale-110 transition-transform" />
+              <span className="hidden md:inline font-sans text-xs text-charcoal">
+                {isRtl ? 'الأوامر السريعة' : 'Commands'}
+              </span>
+              <kbd className="hidden sm:inline-block text-[10px] font-mono uppercase bg-[#FAF6EE] border border-stone-300 px-1 py-0.5 text-stone-500 rounded">
+                ⌘K
+              </kbd>
+            </button>
+
             {/* Language Switcher */}
             <button
               onClick={toggleLocale}
@@ -269,6 +286,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
         </header>
+
+        {/* Global Command Palette */}
+        <CommandPalette />
 
         {/* Dynamic Page Canvas */}
         <main className="flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto">

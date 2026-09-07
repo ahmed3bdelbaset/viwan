@@ -26,10 +26,29 @@ import {
   FileText,
   Sparkles,
   Globe2,
-  Sliders
+  Sliders,
+  Printer,
+  SlidersHorizontal,
+  RotateCcw
 } from 'lucide-react';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { ImageUploader, MultiImageGalleryUploader } from '@/components/ui/ImageUploader';
+import { FocalPointPicker } from '@/components/ui/FocalPointPicker';
+import { BeforeAfterSlider } from '@/components/ui/BeforeAfterSlider';
+import { ProjectMonographPrint } from '@/components/ui/ProjectMonographPrint';
+import { LifecycleStage } from '@/lib/admin-types';
+
+export const LIFECYCLE_STAGES: { id: LifecycleStage; label_en: string; label_ar: string; step: number }[] = [
+  { id: 'concept', label_en: 'Concept Design', label_ar: 'المفهوم والرؤية الأولية', step: 1 },
+  { id: 'schematic', label_en: 'Schematic Design', label_ar: 'التصميم الابتدائي', step: 2 },
+  { id: 'development', label_en: 'Design Development', label_ar: 'التطوير المعماري', step: 3 },
+  { id: 'bim_coordination', label_en: 'BIM Coordination', label_ar: 'تنسيق الـ BIM الإنشائي', step: 4 },
+  { id: 'approvals', label_en: 'Authority Approvals', label_ar: 'الاعتمادات والتراخيص', step: 5 },
+  { id: 'tender', label_en: 'Tendering & Bidding', label_ar: 'وثائق الطرح والمناقصات', step: 6 },
+  { id: 'procurement', label_en: 'Procurement & Awards', label_ar: 'الترسية والتعاقدات', step: 7 },
+  { id: 'supervision', label_en: 'Site Supervision', label_ar: 'الإشراف الميداني', step: 8 },
+  { id: 'handover', label_en: 'Handover & Commissioning', label_ar: 'التسليم والتشغيل', step: 9 },
+];
 
 const LOCATION_PRESETS = [
   { label: 'الرياض (KAFD)', label_en: 'Riyadh (KAFD)', loc_ar: 'مركز الملك عبد الله المالي، الرياض', loc_en: 'KAFD, Riyadh, Saudi Arabia', country_ar: 'السعودية', country_en: 'KSA', lat: 24.7677, lng: 46.6384 },
@@ -59,6 +78,12 @@ export default function AdminProjectsPage() {
     id: '',
     title: ''
   });
+
+  // World-Class Feature States
+  const [monographProject, setMonographProject] = useState<Project | null>(null);
+  const [showBeforeAfterModal, setShowBeforeAfterModal] = useState(false);
+  const [lastAutoSaveTime, setLastAutoSaveTime] = useState<string | null>(null);
+  const [hasSavedDraft, setHasSavedDraft] = useState(false);
 
   const [formData, setFormData] = useState<Partial<Project>>({
     code: '',
@@ -90,8 +115,56 @@ export default function AdminProjectsPage() {
     details_ar: '',
     lat: 24.7677,
     lng: 46.6384,
-    display_order: 1
+    display_order: 1,
+    lifecycle_stage: 'supervision',
+    focal_point: { x: 50, y: 50 },
+    as_built_image: ''
   });
+
+  // Check for unsaved draft in localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const draft = localStorage.getItem('viwan_project_form_draft');
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft);
+          if (parsed && (parsed.title_en || parsed.title_ar || parsed.code)) {
+            setHasSavedDraft(true);
+          }
+        } catch {}
+      }
+    }
+  }, []);
+
+  // Debounced auto-save draft while modal is open
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const timer = setTimeout(() => {
+      if (formData.title_en || formData.title_ar || formData.code || formData.cover_image) {
+        localStorage.setItem('viwan_project_form_draft', JSON.stringify(formData));
+        const timeStr = new Date().toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+        setLastAutoSaveTime(timeStr);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [formData, isModalOpen, isRtl]);
+
+  const handleRestoreDraft = () => {
+    const draft = localStorage.getItem('viwan_project_form_draft');
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        setFormData(parsed);
+        setHasSavedDraft(false);
+      } catch {}
+    }
+  };
+
+  const handleClearDraft = () => {
+    localStorage.removeItem('viwan_project_form_draft');
+    setHasSavedDraft(false);
+    setLastAutoSaveTime(null);
+  };
 
   const loadProjects = () => {
     setProjects(DataStore.getProjects());
@@ -135,7 +208,10 @@ export default function AdminProjectsPage() {
       details_ar: '',
       lat: 24.7677,
       lng: 46.6384,
-      display_order: nextNum
+      display_order: nextNum,
+      lifecycle_stage: 'supervision',
+      focal_point: { x: 50, y: 50 },
+      as_built_image: ''
     });
     setIsModalOpen(true);
   };
@@ -196,10 +272,14 @@ export default function AdminProjectsPage() {
       details_ar: formData.details_ar || '',
       lat: Number(formData.lat) || 24.7677,
       lng: Number(formData.lng) || 46.6384,
-      display_order: formData.display_order || 1
+      display_order: formData.display_order || 1,
+      lifecycle_stage: formData.lifecycle_stage || 'supervision',
+      focal_point: formData.focal_point || { x: 50, y: 50 },
+      as_built_image: formData.as_built_image || ''
     };
 
     DataStore.saveProject(prjToSave);
+    handleClearDraft();
     loadProjects();
     setIsModalOpen(false);
   };
@@ -376,41 +456,54 @@ export default function AdminProjectsPage() {
                     </span>
                   </div>
 
-                  {/* Middle: Location */}
+                  {/* Middle: Location & Stage */}
                   <div className="pt-2 border-t border-[#E7E2D8]/60 flex items-center justify-between text-xs text-stone-600">
                     <div className="flex items-center space-x-1 rtl:space-x-reverse text-[11px] truncate">
                       <MapPin className="w-3.5 h-3.5 text-gold shrink-0" />
                       <span className="truncate">{isRtl ? project.location_ar : project.location_en}</span>
                     </div>
-                    <div className="text-[10px] font-mono text-stone-400">
-                      {project.year}
-                    </div>
+                    {project.lifecycle_stage && (
+                      <div className="text-[9px] font-mono text-gold bg-[#121212] px-2 py-0.5 border border-stone-800 uppercase tracking-wider">
+                        {LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.step}. {isRtl ? LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.label_ar : LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.label_en}
+                      </div>
+                    )}
                   </div>
 
                   {/* Bottom: Action Buttons */}
-                  <div className="pt-2 border-t border-[#E7E2D8]/60 flex items-center justify-end space-x-2 rtl:space-x-reverse">
-                    <Link
-                      href={`/${locale}/projects/${project.slug}`}
-                      target="_blank"
-                      className="p-2 bg-[#FAF6EE] hover:bg-gold hover:text-white text-charcoal border border-[#E7E2D8] transition-colors"
-                      title={t.projects.view}
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </Link>
+                  <div className="pt-2 border-t border-[#E7E2D8]/60 flex items-center justify-between">
                     <button
-                      onClick={() => handleOpenEdit(project)}
-                      className="p-2 bg-[#FAF6EE] hover:bg-gold hover:text-white text-charcoal border border-[#E7E2D8] transition-colors"
-                      title={t.projects.edit}
+                      onClick={() => setMonographProject(project)}
+                      className="px-2.5 py-1.5 bg-[#FAF6EE] hover:bg-gold hover:text-white text-charcoal border border-[#E7E2D8] text-[10px] font-mono flex items-center space-x-1.5 rtl:space-x-reverse transition-colors"
+                      title={isRtl ? 'تصدير وثيقة مونوغراف فاخرة (PDF)' : 'Export Monograph PDF'}
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      <Printer className="w-3.5 h-3.5 text-gold" />
+                      <span>Monograph PDF</span>
                     </button>
-                    <button
-                      onClick={() => handleDelete(project.id, isRtl ? project.title_ar : project.title_en)}
-                      className="p-2 bg-[#FAF6EE] hover:bg-red-600 hover:text-white text-red-600 border border-[#E7E2D8] transition-colors"
-                      title={t.projects.delete}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <Link
+                        href={`/${locale}/projects/${project.slug}`}
+                        target="_blank"
+                        className="p-2 bg-[#FAF6EE] hover:bg-gold hover:text-white text-charcoal border border-[#E7E2D8] transition-colors"
+                        title={t.projects.view}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </Link>
+                      <button
+                        onClick={() => handleOpenEdit(project)}
+                        className="p-2 bg-[#FAF6EE] hover:bg-gold hover:text-white text-charcoal border border-[#E7E2D8] transition-colors"
+                        title={t.projects.edit}
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(project.id, isRtl ? project.title_ar : project.title_en)}
+                        className="p-2 bg-[#FAF6EE] hover:bg-red-600 hover:text-white text-red-600 border border-[#E7E2D8] transition-colors"
+                        title={t.projects.delete}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
@@ -441,6 +534,11 @@ export default function AdminProjectsPage() {
                             src={project.cover_image}
                             alt={project.title_en}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            style={{
+                              objectPosition: project.focal_point
+                                ? `${project.focal_point.x}% ${project.focal_point.y}%`
+                                : 'center',
+                            }}
                           />
                           {project.is_featured && (
                             <div className="absolute top-1 right-1 bg-gold text-charcoal p-0.5 shadow-sm">
@@ -481,24 +579,44 @@ export default function AdminProjectsPage() {
                       </div>
                     </td>
 
-                    {/* Publish Status */}
-                    <td className="py-4 px-6">
-                      <span
-                        className={`text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 border ${
-                          project.publish_status === 'Featured'
-                            ? 'bg-gold/10 text-charcoal border-gold'
-                            : project.publish_status === 'Published'
-                            ? 'bg-green-50 text-green-700 border-green-200'
-                            : 'bg-stone-100 text-stone-500 border-stone-300'
-                        }`}
-                      >
-                        {project.publish_status}
-                      </span>
+                    {/* Publish Status & Lifecycle Stage */}
+                    <td className="py-4 px-6 space-y-1">
+                      <div>
+                        <span
+                          className={`text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 border inline-block ${
+                            project.publish_status === 'Featured'
+                              ? 'bg-gold/10 text-charcoal border-gold'
+                              : project.publish_status === 'Published'
+                              ? 'bg-stone-100 text-charcoal border-stone-300'
+                              : 'bg-stone-100 text-stone-500 border-dashed border-stone-300'
+                          }`}
+                        >
+                          {project.publish_status}
+                        </span>
+                      </div>
+                      {project.lifecycle_stage && (
+                        <div className="text-[9px] font-mono text-stone-500 uppercase tracking-wider flex items-center space-x-1 rtl:space-x-reverse">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gold shrink-0" />
+                          <span className="truncate">
+                            {LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.step}.{' '}
+                            {isRtl
+                              ? LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.label_ar
+                              : LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.label_en}
+                          </span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Actions */}
                     <td className="py-4 px-6 text-right rtl:text-left">
                       <div className="flex items-center justify-end rtl:justify-start space-x-2 rtl:space-x-reverse">
+                        <button
+                          onClick={() => setMonographProject(project)}
+                          className="p-1.5 text-stone-400 hover:text-gold transition-colors"
+                          title={isRtl ? 'تصدير وثيقة مونوغراف فاخرة (Client Monograph PDF)' : 'Export Client Monograph PDF'}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </button>
                         <Link
                           href={`/${locale}/projects/${project.slug}`}
                           target="_blank"
@@ -571,6 +689,11 @@ export default function AdminProjectsPage() {
                   <img
                     src={project.cover_image}
                     alt={project.title_en}
+                    style={
+                      project.focal_point
+                        ? { objectPosition: `${project.focal_point.x}% ${project.focal_point.y}%` }
+                        : undefined
+                    }
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3 bg-charcoal/90 text-gold font-mono text-[10px] px-2 py-0.5">
@@ -602,6 +725,17 @@ export default function AdminProjectsPage() {
                     <MapPin className="w-3 h-3 text-gold" />
                     <span>{isRtl ? project.location_ar : project.location_en}</span>
                   </div>
+                  {project.lifecycle_stage && (
+                    <div className="text-[10px] font-mono text-stone-500 uppercase tracking-wider flex items-center space-x-1.5 rtl:space-x-reverse pt-2 border-t border-stone-100">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gold shrink-0" />
+                      <span className="truncate">
+                        {LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.step}.{' '}
+                        {isRtl
+                          ? LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.label_ar
+                          : LIFECYCLE_STAGES.find((s) => s.id === project.lifecycle_stage)?.label_en}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -616,6 +750,13 @@ export default function AdminProjectsPage() {
                 </Link>
 
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <button
+                    onClick={() => setMonographProject(project)}
+                    className="p-1 text-stone-400 hover:text-gold transition-colors"
+                    title={isRtl ? 'تصدير وثيقة مونوغراف فاخرة (Client Monograph PDF)' : 'Export Client Monograph PDF'}
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                  </button>
                   <button
                     onClick={() => handleOpenEdit(project)}
                     className="p-1 text-stone-400 hover:text-gold"
@@ -650,10 +791,48 @@ export default function AdminProjectsPage() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="space-y-1">
-              <h2 className="font-cinzel text-xl font-semibold text-charcoal uppercase">
-                {editingProject ? t.projects.editModalTitle : t.projects.addModalTitle}
-              </h2>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h2 className="font-cinzel text-xl font-semibold text-charcoal uppercase">
+                  {editingProject ? t.projects.editModalTitle : t.projects.addModalTitle}
+                </h2>
+                {lastAutoSaveTime && (
+                  <div className="text-[10px] font-mono text-stone-500 flex items-center space-x-1.5 rtl:space-x-reverse bg-white px-2.5 py-1 border border-[#E7E2D8]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{isRtl ? `حفظ تلقائي ${lastAutoSaveTime}` : `Auto-saved at ${lastAutoSaveTime}`}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Smart Auto-Draft Recovery Banner */}
+              {hasSavedDraft && !editingProject && (
+                <div className="p-3 bg-gold/10 border border-gold/40 flex items-center justify-between text-xs text-charcoal shadow-2xs">
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <RotateCcw className="w-4 h-4 text-gold shrink-0" />
+                    <span>
+                      {isRtl
+                        ? 'توجد مسودة غير محفوظة لمشروع سابق محفوظة محلياً. هل تود استرجاعها؟'
+                        : 'An unsaved local draft from a previous session was detected. Would you like to restore it?'}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleRestoreDraft}
+                      className="px-2.5 py-1 bg-charcoal text-white text-[11px] font-medium hover:bg-gold transition-colors"
+                    >
+                      {isRtl ? 'استعادة المسودة' : 'Restore Draft'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearDraft}
+                      className="px-2.5 py-1 border border-stone-300 text-stone-500 text-[11px] hover:text-charcoal hover:border-charcoal transition-colors"
+                    >
+                      {isRtl ? 'تجاهل' : 'Discard'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSave} className="space-y-6">
@@ -767,6 +946,27 @@ export default function AdminProjectsPage() {
                       <option value="Draft">{t.projects.draft}</option>
                     </select>
                   </div>
+                </div>
+
+                {/* 9-Stage Architectural Lifecycle Tracking */}
+                <div className="space-y-1 pt-1">
+                  <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block flex items-center justify-between">
+                    <span>{isRtl ? 'مرحلة دورة حياة المشروع المعماري (9 مراحل هندسية)' : 'Architectural Lifecycle Stage (9-Stage Pipeline)'}</span>
+                    <span className="text-gold font-mono text-[9px] font-normal">
+                      {LIFECYCLE_STAGES.find((s) => s.id === formData.lifecycle_stage)?.step || 1} / 9
+                    </span>
+                  </label>
+                  <select
+                    value={formData.lifecycle_stage || 'concept'}
+                    onChange={(e) => setFormData({ ...formData, lifecycle_stage: e.target.value as LifecycleStage })}
+                    className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal font-medium outline-none focus:border-gold"
+                  >
+                    {LIFECYCLE_STAGES.map((stg) => (
+                      <option key={stg.id} value={stg.id}>
+                        {isRtl ? `المرحلة ${stg.step}: ${stg.label_ar} (${stg.label_en})` : `Stage ${stg.step}: ${stg.label_en} (${stg.label_ar})`}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -971,6 +1171,35 @@ export default function AdminProjectsPage() {
                   isRtl={isRtl}
                 />
 
+                {formData.cover_image && (
+                  <FocalPointPicker
+                    imageUrl={formData.cover_image}
+                    value={formData.focal_point || { x: 50, y: 50 }}
+                    onChange={(fp) => setFormData({ ...formData, focal_point: fp })}
+                    isRtl={isRtl}
+                  />
+                )}
+
+                <div className="pt-2 border-t border-[#E7E2D8] space-y-3">
+                  <ImageUploader
+                    label={isRtl ? 'صورة الواقع بعد التنفيذ (As-Built Reality) [لمقارنة الريندر بالواقع]' : 'As-Built Reality Photo (For 3D vs Reality Comparison)'}
+                    value={formData.as_built_image || ''}
+                    onChange={(val) => setFormData({ ...formData, as_built_image: val })}
+                    isRtl={isRtl}
+                  />
+
+                  {formData.cover_image && formData.as_built_image && (
+                    <button
+                      type="button"
+                      onClick={() => setShowBeforeAfterModal(true)}
+                      className="w-full py-2.5 px-4 bg-white border border-gold text-charcoal hover:bg-gold/10 text-xs font-semibold uppercase tracking-wider flex items-center justify-center space-x-2 rtl:space-x-reverse transition-colors shadow-2xs"
+                    >
+                      <SlidersHorizontal className="w-4 h-4 text-gold" />
+                      <span>{isRtl ? 'معاينة شريحة المقارنة التفاعلية (3D Render vs Reality)' : 'Preview Interactive 3D vs Reality Slider'}</span>
+                    </button>
+                  )}
+                </div>
+
                 <MultiImageGalleryUploader
                   label={t.projects.galleryImages}
                   images={formData.gallery_images || []}
@@ -1034,6 +1263,39 @@ export default function AdminProjectsPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* 3D vs Reality Comparison Modal */}
+      {showBeforeAfterModal && formData.cover_image && formData.as_built_image && (
+        <div className="fixed inset-0 z-[100000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#FAF6EE] max-w-4xl w-full border border-[#E7E2D8] p-6 space-y-4 shadow-2xl relative">
+            <button
+              onClick={() => setShowBeforeAfterModal(false)}
+              className={`absolute top-4 ${isRtl ? 'left-4' : 'right-4'} p-2 text-stone-500 hover:text-charcoal`}
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="font-cinzel text-base font-semibold text-charcoal uppercase">
+              {isRtl ? 'مقارنة الريندر المعماري بالواقع المنفذ' : '3D Computational Render vs As-Built Reality'}
+            </h3>
+            <BeforeAfterSlider
+              beforeImage={formData.cover_image}
+              afterImage={formData.as_built_image}
+              beforeLabel={isRtl ? 'التصميم ثلاثي الأبعاد' : '3D Render / BIM'}
+              afterLabel={isRtl ? 'الواقع المنفذ' : 'As-Built Reality'}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Luxury Client Monograph Dossier PDF Export */}
+      {monographProject && (
+        <ProjectMonographPrint
+          project={monographProject}
+          isRtl={isRtl}
+          locale={locale}
+          onClose={() => setMonographProject(null)}
+        />
       )}
 
       {/* Custom Luxury Confirm Modal */}
