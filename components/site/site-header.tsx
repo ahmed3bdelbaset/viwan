@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowUpRight, ArrowRight, ArrowLeft, Menu, X, Mail, Phone, MapPin } from 'lucide-react'
@@ -35,6 +35,7 @@ export function SiteHeader() {
   const isAr = lang === 'ar'
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const drawerRef = useRef<HTMLDivElement>(null)
 
   const isGateway = pathname?.startsWith('/studio-gateway-vw')
   const overDarkHero = !scrolled && isDarkHeroRoute(pathname || '')
@@ -50,7 +51,14 @@ export function SiteHeader() {
     setOpen(false)
   }, [pathname])
 
-  // Lock scrolling when the burger menu is open
+  // Reset drawer scroll to top whenever it opens
+  useEffect(() => {
+    if (open && drawerRef.current) {
+      drawerRef.current.scrollTop = 0
+    }
+  }, [open])
+
+  // Lock background scrolling when the burger menu is open (without killing touch scrolling on the drawer)
   useEffect(() => {
     if (!open) return
 
@@ -58,7 +66,6 @@ export function SiteHeader() {
     const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior
     const originalBodyOverflow = document.body.style.overflow
     const originalBodyOverscroll = document.body.style.overscrollBehavior
-    const originalBodyTouchAction = document.body.style.touchAction
     const originalPaddingRight = document.body.style.paddingRight
 
     const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
@@ -70,7 +77,6 @@ export function SiteHeader() {
     document.documentElement.style.overscrollBehavior = 'none'
     document.body.style.overflow = 'hidden'
     document.body.style.overscrollBehavior = 'none'
-    document.body.style.touchAction = 'none'
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -85,7 +91,6 @@ export function SiteHeader() {
       document.documentElement.style.overscrollBehavior = originalHtmlOverscroll
       document.body.style.overflow = originalBodyOverflow
       document.body.style.overscrollBehavior = originalBodyOverscroll
-      document.body.style.touchAction = originalBodyTouchAction
       document.body.style.paddingRight = originalPaddingRight
       window.removeEventListener('keydown', handleKeyDown)
     }
@@ -204,8 +209,9 @@ export function SiteHeader() {
           - Social media icons (Instagram, LinkedIn, WhatsApp, Facebook, Behance)
          ========================================================================= */}
       <div
+        ref={drawerRef}
         className={cn(
-          'fixed inset-0 z-[100] w-full max-w-[100vw] bg-[#0E0E0C]/96 backdrop-blur-3xl text-ivory flex flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-none touch-pan-y transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] select-none',
+          'fixed inset-0 z-[100] w-full h-full bg-[#0E0E0C]/98 backdrop-blur-3xl text-ivory flex flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] select-none',
           open
             ? 'opacity-100 pointer-events-auto scale-100'
             : 'opacity-0 pointer-events-none scale-[1.02]',
@@ -276,11 +282,11 @@ export function SiteHeader() {
         </div>
 
         {/* Drawer Main Content */}
-        <div className="container-viwan w-full max-w-full overflow-x-hidden flex-1 py-8 sm:py-12 md:py-16 relative z-10 flex flex-col justify-center">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+        <div className="container-viwan w-full max-w-full overflow-x-hidden flex-1 py-6 sm:py-10 md:py-16 relative z-10 flex flex-col justify-start lg:justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center w-full">
             {/* Left 7-8 Cols: Numbered Links with Interactive Hover */}
-            <div className="lg:col-span-8">
-              <span className="eyebrow text-xs text-gold/70 tracking-[0.25em] uppercase block mb-4 sm:mb-6">
+            <div className="w-full lg:col-span-8">
+              <span className="eyebrow text-xs text-gold/70 tracking-[0.25em] uppercase block mb-3 sm:mb-6">
                 {isAr ? 'خريطة الاستوديو والأقسام' : 'NAVIGATION & DISCIPLINES'}
               </span>
 
@@ -348,8 +354,8 @@ export function SiteHeader() {
               </nav>
             </div>
 
-            {/* Right 4-5 Cols: Studio Identity & Direct Contact */}
-            <div className="lg:col-span-4 flex flex-col gap-6 lg:border-s lg:border-white/10 lg:ps-10">
+            {/* Right 4-5 Cols: Studio Identity & Direct Contact (Desktop Only) */}
+            <div className="hidden lg:flex lg:col-span-4 flex-col gap-6 lg:border-s lg:border-white/10 lg:ps-10">
               {/* Studio Locations */}
               <div className="space-y-4">
                 <span className="eyebrow text-xs text-gold/70 tracking-[0.25em] uppercase block">
