@@ -1081,8 +1081,8 @@ function OverviewTab({
                 </div>
                 {p.featured && (
                   <div className="absolute top-2.5 end-2.5">
-                    <span className="px-2 py-0.5 rounded-2xs bg-gold text-charcoal text-[10px] font-semibold flex items-center gap-1">
-                      <Star className="size-2.5 fill-charcoal" />
+                    <span className="px-2 py-0.5 rounded-2xs bg-black/75 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold flex items-center gap-1">
+                      <Star className="size-2.5 text-white fill-white" />
                       <span>{isAr ? 'مميز' : 'Featured'}</span>
                     </span>
                   </div>
@@ -1326,20 +1326,20 @@ function ProjectsTab({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* Project Metrics Badge */}
-            <div className="px-3.5 py-2 rounded-xs bg-[#0f0f13] border border-white/10 font-mono text-xs flex items-center gap-2.5">
+            {/* Project Metrics Badge (Plain Monochromatic) */}
+            <div className="px-3.5 py-2 rounded-xs bg-[#0f0f13] border border-white/10 font-mono text-xs flex items-center gap-2.5 text-white/70">
               <span className="font-serif text-sm text-white font-medium">
                 {totalCount} {isAr ? 'مشروعاً' : 'projects'}
               </span>
               <span className="text-white/20">|</span>
-              <span className="text-emerald-400 flex items-center gap-1">
-                <span className="size-1.5 rounded-full bg-emerald-400" />
+              <span className="text-white/85 flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-white/50" />
                 {publishedCount} {isAr ? 'منشور' : 'live'}
               </span>
               <span className="text-white/20">·</span>
-              <span className="text-amber-400">{draftCount} {isAr ? 'مسودة' : 'draft'}</span>
+              <span className="text-white/55">{draftCount} {isAr ? 'مسودة' : 'draft'}</span>
               <span className="text-white/20">·</span>
-              <span className="text-gold">{featuredCount} {isAr ? 'مميز' : 'featured'}</span>
+              <span className="text-white/55">{featuredCount} {isAr ? 'مميز' : 'featured'}</span>
             </div>
 
             {/* Add New Project Gold Button */}
@@ -1546,10 +1546,10 @@ function ProjectsTab({
 
                       {/* Top Badges: Category & Featured */}
                       <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2 z-10">
-                        {/* Featured Badge */}
+                        {/* Featured Badge - White Star, Monochromatic */}
                         {p.featured ? (
-                          <span className="px-2.5 py-1 rounded-2xs bg-gold text-charcoal text-[10px] font-bold eyebrow flex items-center gap-1 shadow-md shadow-gold/20">
-                            <Star className="size-3 fill-charcoal" />
+                          <span className="px-2.5 py-1 rounded-2xs bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-medium eyebrow flex items-center gap-1.5 shadow-md">
+                            <Star className="size-3 text-white fill-white" />
                             <span>{isAr ? 'مميز (FEATURED)' : 'FEATURED'}</span>
                           </span>
                         ) : (
@@ -1562,12 +1562,12 @@ function ProjectsTab({
                         </span>
                       </div>
 
-                      {/* Bottom Image Overlay Details: Code & Titles & Live Status */}
+                      {/* Bottom Image Overlay Details: Code & Titles & Live Status (Plain Monochromatic) */}
                       <div className="absolute bottom-3 inset-x-3.5 text-white z-10 space-y-1">
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="text-gold/90 font-bold tracking-widest">{refCode}</span>
-                          <span className={`flex items-center gap-1 font-mono text-[10px] ${p.status === 'Draft' ? 'text-amber-400' : 'text-emerald-400'}`}>
-                            <span className={`size-1.5 rounded-full ${p.status === 'Draft' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                          <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/80">
+                            <span className={`size-1.5 rounded-full ${p.status === 'Draft' ? 'bg-white/40' : 'bg-white/70'}`} />
                             <span>{p.status === 'Draft' ? (isAr ? 'مسودة' : 'Draft') : (isAr ? 'منشور' : 'Live')}</span>
                           </span>
                         </div>
@@ -1608,9 +1608,9 @@ function ProjectsTab({
                             <button
                               type="button"
                               onClick={() => handleDelete(p.slug, isAr ? (p.titleAr || p.title) : p.title)}
-                              className="w-full py-2 rounded-xs bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/40 text-rose-300 font-semibold text-xs eyebrow transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                              className="w-full py-2 rounded-xs bg-white/5 hover:bg-white/10 border border-white/15 text-white/80 hover:text-white font-semibold text-xs eyebrow transition-colors flex items-center justify-center gap-2 cursor-pointer"
                             >
-                              <Trash2 className="size-3.5" />
+                              <Trash2 className="size-3.5 text-white/60" />
                               <span>{isAr ? 'حذف (DELETE)' : 'DELETE'}</span>
                             </button>
 
@@ -1619,7 +1619,7 @@ function ProjectsTab({
                               target="_blank"
                               className="w-full py-2 rounded-xs bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-mono transition-colors flex items-center justify-center gap-2"
                             >
-                              <ExternalLink className="size-3 text-gold" />
+                              <Eye className="size-3 text-gold" />
                               <span>{isAr ? 'معاينة حية في الموقع' : 'Live Preview'}</span>
                             </Link>
                           </div>
@@ -1677,8 +1677,8 @@ function ProjectsTab({
                     {/* ── CARD FOOTER & ACTIONS ───────────────────────────── */}
                     <div className="p-4 sm:p-5 pt-0 flex items-center justify-between border-t border-white/5 mt-1 text-xs">
                       {/* Status indicator on the right */}
-                      <div className="text-[11px] font-mono text-white/40 flex items-center gap-1.5">
-                        <span className={`size-1.5 rounded-full ${p.status === 'Draft' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                      <div className="text-[11px] font-mono text-white/50 flex items-center gap-1.5">
+                        <span className={`size-1.5 rounded-full ${p.status === 'Draft' ? 'bg-white/40' : 'bg-white/70'}`} />
                         <span>{p.status === 'Draft' ? (isAr ? 'مسودة غير منشورة' : 'Unpublished Draft') : (isAr ? 'منشور في المعرض العام' : 'Public Portfolio')}</span>
                       </div>
 
@@ -1748,8 +1748,97 @@ function ProjectsTab({
                 </div>
               </div>
 
-              {/* Table Responsive Wrapper */}
-              <div className="overflow-x-auto">
+              {/* ── MOBILE VIEW: DEDICATED CARDS LIST (ZERO HORIZONTAL OVERFLOW) ── */}
+              <div className="md:hidden divide-y divide-white/10">
+                {paginatedProjects.map((p, idx) => {
+                  const refCode = `REF-${p.year || '2024'}-${(p.slug || '').slice(0, 3).toUpperCase()}`
+                  const rowIndex = (tablePage - 1) * pageSize + idx + 1
+
+                  return (
+                    <div key={p.id || p.slug} className="py-3.5 space-y-2.5">
+                      {/* Top Row: Index, Thumbnail, Title, and White Star */}
+                      <div className="flex items-start gap-3">
+                        <span className="text-white/40 font-mono text-xs pt-1 shrink-0">
+                          {String(rowIndex).padStart(2, '0')}
+                        </span>
+
+                        <div className="relative size-12 rounded-xs overflow-hidden bg-black/60 border border-white/10 shrink-0">
+                          <img
+                            src={p.coverImage || p.cover || (p as any).image || '/images/hero-villa.png'}
+                            alt="Thumb"
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-serif text-sm font-medium text-white truncate">
+                              {isAr ? (p.titleAr || (p as any).nameAr || p.title) : p.title}
+                            </h4>
+                            {/* Star Featured Toggle (White Star Icon) */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleFeatured(p)}
+                              className="p-1 rounded-xs hover:bg-white/10 transition-colors cursor-pointer shrink-0 text-white/30 hover:text-white"
+                              title={p.featured ? (isAr ? 'إلغاء التمييز' : 'Unfeature') : (isAr ? 'تمييز في الواجهة' : 'Feature')}
+                            >
+                              <Star
+                                className={`size-3.5 ${p.featured ? 'text-white fill-white' : 'text-white/20'}`}
+                              />
+                            </button>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-[10px] font-mono text-white/50">
+                            <span className="text-gold/90 font-bold">{refCode}</span>
+                            <span>·</span>
+                            <span>{p.year}</span>
+                            <span>·</span>
+                            <span className="truncate">{isAr ? (p.categoryAr || (p as any).typeAr || p.category || 'معماري') : (p.category || 'Architecture')}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bottom Row: Location, Status Pill, and Actions */}
+                      <div className="flex items-center justify-between gap-2 pt-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {/* Status Pill (Monochromatic) */}
+                          <span className="px-2 py-0.5 rounded-2xs text-[10px] font-mono inline-flex items-center gap-1 bg-white/[0.08] text-white/90 border border-white/15 shrink-0">
+                            <span className={`size-1 rounded-full ${p.status === 'Draft' ? 'bg-white/40' : 'bg-white/80'}`} />
+                            <span>{p.status === 'Draft' ? (isAr ? 'مسودة' : 'Draft') : (isAr ? 'منشور' : 'Live')}</span>
+                          </span>
+
+                          <span className="text-[11px] text-white/50 truncate font-mono">
+                            {isAr ? (p.locationAr || p.location) : p.location}
+                          </span>
+                        </div>
+
+                        {/* Actions (Edit & Monochromatic Delete - NO Share Icon) */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => onEdit(p)}
+                            className="px-2.5 py-1 rounded-xs bg-white/5 hover:bg-white/10 border border-white/15 text-gold text-xs font-mono transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <Edit3 className="size-3" />
+                            <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(p.slug, isAr ? (p.titleAr || p.title) : p.title)}
+                            className="p-1.5 rounded-xs bg-white/5 hover:bg-white/10 border border-white/10 text-white/40 hover:text-white transition-colors cursor-pointer"
+                            title={isAr ? 'حذف' : 'Delete'}
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* ── DESKTOP VIEW: FULL DATA TABLE (HIDDEN ON MOBILE) ── */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-start text-xs font-mono">
                   <thead>
                     <tr className="border-b border-white/10 text-white/40 text-[11px] uppercase tracking-wider">
@@ -1821,45 +1910,31 @@ function ProjectsTab({
                             {p.year}
                           </td>
 
-                          {/* Status Pill */}
+                          {/* Status Pill (Monochromatic, No Green/Amber) */}
                           <td className="py-3.5 px-3 text-center">
-                            <span
-                              className={`px-2 py-0.5 rounded-2xs text-[10px] inline-flex items-center gap-1 ${
-                                p.status === 'Draft'
-                                  ? 'bg-amber-400/10 text-amber-400 border border-amber-400/20'
-                                  : 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
-                              }`}
-                            >
-                              <span className={`size-1 rounded-full ${p.status === 'Draft' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                            <span className="px-2 py-0.5 rounded-2xs text-[10px] inline-flex items-center gap-1 bg-white/[0.08] text-white/90 border border-white/15">
+                              <span className={`size-1 rounded-full ${p.status === 'Draft' ? 'bg-white/40' : 'bg-white/80'}`} />
                               <span>{p.status === 'Draft' ? (isAr ? 'مسودة' : 'Draft') : (isAr ? 'منشور' : 'Live')}</span>
                             </span>
                           </td>
 
-                          {/* Star Featured Toggle */}
+                          {/* Star Featured Toggle (White Star, No Emoji) */}
                           <td className="py-3.5 px-3 text-center">
                             <button
                               type="button"
                               onClick={() => handleToggleFeatured(p)}
-                              className="p-1 rounded-xs hover:bg-white/10 transition-colors cursor-pointer text-white/30 hover:text-gold"
+                              className="p-1 rounded-xs hover:bg-white/10 transition-colors cursor-pointer text-white/30 hover:text-white"
                               title={p.featured ? (isAr ? 'إلغاء التمييز' : 'Unfeature') : (isAr ? 'تمييز في الواجهة' : 'Feature')}
                             >
                               <Star
-                                className={`size-3.5 ${p.featured ? 'text-gold fill-gold' : 'text-white/30'}`}
+                                className={`size-3.5 ${p.featured ? 'text-white fill-white' : 'text-white/20'}`}
                               />
                             </button>
                           </td>
 
-                          {/* Actions */}
+                          {/* Actions (Edit & Monochromatic Delete - NO Share Icon) */}
                           <td className="py-3.5 px-3 text-end">
                             <div className="flex items-center justify-end gap-1.5">
-                              <Link
-                                href={`/projects/${p.slug}`}
-                                target="_blank"
-                                className="p-1.5 rounded-xs text-white/40 hover:text-white hover:bg-white/5 transition-colors"
-                                title={isAr ? 'معاينة' : 'Preview'}
-                              >
-                                <ExternalLink className="size-3.5" />
-                              </Link>
                               <button
                                 type="button"
                                 onClick={() => onEdit(p)}
@@ -1871,7 +1946,7 @@ function ProjectsTab({
                               <button
                                 type="button"
                                 onClick={() => handleDelete(p.slug, isAr ? (p.titleAr || p.title) : p.title)}
-                                className="p-1.5 rounded-xs text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-xs text-white/40 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                                 title={isAr ? 'حذف' : 'Delete'}
                               >
                                 <Trash2 className="size-3.5" />
@@ -4969,7 +5044,7 @@ export default function StudioGatewayPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-[#141311] border border-white/15 rounded-xs p-6 max-w-md w-full shadow-2xl space-y-4">
             <div className="flex items-start gap-3">
-              <div className="size-9 rounded-xs bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
+              <div className="size-9 rounded-xs bg-white/10 border border-white/20 flex items-center justify-center text-white/80 shrink-0 mt-0.5">
                 <Trash2 className="size-4" />
               </div>
               <div className="space-y-1">
@@ -4988,7 +5063,7 @@ export default function StudioGatewayPage() {
               <button
                 type="button"
                 onClick={confirmModal.onConfirm}
-                className="px-4 py-1.5 rounded-xs bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition-colors cursor-pointer eyebrow shadow-sm shadow-rose-900/30"
+                className="px-4 py-1.5 rounded-xs bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-semibold transition-colors cursor-pointer eyebrow shadow-sm"
               >
                 {confirmModal.confirmLabel || (isAr ? 'تأكيد الحذف' : 'Confirm Delete')}
               </button>
