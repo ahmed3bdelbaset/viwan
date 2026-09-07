@@ -19,7 +19,7 @@ export function SiteFooter() {
   const pathname = usePathname()
   const { t, lang } = useLanguage()
 
-  if (pathname?.startsWith('/studio-gateway-vw')) {
+  if (pathname?.startsWith('/studio-gateway-vw') || pathname?.startsWith('/admin')) {
     return null
   }
 

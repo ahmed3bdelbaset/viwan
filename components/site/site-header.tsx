@@ -121,7 +121,9 @@ export function SiteHeader() {
     return ''
   }
 
-  if (isGateway) return null
+  const isAdminOrGateway = pathname?.startsWith('/studio-gateway-vw') || pathname?.startsWith('/admin')
+
+  if (isAdminOrGateway) return null
 
   return (
     <>
