@@ -55,6 +55,7 @@ type AuthView = "login" | "forgot-step-1" | "forgot-step-2" | "forgot-step-3" | 
 function AuthGate({ onAuth }: { onAuth: () => void }) {
   const [view, setView] = useState<AuthView>("login")
   const [isAr, setIsAr] = useState(true)
+  const stepNum = view === "forgot-step-1" ? 1 : view === "forgot-step-2" ? 2 : view === "forgot-step-3" ? 3 : 0
 
   // Form states
   const [email, setEmail] = useState("")
@@ -206,7 +207,15 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
 
       if (res.ok && data.success) {
         setPassword("")
-        setView("success")
+        // Automatically establish session and directly log into the account
+        await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password: newPassword }),
+          credentials: "include",
+        }).catch(() => null)
+
+        onAuth()
       } else {
         setError(data.error || (isAr ? "فشل تحديث كلمة المرور" : "Failed to reset password"))
       }
@@ -390,14 +399,8 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
               <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
 
             {/* Studio Branding */}
-            <div className="flex flex-col items-center text-center mb-8">
-              <Logo layout="stacked" className="mb-2" />
-              <div className="flex items-center gap-2 mt-3">
-                <span className="size-1.5 rounded-full bg-gold animate-pulse" />
-                <span className="text-[10px] eyebrow text-gold/90 uppercase tracking-[0.25em]">
-                  {isAr ? "بوابة إدارة الاستوديو المعماري" : "STUDIO GATEWAY · EXECUTIVE PORTAL"}
-                </span>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <Logo layout="stacked" />
             </div>
 
             {/* Error Message Alert */}
@@ -484,30 +487,102 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
               </form>
             )}
 
+            {/* ── 3-Stage Progress Stepper Strip ── */}
+            {stepNum > 0 && (
+              <div className="mb-8 pt-1">
+                <div className="flex items-center justify-between relative px-2">
+                  {/* Stage 1: Email */}
+                  <div className="flex flex-col items-center gap-2 z-10 min-w-[70px]">
+                    <div
+                      className={`size-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300 ${
+                        stepNum > 1
+                          ? "bg-gold text-charcoal shadow-[0_0_12px_rgba(197,168,128,0.35)]"
+                          : stepNum === 1
+                          ? "bg-gold text-charcoal ring-4 ring-gold/25 shadow-[0_0_16px_rgba(197,168,128,0.55)] font-bold"
+                          : "bg-[#181715] border border-white/15 text-white/40"
+                      }`}
+                    >
+                      {stepNum > 1 ? <Check className="size-4 stroke-[3]" /> : "1"}
+                    </div>
+                    <span
+                      className={`text-[11px] eyebrow tracking-wider transition-colors duration-300 text-center ${
+                        stepNum >= 1 ? "text-gold font-medium" : "text-ivory/40"
+                      }`}
+                    >
+                      {isAr ? "البريد" : "Email"}
+                    </span>
+                  </div>
+
+                  {/* Track 1 -> 2 */}
+                  <div className="flex-1 h-0.5 mx-2 -mt-5 bg-white/10 relative overflow-hidden rounded-full">
+                    <div
+                      className={`h-full bg-gold transition-all duration-500 ease-out ${
+                        stepNum >= 2 ? "w-full" : "w-0"
+                      }`}
+                    />
+                  </div>
+
+                  {/* Stage 2: OTP */}
+                  <div className="flex flex-col items-center gap-2 z-10 min-w-[70px]">
+                    <div
+                      className={`size-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300 ${
+                        stepNum > 2
+                          ? "bg-gold text-charcoal shadow-[0_0_12px_rgba(197,168,128,0.35)]"
+                          : stepNum === 2
+                          ? "bg-gold text-charcoal ring-4 ring-gold/25 shadow-[0_0_16px_rgba(197,168,128,0.55)] font-bold"
+                          : "bg-[#181715] border border-white/15 text-white/40"
+                      }`}
+                    >
+                      {stepNum > 2 ? <Check className="size-4 stroke-[3]" /> : "2"}
+                    </div>
+                    <span
+                      className={`text-[11px] eyebrow tracking-wider transition-colors duration-300 text-center ${
+                        stepNum >= 2 ? "text-gold font-medium" : "text-ivory/40"
+                      }`}
+                    >
+                      {isAr ? "رمز التحقق" : "OTP Code"}
+                    </span>
+                  </div>
+
+                  {/* Track 2 -> 3 */}
+                  <div className="flex-1 h-0.5 mx-2 -mt-5 bg-white/10 relative overflow-hidden rounded-full">
+                    <div
+                      className={`h-full bg-gold transition-all duration-500 ease-out ${
+                        stepNum >= 3 ? "w-full" : "w-0"
+                      }`}
+                    />
+                  </div>
+
+                  {/* Stage 3: New Password */}
+                  <div className="flex flex-col items-center gap-2 z-10 min-w-[70px]">
+                    <div
+                      className={`size-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300 ${
+                        stepNum > 3
+                          ? "bg-gold text-charcoal shadow-[0_0_12px_rgba(197,168,128,0.35)]"
+                          : stepNum === 3
+                          ? "bg-gold text-charcoal ring-4 ring-gold/25 shadow-[0_0_16px_rgba(197,168,128,0.55)] font-bold"
+                          : "bg-[#181715] border border-white/15 text-white/40"
+                      }`}
+                    >
+                      {stepNum > 3 ? <Check className="size-4 stroke-[3]" /> : "3"}
+                    </div>
+                    <span
+                      className={`text-[11px] eyebrow tracking-wider transition-colors duration-300 text-center ${
+                        stepNum === 3 ? "text-gold font-medium" : "text-ivory/40"
+                      }`}
+                    >
+                      {isAr ? "كلمة المرور" : "Password"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* ============================================================= */}
             {/* VIEW 2: FORGOT PASSWORD - STEP 1 (Email & Admin Check)       */}
             {/* ============================================================= */}
             {view === "forgot-step-1" && (
               <form onSubmit={handleRequestOtp} className="space-y-5 animate-fade-in">
-                {/* Stepper Header */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <KeyRound className="size-4 text-gold" />
-                    <span className="text-xs eyebrow font-medium text-ivory">
-                      {isAr ? "استعادة كلمة المرور" : "RESET PASSWORD"}
-                    </span>
-                  </div>
-                  <span className="text-[10px] eyebrow text-gold/80 px-2 py-0.5 bg-gold/10 border border-gold/30 rounded-2xs">
-                    {isAr ? "المرحلة 1 من 3" : "Step 1 of 3"}
-                  </span>
-                </div>
-
-                <p className="text-xs leading-relaxed text-ivory/70 font-sans">
-                  {isAr
-                    ? "أدخل البريد الإلكتروني الخاص بك في الإدارة. سيقوم النظام بالتحقق من هويتك وإرسال رمز أمني (OTP) عبر Brevo."
-                    : "Enter your registered administrator email. The system will verify your privileges and dispatch an OTP via Brevo."}
-                </p>
-
                 <div>
                   <label className="block text-[11px] eyebrow text-ivory/60 uppercase tracking-wider mb-2">
                     {isAr ? "البريد الإلكتروني للمسؤول" : "ADMIN EMAIL"}
@@ -550,25 +625,11 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
             {/* ============================================================= */}
             {view === "forgot-step-2" && (
               <form onSubmit={handleVerifyOtp} className="space-y-5 animate-fade-in">
-                {/* Stepper Header */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="size-4 text-gold" />
-                    <span className="text-xs eyebrow font-medium text-ivory">
-                      {isAr ? "تأكيد الرمز الأمني" : "ENTER OTP CODE"}
-                    </span>
-                  </div>
-                  <span className="text-[10px] eyebrow text-gold/80 px-2 py-0.5 bg-gold/10 border border-gold/30 rounded-2xs">
-                    {isAr ? "المرحلة 2 من 3" : "Step 2 of 3"}
+                <div className="text-center mb-2">
+                  <span className="text-[11px] eyebrow text-gold/80 font-mono tracking-wider" dir="ltr">
+                    {email}
                   </span>
                 </div>
-
-                <p className="text-xs leading-relaxed text-ivory/70 font-sans">
-                  {isAr
-                    ? `تم إرسال رمز أمني مكون من 6 أرقام إلى: `
-                    : `We sent a 6-digit security OTP to: `}
-                  <strong className="text-gold font-mono block mt-1" dir="ltr">{email}</strong>
-                </p>
 
                 <div>
                   <label className="block text-[11px] eyebrow text-ivory/60 uppercase tracking-wider mb-2">
@@ -632,25 +693,6 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
             {/* ============================================================= */}
             {view === "forgot-step-3" && (
               <form onSubmit={handleResetPassword} className="space-y-5 animate-fade-in">
-                {/* Stepper Header */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Lock className="size-4 text-gold" />
-                    <span className="text-xs eyebrow font-medium text-ivory">
-                      {isAr ? "تعيين كلمة المرور الجديدة" : "NEW PASSWORD"}
-                    </span>
-                  </div>
-                  <span className="text-[10px] eyebrow text-gold/80 px-2 py-0.5 bg-gold/10 border border-gold/30 rounded-2xs">
-                    {isAr ? "المرحلة 3 من 3" : "Step 3 of 3"}
-                  </span>
-                </div>
-
-                <p className="text-xs leading-relaxed text-ivory/70 font-sans">
-                  {isAr
-                    ? "تم تأكيد هويتك بنجاح. أدخل كلمة المرور الجديدة لحسابك في الاستوديو:"
-                    : "Identity verified. Please set your new administrator password:"}
-                </p>
-
                 <div>
                   <label className="block text-[11px] eyebrow text-ivory/60 uppercase tracking-wider mb-2">
                     {isAr ? "كلمة المرور الجديدة" : "NEW PASSWORD"}
@@ -693,10 +735,10 @@ function AuthGate({ onAuth }: { onAuth: () => void }) {
                 <button
                   type="submit"
                   disabled={loading || !newPassword || newPassword !== confirmPassword}
-                  className="w-full bg-gold hover:bg-ivory text-charcoal font-medium text-xs tracking-widest eyebrow py-3.5 rounded-xs transition-all duration-300 shadow-sm active:scale-98 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
+                  className="w-full bg-gold hover:bg-ivory text-charcoal font-medium text-xs tracking-widest eyebrow py-3.5 rounded-xs transition-all duration-300 shadow-sm active:scale-98 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
                 >
                   {loading && <RefreshCw className="size-3.5 animate-spin" />}
-                  <span>{loading ? (isAr ? "جاري الحفظ..." : "Updating...") : isAr ? "حفظ وتفعيل كلمة المرور" : "SAVE NEW PASSWORD"}</span>
+                  <span>{loading ? (isAr ? "جاري تسجيل الدخول..." : "Signing in...") : isAr ? "تسجيل الدخول" : "SIGN IN"}</span>
                 </button>
               </form>
             )}

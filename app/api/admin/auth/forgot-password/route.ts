@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import {
   isAuthorizedAdminEmail,
   generateOtp,
@@ -97,9 +98,20 @@ export async function POST(req: Request) {
       // Clear the reset session
       consumeResetToken(cleanEmail)
 
+      // Automatically create authenticated session cookie so user enters dashboard directly
+      const sessionToken = Buffer.from(`${cleanEmail}:${Date.now()}:viwan_secret`).toString('base64')
+      const cookieStore = await cookies()
+      cookieStore.set('viwan_admin_token', sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24, // 24 hours
+        path: '/',
+      })
+
       return NextResponse.json({
         success: true,
-        message: 'تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.',
+        message: 'تم تغيير كلمة المرور وتسجيل الدخول بنجاح.',
       })
     }
 
