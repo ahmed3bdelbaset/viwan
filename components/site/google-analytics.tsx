@@ -7,7 +7,7 @@ import Script from 'next/script'
  * Uses Next.js Script with 'afterInteractive' strategy for optimal performance without blocking page load.
  */
 export function GoogleAnalytics() {
-  const gaId = process.env.NEXT_PUBLIC_GA_ID
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-3RV9VLSJS8'
 
   // If no Measurement ID is configured, render nothing
   if (!gaId || gaId.trim() === '') {
