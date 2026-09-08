@@ -8,6 +8,15 @@ import { ButtonLink, Display, Eyebrow, SectionIndex } from '@/components/site/pr
 import { Reveal } from '@/components/site/reveal'
 import { LogoMark } from '@/components/site/logo'
 import { CountUp } from '@/components/ui/count-up'
+import {
+  EmaarLogo,
+  SodicLogo,
+  TmgLogo,
+  AlMarasemLogo,
+  HydeParkLogo,
+  MisrItaliaLogo,
+  RegionalMiniMap,
+} from '@/components/site/client-logos'
 import { DisciplinesShowcase } from '@/components/home/disciplines-showcase'
 import { PROCESS, SERVICES } from '@/lib/site'
 import { FEATURED_PROJECT, HOME_PROJECTS, type Project } from '@/lib/projects'
@@ -513,132 +522,162 @@ export function ArchitecturalMarquee() {
   )
 }
 
-/* 08 — HOME IMPACT & PARTNERS */
+/* 06–09 — HOME IMPACT, WHERE WE WORK, SELECTED CLIENTS & FEEDBACK */
 export function HomeImpactSection() {
-  const { t } = useLanguage()
-  const partners = ['EMAAR', 'SODIC', 'TALAAT MOUSTAFA', 'PALM HILLS', 'ROSHN KSA', 'DIRIYAH GATE']
-  const sectionRef = useRef<HTMLElement>(null)
-  const bgRef = useRef<HTMLDivElement>(null)
+  const { t, lang, isRtl } = useLanguage()
 
-  useEffect(() => {
-    let animId: number | null = null
-    const updateParallax = () => {
-      if (!sectionRef.current || !bgRef.current) return
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        bgRef.current.style.transform = 'none'
-        return
-      }
-      const rect = sectionRef.current.getBoundingClientRect()
-      const winHeight = window.innerHeight
-
-      // If section is approaching or in viewport
-      if (rect.bottom > -150 && rect.top < winHeight + 150) {
-        const sectionCenter = rect.top + rect.height / 2
-        const viewportCenter = winHeight / 2
-        const diff = sectionCenter - viewportCenter
-        // Smooth, visible parallax shift that feels dynamic while keeping plane visible
-        const translateY = Math.max(-55, Math.min(55, -diff * 0.12))
-        bgRef.current.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0)`
-      }
-    }
-
-    const onScroll = () => {
-      if (animId) cancelAnimationFrame(animId)
-      animId = requestAnimationFrame(updateParallax)
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-    updateParallax()
-
-    return () => {
-      if (animId) cancelAnimationFrame(animId)
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-    }
-  }, [])
+  const metrics = t.impact?.metrics || [
+    { value: '50+', label: lang === 'ar' ? 'مشروعاً منجزاً' : 'Projects' },
+    { value: '1M+ m²', label: lang === 'ar' ? 'تم تصميمه' : 'Designed' },
+    { value: '4', label: lang === 'ar' ? 'تخصصات متكاملة' : 'Disciplines' },
+    { value: '3', label: lang === 'ar' ? 'أسواق إقليمية' : 'Markets' },
+  ]
 
   return (
-    <section id="impact" ref={sectionRef} className="relative pt-20 sm:pt-24 md:pt-28 pb-16 sm:pb-20 md:pb-24 surface-dark border-t border-border overflow-hidden">
-      {/* Parallax Architecture Background with Responsive Images */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden select-none z-0">
-        <div
-          ref={bgRef}
-          className="absolute -top-[8%] start-0 w-full h-[116%] will-change-transform transition-transform duration-75 ease-out"
-          style={{ transform: 'translate3d(0, 0px, 0)' }}
-        >
-          {/* Desktop & Tablet: 16:9 Landscape Wide Shot */}
-          <div className="hidden sm:block absolute inset-0">
-            <Image
-              src="/images/airplane-banner-viwan.jpg"
-              alt="VIWAN Aircraft Towing Brand Banner Over Sunny Mediterranean Coastline"
-              fill
-              sizes="100vw"
-              className="object-cover object-[center_36%]"
-              priority={false}
-            />
-          </div>
+    <section id="impact" className="relative py-12 sm:py-16 md:py-20 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30">
+      <div className="container-viwan">
+        {/* Main Architectural Unified Grid Box */}
+        <div className="border border-[#E7E2D8] dark:border-stone-800 bg-white dark:bg-[#161513] shadow-xs">
+          
+          {/* ========================================================================= */}
+          {/* ROW 1: 06 / OUR IMPACT (Left) | 07 / WHERE WE WORK (Right) */}
+          {/* ========================================================================= */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch border-b border-[#E7E2D8] dark:border-stone-800">
+            {/* Left ~64%: 06 OUR IMPACT */}
+            <div className="lg:col-span-8 p-6 sm:p-8 md:p-10 flex flex-col justify-between gap-6">
+              {/* Tag / Eyebrow */}
+              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+                <span className="text-gold font-bold">06</span>
+                <span className="text-stone-300 dark:text-stone-700">/</span>
+                <span className="font-semibold text-charcoal dark:text-ivory">{t.impact?.label || (isRtl ? 'أثرنا وإنجازنا' : 'OUR IMPACT')}</span>
+              </div>
 
-          {/* Mobile: 9:16 Portrait Optimized Shot */}
-          <div className="block sm:hidden absolute inset-0">
-            <Image
-              src="/images/airplane-banner-viwan-mobile.jpg"
-              alt="VIWAN Aircraft Towing Brand Banner Over Sunny Mediterranean Coastline"
-              fill
-              sizes="100vw"
-              className="object-cover object-[68%_32%]"
-              priority={false}
-            />
-          </div>
-        </div>
-        {/* Balanced luxury marine tint: crystal-clear sky to showcase plane & banner, dark sea vignette below */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#08121a]/25 via-transparent to-[#050c13]/85" />
-        {/* Subtle vignette */}
-        <div className="absolute inset-0 bg-radial-[ellipse_at_center,_transparent_45%,_#050c13_95%] opacity-40" />
-      </div>
-
-      <div className="relative z-10 container-viwan flex flex-col justify-between min-h-[720px] md:min-h-[820px] pt-4 sm:pt-0">
-        {/* Top: Section Header */}
-        <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="flex flex-col gap-3 max-w-xl">
-            <SectionIndex n={t.impact.index} label={t.impact.label} dark />
-            <Display as="h2" size="md" className="text-ivory drop-shadow-md">
-              {t.impact.heading}
-            </Display>
-          </div>
-          <p className="text-xs eyebrow text-ivory/85 max-w-xs md:text-right rtl:md:text-left drop-shadow">
-            {t.impact.sub}
-          </p>
-        </Reveal>
-
-        {/* Middle: Open Sky Flight Corridor — Airplane and banner soar clearly without any boxes covering them */}
-        <div className="h-36 sm:h-48 md:h-64 lg:h-72 w-full pointer-events-none" aria-hidden="true" />
-
-        {/* Bottom Area: Metric Cards & Partners */}
-        <div className="flex flex-col gap-10 md:gap-14">
-          {/* Luxury Deep Ocean Frosted Glass Metric Cards harmonizing with the marine landscape */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            {t.impact.metrics.map((m, i) => (
-              <Reveal
-                key={i}
-                delay={i * 80}
-                className="group p-5 sm:p-7 md:p-8 border border-white/15 bg-[#07131e]/65 dark:bg-[#030910]/75 backdrop-blur-md flex flex-col gap-1.5 sm:gap-2 shadow-2xl hover:border-gold/70 hover:bg-[#07131e]/85 transition-all duration-500 hover:-translate-y-1 rounded-sm"
-              >
-                <CountUp value={m.value} className="display text-3xl sm:text-4xl md:text-5xl text-gold font-light tracking-tight" />
-                <span className="eyebrow text-[0.7rem] sm:text-xs text-ivory font-bold pt-1 sm:pt-2 tracking-wider group-hover:text-gold transition-colors duration-300">{m.label}</span>
-                <span className="text-[0.7rem] sm:text-xs text-ivory/80 leading-relaxed">{m.sub}</span>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={200} className="pt-6 sm:pt-8 border-t border-white/15 flex flex-col gap-6">
-            <p className="eyebrow text-gold text-xs">{t.impact.partnersLabel}</p>
-            <div className="flex flex-wrap items-center justify-between gap-6 sm:gap-8 text-ivory/90 font-serif text-base sm:text-lg tracking-wider">
-              {partners.map((p, idx) => (
-                <span key={idx} className="hover:text-gold transition-colors duration-300 drop-shadow-sm">{p}</span>
-              ))}
+              {/* 4 Metric Columns with vertical dividers */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x rtl:sm:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 pt-2">
+                {metrics.map((m: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="py-3 sm:py-0 px-3 sm:px-6 first:ps-0 last:pe-0 flex flex-col justify-center"
+                  >
+                    <div className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-charcoal dark:text-ivory tracking-tight leading-none mb-2">
+                      <CountUp value={m.value} />
+                    </div>
+                    <div className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-medium tracking-wide">
+                      {m.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </Reveal>
+
+            {/* Right ~36%: 07 WHERE WE WORK */}
+            <div className="lg:col-span-4 p-6 sm:p-8 md:p-10 border-t lg:border-t-0 lg:border-s border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-5 bg-[#FAF8F5]/50 dark:bg-[#141311]/50">
+              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+                <span className="text-gold font-bold">07</span>
+                <span className="text-stone-300 dark:text-stone-700">/</span>
+                <span className="font-semibold text-charcoal dark:text-ivory">
+                  {t.impact?.whereWeWork?.label || (isRtl ? 'أين نعمل' : 'WHERE WE WORK')}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-5 sm:gap-6">
+                {/* Minimalist Regional Map */}
+                <RegionalMiniMap className="w-28 h-20 sm:w-32 sm:h-22" />
+
+                {/* Locations Text */}
+                <div className="space-y-1.5 flex-1">
+                  <p className="font-serif text-sm sm:text-base text-charcoal dark:text-ivory leading-snug">
+                    {isRtl ? (
+                      <>
+                        مقرنا في القاهرة،<br />
+                        ونعمل عبر مصر<br />
+                        وكافة أنحاء المنطقة.
+                      </>
+                    ) : (
+                      <>
+                        Based in Cairo,<br />
+                        Working across Egypt<br />
+                        and the region.
+                      </>
+                    )}
+                  </p>
+                  <p className="text-[10px] font-mono tracking-widest uppercase text-stone-500 pt-1 border-t border-[#E7E2D8]/60 dark:border-stone-800/60">
+                    {isRtl ? 'مصر / السعودية / الشرق الأوسط' : 'EGYPT / KSA / MIDDLE EAST'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* ROW 2: 08 SELECTED CLIENTS (Left) | 09 CLIENT FEEDBACK (Right) */}
+          {/* ========================================================================= */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+            {/* Left ~64%: 08 SELECTED CLIENTS */}
+            <div className="lg:col-span-8 p-6 sm:p-8 md:p-10 flex flex-col justify-between gap-6">
+              {/* Tag / Eyebrow */}
+              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+                <span className="text-gold font-bold">08</span>
+                <span className="text-stone-300 dark:text-stone-700">/</span>
+                <span className="font-semibold text-charcoal dark:text-ivory">
+                  {t.impact?.selectedClients?.label || (isRtl ? 'عملاؤنا المختارون' : 'SELECTED CLIENTS')}
+                </span>
+              </div>
+
+              {/* 6 Client Logos in horizontal row with thin vertical dividers */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-y sm:divide-y-0 sm:divide-x rtl:sm:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 items-center">
+                {/* 1. EMAAR */}
+                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
+                  <EmaarLogo className="h-5 sm:h-6 w-auto max-w-[110px]" />
+                </div>
+                {/* 2. SODIC */}
+                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
+                  <SodicLogo className="h-5 sm:h-6 w-auto max-w-[110px]" />
+                </div>
+                {/* 3. TMG */}
+                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
+                  <TmgLogo className="h-5 sm:h-6 w-auto max-w-[100px]" />
+                </div>
+                {/* 4. ALMARASEM */}
+                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
+                  <AlMarasemLogo className="h-7 sm:h-8 w-auto max-w-[115px]" />
+                </div>
+                {/* 5. HYDE PARK */}
+                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
+                  <HydeParkLogo className="h-5 sm:h-6 w-auto max-w-[115px]" />
+                </div>
+                {/* 6. MISR ITALIA */}
+                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
+                  <MisrItaliaLogo className="h-5 sm:h-6 w-auto max-w-[120px]" />
+                </div>
+              </div>
+            </div>
+
+            {/* Right ~36%: 09 CLIENT FEEDBACK */}
+            <div className="lg:col-span-4 p-6 sm:p-8 md:p-10 border-t lg:border-t-0 lg:border-s border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-4 bg-[#FAF8F5]/50 dark:bg-[#141311]/50">
+              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+                <span className="text-gold font-bold">09</span>
+                <span className="text-stone-300 dark:text-stone-700">/</span>
+                <span className="font-semibold text-charcoal dark:text-ivory">
+                  {t.impact?.clientFeedback?.label || (isRtl ? 'آراء العملاء' : 'CLIENT FEEDBACK')}
+                </span>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <span className="text-2xl sm:text-3xl text-gold font-serif leading-none shrink-0 select-none">“</span>
+                <p className="font-serif text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-light italic">
+                  {isRtl
+                    ? '“فهمت VIWAN المشروع كتجربة معمارية متكاملة، وليس مجرد مجموعة من القرارات التصميمية المنفصلة.”'
+                    : '“VIWAN understood the project as a complete experience, not a collection of separate design decisions.”'}
+                </p>
+              </div>
+
+              <div className="text-[11px] text-stone-500 font-mono tracking-wider pt-2 border-t border-[#E7E2D8]/60 dark:border-stone-800/60">
+                {isRtl ? '— عميل إقامة خاصة' : '— Private Residence Client'}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

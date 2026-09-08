@@ -12,6 +12,7 @@ export function CountUp({ value, duration = 1800, className = '' }: CountUpProps
   // Initialize with initial target value for SSR and SEO
   const [displayValue, setDisplayValue] = useState<string>(value)
   const ref = useRef<HTMLSpanElement>(null)
+  const hasAnimatedRef = useRef<boolean>(false)
 
   // Extract prefix, numeric value, and suffix
   // e.g. "45+" => prefix: "", num: 45, suffix: "+"
@@ -26,17 +27,27 @@ export function CountUp({ value, duration = 1800, className = '' }: CountUpProps
     const el = ref.current
     if (!el || targetNum === 0) return
 
+    // If already animated in this session, keep final value
+    if (hasAnimatedRef.current) {
+      setDisplayValue(value)
+      return
+    }
+
     // Honor reduced motion preference
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
       setDisplayValue(value)
+      hasAnimatedRef.current = true
       return
     }
 
     let animFrame: number | null = null
     let startTime: number | null = null
 
-    // Adaptive duration: smaller numbers (like 4) need much less time so they don't stutter,
-    // while larger numbers (like 45 or 140) have a brisk, smooth pace
+    // Set initial display to 0 before animation begins
+    setDisplayValue(`${prefix}0${suffix}`)
+
+    // Adaptive duration: smaller numbers (like 3 or 4) need much less time so they don't stutter,
+    // while larger numbers (like 50 or 140) have a brisk, smooth pace
     const effectiveDuration =
       targetNum <= 5
         ? Math.min(duration, 700)
@@ -45,6 +56,9 @@ export function CountUp({ value, duration = 1800, className = '' }: CountUpProps
         : Math.min(duration, 1400)
 
     const startAnimation = () => {
+      if (hasAnimatedRef.current) return
+      hasAnimatedRef.current = true
+
       startTime = null
       const step = (timestamp: number) => {
         if (!startTime) startTime = timestamp
@@ -67,19 +81,12 @@ export function CountUp({ value, duration = 1800, className = '' }: CountUpProps
       animFrame = requestAnimationFrame(step)
     }
 
-    const resetValue = () => {
-      if (animFrame) cancelAnimationFrame(animFrame)
-      setDisplayValue(`${prefix}0${suffix}`)
-    }
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !hasAnimatedRef.current) {
             startAnimation()
-          } else {
-            // Reset when scrolled out of view so it counts again when scrolling back
-            resetValue()
+            observer.unobserve(el)
           }
         })
       },
