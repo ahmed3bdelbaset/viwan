@@ -40,8 +40,30 @@ function getDynamicProjects(): Project[] {
         cover: p.cover || p.coverImage || p.cover_image || '/images/project-private-residence.png',
         interior: p.interior || p.cover || '/images/interior-living-marble.jpg',
         cinematic: p.cinematic || p.cover || '/images/hero-villa.png',
-        gallery: Array.isArray(p.gallery) ? p.gallery : [],
+        gallery: (Array.isArray(p.gallery) ? p.gallery : [])
+          .map((item: any, idx: number) => {
+            if (typeof item === 'string') {
+              return {
+                src: item,
+                caption: p.nameAr ? `${p.nameAr} - لوحة توثيقية 0${idx + 1}` : `${p.name || 'Project'} - Plate 0${idx + 1}`,
+                category: p.type || p.category || 'Architecture',
+              }
+            }
+            return {
+              src: item?.src || item?.url || item?.image || '',
+              caption: item?.caption || (p.nameAr ? `${p.nameAr} - لوحة توثيقية 0${idx + 1}` : `${p.name || 'Project'} - Plate 0${idx + 1}`),
+              captionAr: item?.captionAr,
+              category: item?.category || p.type || p.category || 'Architecture',
+            }
+          })
+          .filter((g: any) => Boolean(g.src)),
         featured: Boolean(p.featured || p.is_featured),
+        youtubeUrl: p.youtubeUrl || p.youtube_url,
+        youtubeId: p.youtubeId || p.youtube_id,
+        coordinates: p.coordinates || (p.lat && p.lng ? `${p.lat}° N, ${p.lng}° E` : undefined),
+        lat: p.lat ? Number(p.lat) : undefined,
+        lng: p.lng ? Number(p.lng) : undefined,
+        projectUrl: p.projectUrl || p.project_url || p.externalLink || p.external_link,
       }))
     }
   } catch (err) {

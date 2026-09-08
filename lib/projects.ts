@@ -38,6 +38,12 @@ export type Project = {
   cinematic: string
   gallery: GalleryItem[]
   featured?: boolean
+  youtubeUrl?: string
+  youtubeId?: string
+  coordinates?: string
+  lat?: number
+  lng?: number
+  projectUrl?: string
 }
 
 export const PROJECTS: Project[] = [

@@ -71,16 +71,22 @@ export interface AdminProjectItem {
   sector_en?: string;
   sector_ar?: string;
   disciplines: string[];
-  scope?: string[];
+  heading?: string;
+  headingAr?: string;
   description?: string;
   descriptionAr?: string;
   philosophy?: string;
+  philosophyAr?: string;
   vision_en?: string;
   vision_ar?: string;
   cover: string;
   gallery: string[];
   featured?: boolean;
   is_featured?: boolean;
+  youtubeUrl?: string;
+  youtubeId?: string;
+  coordinates?: string;
+  projectUrl?: string;
 }
 
 const DISCIPLINES_LIST = [
@@ -353,12 +359,18 @@ export default function AdminProjectsPage() {
       area_sqm: '1,500 m²',
       subtitle_en: 'A home in harmony with its surroundings.',
       subtitle_ar: 'منزل متناغم مع محيطه الطبيعي ويوفر ملاذاً هادئاً.',
+      heading: 'A refined balance of architecture and nature.',
+      headingAr: 'توازن دقيق بين روعة العمارة الحديثة وجمال الطبيعة.',
       description: 'A refined balance of modern architecture, timeless natural materials, and serene outdoor spaces.',
       descriptionAr: 'توازن دقيق بين روعة العمارة الحديثة والمواد الطبيعية والمساحات الخارجية الهادئة.',
+      philosophy: 'Architecture shaped by light and proportion.',
+      philosophyAr: 'حوار هندسي بين متطلبات المعيشة والسكينة الطبيعية.',
       cover: '/images/hero-villa.png',
       gallery: [],
       is_featured: false,
-      scope: ['Architecture Design', 'BIM Coordination'],
+      youtubeUrl: '',
+      coordinates: '30.0444° N, 31.2357° E',
+      projectUrl: '',
     });
     setIsModalOpen(true);
   };
@@ -369,10 +381,23 @@ export default function AdminProjectsPage() {
       ...project,
       title_en: project.title_en || project.title || project.name,
       title_ar: project.title_ar || project.nameAr || project.title,
+      heading: project.heading || '',
+      headingAr: project.headingAr || '',
+      description: project.description || (project as any).details_en || '',
+      descriptionAr: project.descriptionAr || (project as any).details_ar || '',
+      philosophy: project.philosophy || (project as any).vision_en || '',
+      philosophyAr: project.philosophyAr || (project as any).vision_ar || '',
       cover: project.cover || '/images/hero-villa.png',
-      gallery: Array.isArray(project.gallery) ? project.gallery : [],
-      disciplines: Array.isArray(project.disciplines) && project.disciplines.length > 0 ? project.disciplines : [project.category || 'Architecture'],
+      gallery: Array.isArray(project.gallery) 
+        ? project.gallery.map((g: any) => typeof g === 'string' ? g : (g.src || '')) 
+        : [],
+      disciplines: Array.isArray(project.disciplines) && project.disciplines.length > 0 
+        ? project.disciplines 
+        : [project.category || 'Architecture'],
       is_featured: Boolean(project.is_featured || project.featured),
+      youtubeUrl: project.youtubeUrl || '',
+      coordinates: project.coordinates || (project.lat && project.lng ? `${project.lat}° N, ${project.lng}° E` : ''),
+      projectUrl: project.projectUrl || '',
     });
     setIsModalOpen(true);
   };
@@ -1343,19 +1368,32 @@ export default function AdminProjectsPage() {
                   </div>
                 </div>
 
-                {/* 5 Disciplines Interactive Cards */}
+                {/* 5 Disciplines Interactive Cards (Multi-Select Enabled) */}
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1">
                   {DISCIPLINES_LIST.map((d) => {
-                    const isSelected = form.category === d.id || form.category === d.slug || (Array.isArray(form.disciplines) && (form.disciplines.includes(d.id) || form.disciplines.includes(d.slug)));
+                    const currentDisciplines = Array.isArray(form.disciplines) ? form.disciplines : [];
+                    const isSelected = currentDisciplines.includes(d.id) || currentDisciplines.includes(d.slug) || form.category === d.id;
+                    const isPrimary = form.category === d.id;
+
                     return (
                       <button
                         type="button"
                         key={d.id}
                         onClick={() => {
+                          let updated: string[];
+                          if (isSelected) {
+                            // Only allow unselecting if more than one discipline is chosen
+                            updated = currentDisciplines.length > 1 
+                              ? currentDisciplines.filter((x) => x !== d.id && x !== d.slug)
+                              : currentDisciplines;
+                          } else {
+                            updated = [...currentDisciplines, d.id];
+                          }
+                          const newCat = updated.includes(form.category || '') ? form.category : updated[0];
                           setForm((prev) => ({
                             ...prev,
-                            category: d.id,
-                            disciplines: [d.id],
+                            disciplines: updated,
+                            category: newCat,
                           }));
                         }}
                         className={`p-3 text-start border transition-all flex flex-col justify-between gap-2 cursor-pointer rounded-xs ${
@@ -1369,7 +1407,14 @@ export default function AdminProjectsPage() {
                             {d.code}
                           </span>
                           {isSelected ? (
-                            <Check className="w-3.5 h-3.5 text-gold" />
+                            <span className="flex items-center gap-1">
+                              {isPrimary && (
+                                <span className="text-[8.5px] font-mono bg-gold text-charcoal px-1 py-0.5 rounded-xs uppercase font-bold">
+                                  {isRtl ? 'رئيسي' : 'PRIMARY'}
+                                </span>
+                              )}
+                              <Check className="w-3.5 h-3.5 text-gold" />
+                            </span>
                           ) : (
                             <span className="size-2 rounded-full bg-stone-300" />
                           )}
@@ -1387,14 +1432,32 @@ export default function AdminProjectsPage() {
                   })}
                 </div>
 
-                {/* Clear visual feedback */}
-                <div className="p-2.5 bg-white border border-[#E7E2D8] text-[11px] text-stone-600 flex items-start gap-2">
-                  <Sparkles className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                  <span>
-                    {isRtl
-                      ? `سيتم ربط هذا المشروع بقسم (${DISCIPLINES_LIST.find(d => d.id === form.category)?.labelAr || 'التصميم الداخلي'}) في صفحة المشاريع العامة (/projects) بجانب المشاريع الأخرى من نفس التخصص.`
-                      : `This project is linked to (${form.category || 'Architecture'}) and will be displayed in that discipline section on the public /projects page.`}
-                  </span>
+                {/* Clear visual feedback & Primary Discipline Selection */}
+                <div className="p-2.5 bg-white border border-[#E7E2D8] text-[11px] text-stone-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-gold shrink-0" />
+                    <span>
+                      {isRtl
+                        ? `التخصصات المعمارية المحددة: ${(form.disciplines || []).map(d => DISCIPLINES_LIST.find(item => item.id === d)?.labelAr || d).join(' + ')}`
+                        : `Selected Disciplines: ${(form.disciplines || []).join(' + ')}`}
+                    </span>
+                  </div>
+                  {Array.isArray(form.disciplines) && form.disciplines.length > 1 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-stone-500">{isRtl ? 'التخصص الأساسي للعرض:' : 'Primary Category:'}</span>
+                      <select
+                        value={form.category || form.disciplines[0]}
+                        onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                        className="bg-[#FAF6EE] border border-[#E7E2D8] px-2 py-1 text-xs text-charcoal focus:outline-none"
+                      >
+                        {form.disciplines.map((d) => (
+                          <option key={d} value={d}>
+                            {DISCIPLINES_LIST.find((item) => item.id === d)?.labelAr || d}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1484,6 +1547,174 @@ export default function AdminProjectsPage() {
                     placeholder="منزل متناغم مع محيطه الطبيعي ويوفر ملاذاً هادئاً."
                     className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-cairo"
                   />
+                </div>
+              </div>
+
+              {/* Row 6: Architectural Brief Headings */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'عنوان الموجز المعماري (EN)' : 'ARCHITECTURAL BRIEF HEADING (EN)'}
+                  </label>
+                  <input
+                    type="text"
+                    value={form.heading || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, heading: e.target.value }))}
+                    placeholder="A refined balance of architecture and nature."
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'عنوان الموجز المعماري (AR)' : 'ARCHITECTURAL BRIEF HEADING (AR)'}
+                  </label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={form.headingAr || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, headingAr: e.target.value }))}
+                    placeholder="توازن دقيق بين روعة العمارة وجمال الطبيعة."
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-cairo"
+                  />
+                </div>
+              </div>
+
+              {/* Row 7: Full Description / Narrative */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'الوصف المعماري الكامل وتفاصيل المشروع (EN)' : 'FULL ARCHITECTURAL DESCRIPTION (EN)'}
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={form.description || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+                    placeholder="Detailed spatial program, materials, and structural narrative..."
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'الوصف المعماري الكامل وتفاصيل المشروع (AR)' : 'FULL ARCHITECTURAL DESCRIPTION (AR)'}
+                  </label>
+                  <textarea
+                    rows={4}
+                    dir="rtl"
+                    value={form.descriptionAr || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, descriptionAr: e.target.value }))}
+                    placeholder="تفاصيل البرنامج الفراغي، خامات التشطيب، الكتل المعمارية..."
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y font-cairo"
+                  />
+                </div>
+              </div>
+
+              {/* Row 8: Design Philosophy */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'فلسفة ورؤية التصميم الفراغي (EN)' : 'DESIGN PHILOSOPHY & CONCEPT (EN)'}
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={form.philosophy || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, philosophy: e.target.value }))}
+                    placeholder="Architecture shaped by light and proportion."
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'فلسفة ورؤية التصميم (AR)' : 'DESIGN PHILOSOPHY & CONCEPT (AR)'}
+                  </label>
+                  <textarea
+                    rows={2}
+                    dir="rtl"
+                    value={form.philosophyAr || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, philosophyAr: e.target.value }))}
+                    placeholder="حوار هندسي بين متطلبات المعيشة والسكينة الطبيعية..."
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y font-cairo"
+                  />
+                </div>
+              </div>
+
+              {/* Row 9: YouTube Video Tour (Optional) */}
+              <div className="p-4 bg-[#FAF6EE] border border-[#E7E2D8] space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider flex items-center gap-1.5">
+                    <Film className="w-3.5 h-3.5 text-gold" />
+                    <span>{isRtl ? 'رابط فيديو يوتيوب للمشروع (اختياري)' : 'PROJECT YOUTUBE VIDEO TOUR (OPTIONAL)'}</span>
+                  </label>
+                  <span className="text-[10px] text-stone-500 font-mono">YouTube Zero-Disk Integration</span>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                  <div className="flex-1 w-full">
+                    <input
+                      type="url"
+                      value={form.youtubeUrl || ''}
+                      onChange={(e) => setForm((prev) => ({ ...prev, youtubeUrl: e.target.value }))}
+                      placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                      className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-mono"
+                    />
+                  </div>
+
+                  {form.youtubeUrl && extractYouTubeId(form.youtubeUrl) && (
+                    <div className="flex items-center gap-2 border border-[#E7E2D8] bg-white p-1 shrink-0">
+                      <img
+                        src={getYouTubeThumbnail(extractYouTubeId(form.youtubeUrl)!)}
+                        alt="YouTube Preview"
+                        className="w-16 h-10 object-cover"
+                      />
+                      <span className="text-[10px] text-emerald-700 font-medium px-2">
+                        {isRtl ? 'تم التعرف على الفيديو ✓' : 'Valid YouTube Video ✓'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-[10px] text-stone-500">
+                  {isRtl
+                    ? 'سيظهر هذا الفيديو بمشغل سينمائي عالي الدقة داخل صفحة المشروع، ويُعرض تلقائياً في سكشن الفيديوهات بصفحة المشاريع العامة (/projects).'
+                    : 'This video will appear in a 4K cinema player inside the project monograph, and automatically appears in the video showcase on /projects.'}
+                </p>
+              </div>
+
+              {/* Row 10: Coordinates & External Links (Optional) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-gold" />
+                    <span>{isRtl ? 'إحداثيات موقع المشروع (اختياري)' : 'PROJECT COORDINATES (OPTIONAL)'}</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.coordinates || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, coordinates: e.target.value }))}
+                    placeholder="مثال: 30.0444° N, 31.2357° E أو إحداثيات جوجل ماب"
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-mono"
+                  />
+                  <p className="text-[10px] text-stone-500">
+                    {isRtl ? 'يتم عرضها برابط مباشر إلى خرائط Google Maps في المواصفات الفنية للمشروع.' : 'Linked to Google Maps in project specifications.'}
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider flex items-center gap-1">
+                    <ExternalLink className="w-3.5 h-3.5 text-gold" />
+                    <span>{isRtl ? 'رابط المشروع الخارجي / جولة 3D (اختياري)' : 'EXTERNAL / 3D VIRTUAL TOUR LINK (OPTIONAL)'}</span>
+                  </label>
+                  <input
+                    type="url"
+                    value={form.projectUrl || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, projectUrl: e.target.value }))}
+                    placeholder="https://... (Behance, 3D Matterport, or Live Site)"
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                  />
+                  <p className="text-[10px] text-stone-500">
+                    {isRtl ? 'زر أنيق لزيارة الموقع أو استكشاف الجولة الفراغية ثلاثية الأبعاد.' : 'Direct button for visitors to view virtual tour or documentation.'}
+                  </p>
                 </div>
               </div>
 

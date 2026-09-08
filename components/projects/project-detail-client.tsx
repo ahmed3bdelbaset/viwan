@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { Project, PROJECTS } from '@/lib/projects'
 import { Display, Eyebrow, SectionIndex, ButtonLink } from '@/components/site/primitives'
 import { Reveal } from '@/components/site/reveal'
-import { BeforeAfterSlider } from '@/components/ui/before-after-slider'
+import { extractYouTubeId } from '@/lib/youtube'
 import { FinalCta } from '@/components/site/final-cta'
-import { ArrowLeft, ArrowRight, ArrowUpRight, Layers, FileDown } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpRight, Layers, FileDown, MapPin, ExternalLink, Play } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import {
@@ -214,6 +214,43 @@ export function ProjectDetailClient({
                   ))}
                 </ul>
               </div>
+              {(project.coordinates || (project.lat && project.lng)) && (
+                <div className="py-4 flex items-center justify-between gap-4">
+                  <span className="eyebrow text-muted-foreground flex items-center gap-1">
+                    <MapPin className="size-3 text-gold" />
+                    {lang === 'ar' ? 'إحداثيات الموقع' : 'Coordinates'}
+                  </span>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      project.lat && project.lng ? `${project.lat},${project.lng}` : (project.coordinates || '')
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-gold hover:underline flex items-center gap-1.5"
+                    title={lang === 'ar' ? 'عرض على خرائط جوجل' : 'View on Google Maps'}
+                  >
+                    <span>{project.coordinates || `${project.lat}° N, ${project.lng}° E`}</span>
+                    <ArrowUpRight className="size-3" />
+                  </a>
+                </div>
+              )}
+              {project.projectUrl && (
+                <div className="py-4 flex items-center justify-between gap-4">
+                  <span className="eyebrow text-muted-foreground flex items-center gap-1">
+                    <ExternalLink className="size-3 text-gold" />
+                    {lang === 'ar' ? 'رابط المشروع' : 'Project Link'}
+                  </span>
+                  <a
+                    href={project.projectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-gold hover:underline flex items-center gap-1.5"
+                  >
+                    <span>{lang === 'ar' ? 'زيارة الرابط / الجولة' : 'Visit / Live Link'}</span>
+                    <ArrowUpRight className="size-3" />
+                  </a>
+                </div>
+              )}
             </div>
 
             <div className="p-6 border border-gold/40 bg-background flex flex-col gap-4 corner-ticks">
@@ -246,32 +283,34 @@ export function ProjectDetailClient({
         </div>
       </section>
 
-      {/* Interactive Before / After Feature */}
-      <section className="section-gap surface-dark">
-        <div className="container-viwan flex flex-col gap-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="flex flex-col gap-3 max-w-xl">
-              <Eyebrow gold>{lang === 'ar' ? 'التحول والدقة الفراغية' : 'Transformation / Detail'}</Eyebrow>
-              <Display as="h2" size="md" className="text-ivory">
-                {lang === 'ar' ? 'من المخطط المبدئي إلى اكتمال الفراغ' : 'From Concept Rendering to Realized Space'}
-              </Display>
+      {/* Optional YouTube Video Feature */}
+      {(project.youtubeUrl || project.youtubeId) && (
+        <section className="section-gap surface-dark border-t border-stone-800">
+          <div className="container-viwan flex flex-col gap-10">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div className="flex flex-col gap-3 max-w-xl">
+                <Eyebrow gold>{lang === 'ar' ? 'التوثيق السينمائي للمشروع' : 'ARCHITECTURAL FILM & VIDEO TOUR'}</Eyebrow>
+                <Display as="h2" size="md" className="text-ivory">
+                  {lang === 'ar' ? 'جولة الفيديو المعمارية عالية الدقة' : 'Cinematic Architectural Walkthrough'}
+                </Display>
+              </div>
+              <span className="eyebrow text-xs text-gold font-mono border border-gold/40 px-3 py-1.5 bg-black/40">
+                // 4K ARCHITECTURAL CINEMA
+              </span>
             </div>
-            <p className="text-xs eyebrow text-ivory/60">
-              {lang === 'ar' ? 'اسحب الخط للمقارنة بين العمارة والتصميم الداخلي' : 'Drag slider to inspect materiality & precision'}
-            </p>
-          </div>
 
-          <div className="w-full border border-border">
-            <BeforeAfterSlider
-              beforeImage={project.cover}
-              afterImage={project.interior || project.cinematic}
-              beforeLabel={lang === 'ar' ? 'الكتلة المعمارية والواجهات' : 'Architecture & Facade'}
-              afterLabel={lang === 'ar' ? 'التشطيب والتصميم الداخلي' : 'Interior Materialization'}
-              aspectRatio="aspect-[16/9] md:aspect-[21/9]"
-            />
+            <div className="relative aspect-video w-full max-w-5xl mx-auto overflow-hidden border border-white/15 bg-black shadow-2xl">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${project.youtubeId || (project.youtubeUrl ? extractYouTubeId(project.youtubeUrl) : '')}?rel=0&modestbranding=1`}
+                title={displayName}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full border-0"
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Curated Gallery Section */}
       <section className="section-gap">
@@ -284,9 +323,20 @@ export function ProjectDetailClient({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
-            {project.gallery.map((img, i) => {
+            {project.gallery.map((img: any, i) => {
+              const imgSrc = typeof img === 'string' ? img : (img?.src || img?.url || '')
+              if (!imgSrc) return null
+
               const isHeroGallery = i === 0 || i === 3
               const colSpan = isHeroGallery ? 'md:col-span-12' : i % 2 === 0 ? 'md:col-span-7' : 'md:col-span-5'
+
+              const imgCaption = typeof img === 'string'
+                ? (isAr ? `${displayName} - لوحة توثيقية 0${i + 1}` : `${displayName} - Architectural Plate // 0${i + 1}`)
+                : (img.caption || (isAr ? `${displayName} - لوحة توثيقية 0${i + 1}` : `${displayName} - Architectural Plate // 0${i + 1}`))
+
+              const imgCategory = typeof img === 'string'
+                ? (project.type || 'Architecture')
+                : (img.category || project.type || 'Architecture')
 
               return (
                 <Reveal
@@ -298,7 +348,7 @@ export function ProjectDetailClient({
                   <ArchitecturalFrame
                     label={`ARCHITECTURAL PLATE // 0${i + 1}`}
                     scale="1:100"
-                    caption={img.caption}
+                    caption={imgCaption}
                   >
                     <div
                       className={`relative w-full overflow-hidden bg-secondary zoom-img ${
@@ -306,8 +356,8 @@ export function ProjectDetailClient({
                       }`}
                     >
                       <Image
-                        src={img.src}
-                        alt={img.caption}
+                        src={imgSrc}
+                        alt={imgCaption}
                         fill
                         sizes="(max-width: 768px) 100vw, 1200px"
                         className="object-cover"
@@ -315,8 +365,8 @@ export function ProjectDetailClient({
                     </div>
                   </ArchitecturalFrame>
                   <figcaption className="flex items-center justify-between text-xs eyebrow text-muted-foreground pt-1">
-                    <span>{img.caption}</span>
-                    <span className="text-gold font-mono text-[10px]">{img.category}</span>
+                    <span>{imgCaption}</span>
+                    <span className="text-gold font-mono text-[10px]">{imgCategory}</span>
                   </figcaption>
                 </Reveal>
               )

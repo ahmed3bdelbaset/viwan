@@ -47,7 +47,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isPublicAuthPage) {
       if (!AuthService.isAuthenticated()) {
-        router.push('/admin/login');
+        router.push('/portal-vault-vw792');
       } else {
         const user = AuthService.getCurrentUser();
         if (user) {
@@ -84,7 +84,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     AuthService.logout();
-    router.push('/admin/login');
+    router.push('/portal-vault-vw792');
   };
 
   return (

@@ -57,24 +57,29 @@ export function proxy(request: NextRequest) {
   }
 
   // =========================================================================
+  // =========================================================================
   // 2. Rate Limiting for Public APIs and Authentication
   // =========================================================================
-  if (pathname.startsWith('/api/')) {
-    // Stricter limits for login attempts (Brute-Force defense): 10 per 15 mins
-    if (pathname === '/api/auth/login' || pathname === '/api/admin/login') {
-      const allowed = checkRateLimit(`login_${ip}`, 10, 15 * 60 * 1000)
-      if (!allowed) {
-        return NextResponse.json(
-          {
-            success: false,
-            code: 'RATE_LIMIT_EXCEEDED',
-            error: 'تم تجاوز الحد الأقصى للمحاولات. يرجى الانتظار 15 دقيقة ثم المحاولة مجدداً.',
-          },
-          { status: 429, headers: { 'Retry-After': '900' } }
-        )
-      }
+  if (pathname === '/portal-vault-vw792' || pathname === '/api/auth/login' || pathname === '/api/admin/login') {
+    const allowed = checkRateLimit(`login_${ip}`, 10, 15 * 60 * 1000)
+    if (!allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'RATE_LIMIT_EXCEEDED',
+          error: 'تم تجاوز الحد الأقصى للمحاولات. يرجى الانتظار 15 دقيقة ثم المحاولة مجدداً.',
+        },
+        { status: 429, headers: { 'Retry-After': '900' } }
+      )
     }
+  }
 
+  // Block old predictable admin login path with 404 Not Found
+  if (pathname === '/admin/login') {
+    return new NextResponse('Not Found', { status: 404 })
+  }
+
+  if (pathname.startsWith('/api/')) {
     // Rate limits for public forms (Anti-Spam & Denial of Service defense): 6 per minute
     if (
       pathname === '/api/contact' ||
@@ -99,7 +104,7 @@ export function proxy(request: NextRequest) {
   // 3. Default-Deny Access Control for Admin Dashboard & Admin APIs
   // =========================================================================
   const isPublicAdminRoute =
-    pathname === '/admin/login' ||
+    pathname === '/portal-vault-vw792' ||
     pathname === '/admin/forgot-password' ||
     pathname === '/admin/reset-password' ||
     pathname === '/api/admin/login' ||
@@ -127,8 +132,8 @@ export function proxy(request: NextRequest) {
           )
         }
 
-        // If UI page, redirect to admin login
-        const loginUrl = new URL('/admin/login', request.url)
+        // If UI page, redirect to secret admin login portal
+        const loginUrl = new URL('/portal-vault-vw792', request.url)
         return NextResponse.redirect(loginUrl)
       }
     }

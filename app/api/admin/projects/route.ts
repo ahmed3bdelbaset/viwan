@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { readDb, writeDb } from '@/lib/db'
 import { Project } from '@/lib/projects'
+import { extractYouTubeId } from '@/lib/youtube'
 
 export async function GET() {
   try {
@@ -55,6 +56,10 @@ export async function GET() {
       gallery_images: Array.isArray(p.gallery_images) && p.gallery_images.length > 0 
         ? p.gallery_images 
         : (Array.isArray(p.gallery) ? p.gallery.map((g: any) => typeof g === 'string' ? g : g.src) : []),
+      youtubeUrl: p.youtubeUrl || p.youtube_url || '',
+      youtubeId: p.youtubeId || p.youtube_id || '',
+      coordinates: p.coordinates || (p.lat && p.lng ? `${p.lat}° N, ${p.lng}° E` : ''),
+      projectUrl: p.projectUrl || p.project_url || '',
     }))
     return NextResponse.json({ success: true, projects })
   } catch (error) {
@@ -132,6 +137,10 @@ export async function POST(req: Request) {
       area_sqm: body.area_sqm || '1,000 m²',
       lat: Number(body.lat) || 30.0444,
       lng: Number(body.lng) || 31.2357,
+      coordinates: body.coordinates || (body.lat && body.lng ? `${body.lat}° N, ${body.lng}° E` : ''),
+      projectUrl: body.projectUrl || body.project_url || '',
+      youtubeUrl: body.youtubeUrl || body.youtube_url || '',
+      youtubeId: body.youtubeId || (body.youtubeUrl ? extractYouTubeId(body.youtubeUrl) : ''),
       display_order: Number(body.display_order) || db.projects.length + 1,
       lifecycle_stage: body.lifecycle_stage || 'handover',
     }
@@ -216,6 +225,10 @@ export async function PUT(req: Request) {
       featured: isFeat,
       is_featured: isFeat,
       publish_status: updates.publish_status || (isFeat ? 'Featured' : 'Published'),
+      coordinates: updates.coordinates || current.coordinates || '',
+      projectUrl: updates.projectUrl || current.projectUrl || '',
+      youtubeUrl: typeof updates.youtubeUrl !== 'undefined' ? updates.youtubeUrl : (current.youtubeUrl || ''),
+      youtubeId: updates.youtubeUrl ? (updates.youtubeId || extractYouTubeId(updates.youtubeUrl) || current.youtubeId || '') : (current.youtubeId || ''),
     }
 
     writeDb(db)
