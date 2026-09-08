@@ -129,10 +129,10 @@ export default function AdminDashboardOverviewPage() {
               </div>
               <div className="space-y-1 flex-grow">
                 <p className="text-xs text-charcoal leading-snug">
-                  <strong className="font-semibold">{isRtl ? 'تحديث مشروع:' : 'Project Updated:'}</strong> {isRtl ? 'رفع مخططات ورندرات المرحلة الثانية لمستشفى التخصصي بالرياض.' : 'Specialized Hospital Riyadh Phase 2 renders updated.'}
+                  <strong className="font-semibold">{isRtl ? 'تحديث مشروع:' : 'Project Updated:'}</strong> {isRtl ? 'اعتماد مخططات ورندرات المركز التجاري الحضري بالرياض (Urban Commercial Hub).' : 'Architectural drawings and renders approved for Urban Commercial Hub (Riyadh).'}
                 </p>
                 <div className="text-[10px] text-stone-500 font-mono tracking-wider uppercase">
-                  {isRtl ? 'اليوم، 09:45 ص • بواسطة المهندس طارق' : 'TODAY, 09:45 AM • BY TAREK M.'}
+                  {isRtl ? 'اليوم، 09:45 ص • بواسطة كبير المعماريين طارق منصور' : 'TODAY, 09:45 AM • BY CHIEF ARCHITECT TAREK MANSOUR'}
                 </div>
               </div>
             </div>
@@ -144,10 +144,25 @@ export default function AdminDashboardOverviewPage() {
               </div>
               <div className="space-y-1 flex-grow">
                 <p className="text-xs text-charcoal leading-snug">
-                  <strong className="font-semibold">{isRtl ? 'نشر مقال:' : 'Insight Published:'}</strong> {isRtl ? 'مستقبل التبريد السلبي في المناخات الجافة متاح الآن.' : '"The Future of Passive Cooling in Arid Climates" is now live.'}
+                  <strong className="font-semibold">{isRtl ? 'معرض الصور:' : 'Gallery Update:'}</strong> {isRtl ? 'تحديث أصول المعرض واللقطات السينمائية لمنزل البحيرة (Lake House).' : 'Architectural gallery assets and cinematic shots updated for Lake House.'}
                 </p>
                 <div className="text-[10px] text-stone-500 font-mono tracking-wider uppercase">
-                  {isRtl ? 'أمس، 02:20 م • بواسطة الإدارة' : 'YESTERDAY, 14:20 PM • BY ADMIN'}
+                  {isRtl ? 'أمس، 04:15 م • بواسطة الإدارة' : 'YESTERDAY, 04:15 PM • BY ADMIN'}
+                </div>
+              </div>
+            </div>
+
+            {/* Activity 3 */}
+            <div className="bg-white p-5 border border-[#E7E2D8] flex items-start space-x-4 rtl:space-x-reverse shadow-sm">
+              <div className="w-9 h-9 border border-[#E7E2D8] bg-[#FAF6EE] flex items-center justify-center shrink-0">
+                <Layers className="w-4 h-4 text-charcoal" />
+              </div>
+              <div className="space-y-1 flex-grow">
+                <p className="text-xs text-charcoal leading-snug">
+                  <strong className="font-semibold">{isRtl ? 'مشروع مميز:' : 'Featured Case Study:'}</strong> {isRtl ? 'تثبيت إقامة خاصة 01 بالقاهرة الجديدة كدراسة حالة مميزة على الموقع العام.' : 'Private Residence 01 pinned as featured architectural case study.'}
+                </p>
+                <div className="text-[10px] text-stone-500 font-mono tracking-wider uppercase">
+                  {isRtl ? 'منذ يومين • بواسطة فريق التصميم' : '2 DAYS AGO • BY DESIGN TEAM'}
                 </div>
               </div>
             </div>

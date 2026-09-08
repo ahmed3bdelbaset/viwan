@@ -485,7 +485,7 @@ export default function AdminLoginPage() {
       {/* ========================================================================= */}
       {/* MAIN VIEWPORT WRAPPER (Top Header, Centered Floating Card, Bottom Footer) */}
       {/* ========================================================================= */}
-      <div className="relative z-20 min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-y-auto">
+      <div className="relative z-20 min-h-screen flex flex-col justify-between p-4 sm:p-10 lg:p-12 overflow-y-auto">
         {/* Top Header Bar: Consistent placement so switching language never jumps */}
         <div className="w-full flex items-center justify-between z-20">
           {/* Language Toggle Button */}
@@ -511,10 +511,10 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Center Stage: The Luxury Floating Form Card Centered in the middle of the screen */}
-        <div className="w-full flex items-center justify-center my-auto py-4 sm:py-8">
+        <div className="w-full flex items-center justify-center my-auto py-3 sm:py-8">
           <div
             dir={isRtl ? 'rtl' : 'ltr'}
-            className={`w-[86%] sm:w-full max-w-[325px] sm:max-w-[440px] bg-gradient-to-r from-[#FAF6EE]/50 via-[#FAF6EE]/75 to-[#FAF6EE]/95 backdrop-blur-xl rounded-[20px] sm:rounded-[26px] p-4 sm:p-8 border border-white/60 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-3.5 sm:space-y-5 transition-all duration-300 ${
+            className={`w-[82%] sm:w-full max-w-[305px] sm:max-w-[440px] bg-gradient-to-r from-[#FAF6EE]/45 via-[#FAF6EE]/70 to-[#FAF6EE]/92 backdrop-blur-md rounded-[20px] sm:rounded-[26px] p-3.5 sm:p-8 border border-white/60 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-3 sm:space-y-5 transition-all duration-300 ${
               isRtl ? 'font-cairo' : 'font-sans'
             }`}
           >
