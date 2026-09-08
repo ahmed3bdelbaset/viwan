@@ -350,29 +350,8 @@ export default function AdminSettingsPage() {
         {/* ========================================================================= */}
         {/* 3. MULTIPLE EMAIL INQUIRY ADDRESSES */}
         {/* ========================================================================= */}
-        <div className="bg-white p-7 border border-[#E7E2D8] shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#E7E2D8] gap-4">
-            <div className="flex items-center space-x-3 rtl:space-x-reverse">
-              <div className="w-8 h-8 bg-[#FAF6EE] border border-[#E7E2D8] flex items-center justify-center text-charcoal">
-                <Mail className="w-4 h-4 text-gold" />
-              </div>
-              <div>
-                <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <h2 className="font-cinzel text-sm font-semibold uppercase text-charcoal">
-                    {isRtl ? 'توجيه إشعارات البريد الإلكتروني الرسمي للأقسام' : 'OFFICIAL DEPARTMENT EMAIL ROUTING'}
-                  </h2>
-                  <span className="text-[10px] bg-[#FAF6EE] border border-[#E7E2D8] text-charcoal font-mono px-2 py-0.5">
-                    GoDaddy SMTP
-                  </span>
-                </div>
-                <p className="text-[11px] text-stone-text font-light mt-0.5">
-                  {isRtl
-                    ? 'أي حجز استشارة أو استفسار أو طلب توظيف يُحوّل تلقائياً وفوراً كإشعار رسمي للبريد المحدد بدون تكديس في لوحة التحكم.'
-                    : 'Client inquiries, 30-min consultation bookings, and job applications are dispatched directly to the addresses below.'}
-                </p>
-              </div>
-            </div>
-
+        <div className="bg-white border border-[#E7E2D8] p-6 space-y-6 shadow-sm">
+          <div className="flex items-center justify-between border-b border-[#E7E2D8] pb-4">
             <button
               type="button"
               onClick={handleAddEmail}
@@ -381,23 +360,6 @@ export default function AdminSettingsPage() {
               <Plus className="w-3.5 h-3.5" />
               <span>{t.settings.addEmail}</span>
             </button>
-          </div>
-
-          {/* GoDaddy SMTP Status Alert */}
-          <div className="p-3.5 bg-[#FAF6EE] border border-[#E7E2D8] flex items-center justify-between text-xs">
-            <div className="space-y-0.5">
-              <span className="font-semibold text-charcoal block">
-                {isRtl ? 'البريد الرسمي الأساسي للاستوديو: info@viwan.net' : 'Primary Studio Gateway: info@viwan.net'}
-              </span>
-              <span className="text-[11px] text-stone-500 font-mono">
-                {isRtl
-                  ? 'يتم إرسال الرسائل بتنسيق رسمي ومُهندم بدون أي إيموجي ومباشرة إلى صندوق بريدكم.'
-                  : 'Formal executive formatting with zero emojis dispatched directly to your corporate inbox.'}
-              </span>
-            </div>
-            <div className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 font-mono uppercase tracking-wider">
-              {isRtl ? 'نظام التوجيه نشط' : 'ROUTING ACTIVE'}
-            </div>
           </div>
 
           <div className="space-y-4">
@@ -664,20 +626,6 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </label>
-            </div>
-          </div>
-
-          <div className="bg-[#FAF6EE]/70 border border-[#E7E2D8] p-4 text-xs text-stone-600 leading-relaxed flex items-start space-x-3 rtl:space-x-reverse">
-            <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold text-charcoal block mb-0.5">
-                {isRtl ? 'دليل استمرارية البيانات في بيئات الإنتاج (Production Persistence):' : 'Production Persistence Architecture:'}
-              </span>
-              <p>
-                {isRtl
-                  ? 'عند عمل Deploy على منصات مثل Vercel، يمكنك أخذ نسخة احتياطية من هنا قبل الرفع واستعادتها بضغطة زر واحدة. وللحفظ السحابي الدائم بدون أي تدخل، المنصة مهيأة أيضاً للربط مع قواعد البيانات السحابية (PostgreSQL / Turso / Supabase) عبر متغير البيئة DATABASE_URL.'
-                  : 'On ephemeral serverless platforms like Vercel, use the one-click Export/Restore above to preserve data, or connect a remote persistent cloud database (PostgreSQL / Turso / Supabase) via DATABASE_URL.'}
-              </p>
             </div>
           </div>
         </div>

@@ -15,7 +15,6 @@ import {
   AlMarasemLogo,
   HydeParkLogo,
   MisrItaliaLogo,
-  RegionalMiniMap,
 } from '@/components/site/client-logos'
 import { DisciplinesShowcase } from '@/components/home/disciplines-showcase'
 import { PROCESS, SERVICES } from '@/lib/site'
@@ -522,9 +521,45 @@ export function ArchitecturalMarquee() {
   )
 }
 
-/* 06–09 — HOME IMPACT, WHERE WE WORK, SELECTED CLIENTS & FEEDBACK */
+/* 06–09 — HOME IMPACT, SELECTED CLIENTS & FEEDBACK */
 export function HomeImpactSection() {
   const { t, lang, isRtl } = useLanguage()
+  const [logosVisible, setLogosVisible] = useState(false)
+  const clientsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = clientsRef.current
+    if (!el) {
+      setLogosVisible(true)
+      return
+    }
+
+    // Safety fallback: ensure logos always reveal within 600ms even if observer fails
+    const timer = setTimeout(() => {
+      setLogosVisible(true)
+    }, 600)
+
+    if (!('IntersectionObserver' in window)) {
+      setLogosVisible(true)
+      return () => clearTimeout(timer)
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setLogosVisible(true)
+          clearTimeout(timer)
+        }
+      },
+      { threshold: 0.1, rootMargin: '40px' }
+    )
+
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      clearTimeout(timer)
+    }
+  }, [])
 
   const metrics = t.impact?.metrics || [
     { value: '50+', label: lang === 'ar' ? 'مشروعاً منجزاً' : 'Projects' },
@@ -533,137 +568,117 @@ export function HomeImpactSection() {
     { value: '3', label: lang === 'ar' ? 'أسواق إقليمية' : 'Markets' },
   ]
 
+  const clientLogos = [
+    { name: 'EMAAR', component: <EmaarLogo className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto" /> },
+    { name: 'SODIC', component: <SodicLogo className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto" /> },
+    { name: 'TMG', component: <TmgLogo className="h-9 sm:h-11 md:h-12 lg:h-14 w-auto" /> },
+    { name: 'ALMARASEM', component: <AlMarasemLogo className="h-10 sm:h-12 md:h-13 lg:h-15 w-auto" /> },
+    { name: 'HYDE PARK', component: <HydeParkLogo className="h-8 sm:h-10 md:h-11 lg:h-13 w-auto" /> },
+    { name: 'MISR ITALIA', component: <MisrItaliaLogo className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto" /> },
+  ]
+
   return (
-    <section id="impact" className="relative py-12 sm:py-16 md:py-20 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30 architectural-hairline-grid">
+    <section id="impact" className="relative py-12 sm:py-16 md:py-24 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30 architectural-hairline-grid">
       <div className="container-viwan">
         {/* Main Architectural Unified Grid Box */}
         <div className="border border-[#E7E2D8] dark:border-stone-800 bg-white dark:bg-[#161513] shadow-xs">
           
           {/* ========================================================================= */}
-          {/* ROW 1: 06 / OUR IMPACT (Left) | 07 / WHERE WE WORK (Right) */}
+          {/* ROW 1: 06 / OUR IMPACT (Full Width, Big High-Impact Typography) */}
           {/* ========================================================================= */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch border-b border-[#E7E2D8] dark:border-stone-800">
-            {/* Left ~64%: 06 OUR IMPACT */}
-            <div className="lg:col-span-8 p-6 sm:p-8 md:p-10 flex flex-col justify-between gap-6">
-              {/* Tag / Eyebrow */}
-              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
-                <span className="text-gold font-bold">06</span>
-                <span className="text-stone-300 dark:text-stone-700">/</span>
-                <span className="font-semibold text-charcoal dark:text-ivory">{t.impact?.label || (isRtl ? 'أثرنا وإنجازنا' : 'OUR IMPACT')}</span>
-              </div>
-
-              {/* 4 Metric Columns with vertical dividers */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x rtl:sm:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 pt-2">
-                {metrics.map((m: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="py-3 sm:py-0 px-3 sm:px-6 first:ps-0 last:pe-0 flex flex-col justify-center"
-                  >
-                    <div className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-charcoal dark:text-ivory tracking-tight leading-none mb-2">
-                      <CountUp value={m.value} />
-                    </div>
-                    <div className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-medium tracking-wide">
-                      {m.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className="p-6 sm:p-10 md:p-14 lg:p-16 border-b border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-8 sm:gap-10">
+            {/* Tag / Eyebrow */}
+            <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+              <span className="text-gold font-bold">06</span>
+              <span className="text-stone-300 dark:text-stone-700">/</span>
+              <span className="font-semibold text-charcoal dark:text-ivory">
+                {t.impact?.label || (isRtl ? 'أثرنا وإنجازنا' : 'OUR IMPACT')}
+              </span>
             </div>
 
-            {/* Right ~36%: 07 WHERE WE WORK */}
-            <div className="lg:col-span-4 p-6 sm:p-8 md:p-10 border-t lg:border-t-0 lg:border-s border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-5 bg-[#FAF8F5]/50 dark:bg-[#141311]/50">
-              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
-                <span className="text-gold font-bold">07</span>
-                <span className="text-stone-300 dark:text-stone-700">/</span>
-                <span className="font-semibold text-charcoal dark:text-ivory">
-                  {t.impact?.whereWeWork?.label || (isRtl ? 'أين نعمل' : 'WHERE WE WORK')}
-                </span>
-              </div>
+            {/* 4 Metric Columns with vertical dividers, generous spacing, and large prominent serif numbers */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 pt-2">
+              {metrics.map((m: any, idx: number) => {
+                const isArea = idx === 1 || m.value.includes('1M') || m.label?.toLowerCase().includes('design') || m.label?.includes('تصميم')
+                const rawNum = m.value.replace(' m²', '').replace('م²', '').trim()
 
-              <div className="flex items-center gap-5 sm:gap-6">
-                {/* Minimalist Regional Map */}
-                <RegionalMiniMap className="w-28 h-20 sm:w-32 sm:h-22" />
-
-                {/* Locations Text */}
-                <div className="space-y-1.5 flex-1">
-                  <p className="font-serif text-sm sm:text-base text-charcoal dark:text-ivory leading-snug">
-                    {isRtl ? (
-                      <>
-                        مقرنا في القاهرة،<br />
-                        ونعمل عبر مصر<br />
-                        وكافة أنحاء المنطقة.
-                      </>
-                    ) : (
-                      <>
-                        Based in Cairo,<br />
-                        Working across Egypt<br />
-                        and the region.
-                      </>
-                    )}
-                  </p>
-                  <p className="text-[10px] font-mono tracking-widest uppercase text-stone-500 pt-1 border-t border-[#E7E2D8]/60 dark:border-stone-800/60">
-                    {isRtl ? 'مصر / السعودية / الشرق الأوسط' : 'EGYPT / KSA / MIDDLE EAST'}
-                  </p>
-                </div>
-              </div>
+                return (
+                  <div
+                    key={idx}
+                    className="py-6 sm:py-8 lg:py-2 px-4 sm:px-8 lg:px-12 first:ps-0 last:pe-0 flex flex-col justify-center"
+                  >
+                    <div className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light text-charcoal dark:text-ivory tracking-tight leading-none mb-3 sm:mb-4">
+                      <CountUp value={rawNum} />
+                    </div>
+                    <div className="text-xs sm:text-sm md:text-base text-stone-600 dark:text-stone-400 font-medium tracking-wide">
+                      {isArea ? (
+                        <div className="flex flex-col">
+                          <span className="font-serif text-base sm:text-lg md:text-xl font-normal text-charcoal dark:text-ivory leading-tight">
+                            {lang === 'ar' ? 'م²' : 'm²'}
+                          </span>
+                          <span className="mt-0.5">{m.label}</span>
+                        </div>
+                      ) : (
+                        <span>{m.label}</span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
 
           {/* ========================================================================= */}
-          {/* ROW 2: 08 SELECTED CLIENTS (Left) | 09 CLIENT FEEDBACK (Right) */}
+          {/* ROW 2: 07 SELECTED CLIENTS (Left) | 08 CLIENT FEEDBACK (Right) */}
           {/* ========================================================================= */}
           <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-            {/* Left ~64%: 08 SELECTED CLIENTS */}
-            <div className="lg:col-span-8 p-6 sm:p-8 md:p-10 flex flex-col justify-between gap-6">
+            {/* Left ~64%: 07 SELECTED CLIENTS (Clean Architectural Tiles on Mobile, Divider Row on Desktop) */}
+            <div className="lg:col-span-8 p-5 sm:p-8 md:p-10 flex flex-col justify-between gap-6">
               {/* Tag / Eyebrow */}
               <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
-                <span className="text-gold font-bold">08</span>
+                <span className="text-gold font-bold">07</span>
                 <span className="text-stone-300 dark:text-stone-700">/</span>
                 <span className="font-semibold text-charcoal dark:text-ivory">
                   {t.impact?.selectedClients?.label || (isRtl ? 'عملاؤنا المختارون' : 'SELECTED CLIENTS')}
                 </span>
               </div>
 
-              {/* 6 Client Logos in horizontal row with thin vertical dividers */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-y sm:divide-y-0 sm:divide-x rtl:sm:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 items-center">
-                {/* 1. EMAAR */}
-                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
-                  <EmaarLogo className="h-5 sm:h-6 w-auto max-w-[110px]" />
-                </div>
-                {/* 2. SODIC */}
-                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
-                  <SodicLogo className="h-5 sm:h-6 w-auto max-w-[110px]" />
-                </div>
-                {/* 3. TMG */}
-                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
-                  <TmgLogo className="h-5 sm:h-6 w-auto max-w-[100px]" />
-                </div>
-                {/* 4. ALMARASEM */}
-                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
-                  <AlMarasemLogo className="h-7 sm:h-8 w-auto max-w-[115px]" />
-                </div>
-                {/* 5. HYDE PARK */}
-                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
-                  <HydeParkLogo className="h-5 sm:h-6 w-auto max-w-[115px]" />
-                </div>
-                {/* 6. MISR ITALIA */}
-                <div className="py-4 sm:py-2 px-3 flex items-center justify-center min-h-[64px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-colors">
-                  <MisrItaliaLogo className="h-5 sm:h-6 w-auto max-w-[120px]" />
-                </div>
+              {/* 6 Client Logos: Clean Cards on Mobile (Zero Overlap), Seamless Divider Row on Desktop */}
+              <div
+                ref={clientsRef}
+                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 lg:gap-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 items-center"
+              >
+                {clientLogos.map((client, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      transitionDelay: `${idx * 100}ms`,
+                    }}
+                    className={`bg-[#FAF8F5]/80 dark:bg-[#161513] lg:bg-transparent border border-[#E7E2D8] dark:border-stone-800/80 lg:border-none p-3.5 sm:p-5 flex items-center justify-center min-h-[92px] sm:min-h-[110px] lg:min-h-[130px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-all duration-700 ease-out group ${
+                      logosVisible
+                        ? 'opacity-100 translate-y-0 scale-100 filter-none'
+                        : 'opacity-0 translate-y-6 scale-90 blur-[1px]'
+                    }`}
+                  >
+                    <div className="w-full flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300 ease-out">
+                      {client.component}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Right ~36%: 09 CLIENT FEEDBACK */}
-            <div className="lg:col-span-4 p-6 sm:p-8 md:p-10 border-t lg:border-t-0 lg:border-s border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-4 bg-[#FAF8F5]/50 dark:bg-[#141311]/50">
+            {/* Right ~36%: 08 CLIENT FEEDBACK */}
+            <div className="lg:col-span-4 p-5 sm:p-8 md:p-10 border-t lg:border-t-0 lg:border-s border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-4 bg-[#FAF8F5]/50 dark:bg-[#141311]/50">
               <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
-                <span className="text-gold font-bold">09</span>
+                <span className="text-gold font-bold">08</span>
                 <span className="text-stone-300 dark:text-stone-700">/</span>
                 <span className="font-semibold text-charcoal dark:text-ivory">
                   {t.impact?.clientFeedback?.label || (isRtl ? 'آراء العملاء' : 'CLIENT FEEDBACK')}
                 </span>
               </div>
 
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-3 pt-2">
                 <span className="text-2xl sm:text-3xl text-gold font-serif leading-none shrink-0 select-none">“</span>
                 <p className="font-serif text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-light italic">
                   {isRtl

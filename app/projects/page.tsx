@@ -436,79 +436,94 @@ export default function ProjectsPage() {
       const matched = dbProjects.filter((p) => {
         const catNorm = cat.id.toLowerCase().replace(/[^a-z0-9]/g, '')
         const titleNorm = cat.titleEn.toLowerCase().replace(/[^a-z0-9]/g, '')
+        const titleArNorm = cat.titleAr.replace(/[\s\(\)\u064B-\u065F]/g, '')
 
-        if (p.discipline && typeof p.discipline === 'string') {
-          const dNorm = p.discipline.toLowerCase().replace(/[^a-z0-9]/g, '')
-          if (dNorm === catNorm || dNorm === titleNorm) return true
-        }
-        if (p.category && typeof p.category === 'string') {
-          const cNorm = p.category.toLowerCase().replace(/[^a-z0-9]/g, '')
-          if (cNorm === catNorm || cNorm === titleNorm || cNorm.includes(catNorm)) return true
-        }
+        const candidateStrings: string[] = []
+        if (p.discipline && typeof p.discipline === 'string') candidateStrings.push(p.discipline)
+        if (p.category && typeof p.category === 'string') candidateStrings.push(p.category)
+        if (p.type && typeof p.type === 'string') candidateStrings.push(p.type)
+        if (p.sector_en && typeof p.sector_en === 'string') candidateStrings.push(p.sector_en)
+        if (p.sector_ar && typeof p.sector_ar === 'string') candidateStrings.push(p.sector_ar)
         if (Array.isArray(p.disciplines)) {
-          return p.disciplines.some((d: string) => {
-            const dNorm = d.toLowerCase().replace(/[^a-z0-9]/g, '')
-            return (
-              dNorm.includes(catNorm) ||
-              catNorm.includes(dNorm) ||
-              dNorm.includes(titleNorm) ||
-              titleNorm.includes(dNorm)
-            )
+          p.disciplines.forEach((d: any) => {
+            if (typeof d === 'string') candidateStrings.push(d)
           })
         }
-        return false
+
+        return candidateStrings.some((str) => {
+          if (!str) return false
+          const norm = str.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]/g, '')
+          // English checks
+          if (norm === catNorm || norm === titleNorm || norm.includes(catNorm) || catNorm.includes(norm)) return true
+          if (norm.includes(titleNorm) || titleNorm.includes(norm)) return true
+          // Arabic checks
+          const arNorm = str.replace(/[\s\(\)\u064B-\u065F]/g, '')
+          if (arNorm.includes(titleArNorm) || titleArNorm.includes(arNorm)) return true
+          // Specific keyword mappings
+          if (cat.id === 'architecture' && (norm.includes('architect') || arNorm.includes('معمار') || arNorm.includes('عمارة'))) return true
+          if (cat.id === 'interior-design' && (norm.includes('interior') || arNorm.includes('داخلي') || arNorm.includes('ديكور'))) return true
+          if (cat.id === 'landscape' && (norm.includes('landscape') || arNorm.includes('لاندسكيب') || arNorm.includes('مواقع'))) return true
+          if (cat.id === 'urban-design' && (norm.includes('urban') || arNorm.includes('عمران') || arNorm.includes('تخطيط'))) return true
+          if (cat.id === 'engineering' && (norm.includes('engineer') || arNorm.includes('هندسة') || arNorm.includes('متكامل'))) return true
+          return false
+        })
       })
 
       if (!matched.length) return cat
 
-      const feat = matched.find((p) => p.featured || p.is_featured) || matched[0]
-      const rest = matched.filter((p) => p.id !== feat.id && p.slug !== feat.slug)
+      // Only override featured if explicitly marked as featured
+      const feat = matched.find((p) => Boolean(p.featured || p.is_featured))
+      const rest = feat
+        ? matched.filter((p) => p.id !== feat.id && p.slug !== feat.slug)
+        : matched
 
-      const updatedFeatured: ProjectItem = {
-        id: feat.id || cat.featured.id,
-        titleEn: feat.name || feat.title || cat.featured.titleEn,
-        titleAr: feat.nameAr || feat.titleAr || feat.title_ar || cat.featured.titleAr,
-        locationEn: feat.location || feat.location_en || cat.featured.locationEn,
-        locationAr: feat.locationAr || feat.location_ar || cat.featured.locationAr,
-        year: String(feat.year || cat.featured.year),
-        scopeEn: feat.scope ? `Scope of Work: ${Array.isArray(feat.scope) ? feat.scope.join(' + ') : feat.scope}` : cat.featured.scopeEn,
-        scopeAr: feat.scopeAr ? `نطاق العمل: ${Array.isArray(feat.scopeAr) ? feat.scopeAr.join(' + ') : feat.scopeAr}` : cat.featured.scopeAr,
-        image: feat.cover || feat.coverImage || feat.cover_image || cat.featured.image,
-        alt: feat.name || feat.title || cat.featured.alt,
-        descEn: feat.description || feat.details_en || cat.featured.descEn,
-        descAr: feat.descriptionAr || feat.details_ar || cat.featured.descAr,
-        scopeListEn: Array.isArray(feat.scope) && feat.scope.length ? feat.scope : cat.featured.scopeListEn,
-        scopeListAr: Array.isArray(feat.scopeAr) && feat.scopeAr.length ? feat.scopeAr : cat.featured.scopeListAr,
-        slug: feat.slug || cat.featured.slug,
-      }
+      const updatedFeatured: ProjectItem = feat
+        ? {
+            id: feat.id || cat.featured.id,
+            titleEn: feat.title_en || feat.name || feat.title || cat.featured.titleEn,
+            titleAr: feat.title_ar || feat.nameAr || feat.titleAr || cat.featured.titleAr,
+            locationEn: feat.location_en || feat.location || cat.featured.locationEn,
+            locationAr: feat.location_ar || feat.locationAr || cat.featured.locationAr,
+            year: String(feat.year || cat.featured.year),
+            scopeEn: feat.scope ? `Scope of Work: ${Array.isArray(feat.scope) ? feat.scope.join(' + ') : feat.scope}` : cat.featured.scopeEn,
+            scopeAr: feat.scopeAr ? `نطاق العمل: ${Array.isArray(feat.scopeAr) ? feat.scopeAr.join(' + ') : feat.scopeAr}` : cat.featured.scopeAr,
+            image: feat.cover || feat.coverImage || feat.cover_image || cat.featured.image,
+            alt: feat.title_en || feat.name || feat.title || cat.featured.alt,
+            descEn: feat.description || feat.details_en || cat.featured.descEn,
+            descAr: feat.descriptionAr || feat.details_ar || cat.featured.descAr,
+            scopeListEn: Array.isArray(feat.scope) && feat.scope.length ? feat.scope : cat.featured.scopeListEn,
+            scopeListAr: Array.isArray(feat.scopeAr) && feat.scopeAr.length ? feat.scopeAr : cat.featured.scopeListAr,
+            slug: feat.slug || cat.featured.slug,
+          }
+        : cat.featured
 
-      let updatedSubProjects: ProjectItem[] = []
-      if (rest.length > 0) {
-        updatedSubProjects = rest.map((p, rIdx) => ({
-          id: p.id || `sub-${p.slug || rIdx}`,
-          titleEn: p.name || p.title || p.title_en || 'Architectural Project',
-          titleAr: p.nameAr || p.titleAr || p.title_ar || p.name || 'مشروع معماري',
-          locationEn: p.location || p.location_en || 'Cairo, Egypt',
-          locationAr: p.locationAr || p.location_ar || 'القاهرة، مصر',
-          year: String(p.year || '2025'),
-          scopeEn: p.scope ? `Scope of Work: ${Array.isArray(p.scope) ? p.scope.join(' + ') : p.scope}` : 'Scope of Work: Architecture',
-          scopeAr: p.scopeAr ? `نطاق العمل: ${Array.isArray(p.scopeAr) ? p.scopeAr.join(' + ') : p.scopeAr}` : 'نطاق العمل: عمارة',
-          image: p.cover || p.coverImage || p.cover_image || '/images/project-private-residence.png',
-          alt: p.name || p.title || 'Project Detail',
-          descEn: p.description || p.details_en || '',
-          descAr: p.descriptionAr || p.details_ar || '',
-          scopeListEn: Array.isArray(p.scope) ? p.scope : [],
-          scopeListAr: Array.isArray(p.scopeAr) ? p.scopeAr : [],
-          slug: p.slug,
-        }))
-      } else {
-        updatedSubProjects = [...cat.subProjects]
-      }
+      const dynamicSub: ProjectItem[] = rest.map((p, rIdx) => ({
+        id: p.id || `sub-${p.slug || rIdx}`,
+        titleEn: p.title_en || p.name || p.title || 'Architectural Project',
+        titleAr: p.title_ar || p.nameAr || p.titleAr || p.name || 'مشروع معماري',
+        locationEn: p.location_en || p.location || 'Cairo, Egypt',
+        locationAr: p.location_ar || p.locationAr || 'القاهرة، مصر',
+        year: String(p.year || '2026'),
+        scopeEn: p.scope ? `Scope of Work: ${Array.isArray(p.scope) ? p.scope.join(' + ') : p.scope}` : 'Scope of Work: Architecture',
+        scopeAr: p.scopeAr ? `نطاق العمل: ${Array.isArray(p.scopeAr) ? p.scopeAr.join(' + ') : p.scopeAr}` : 'نطاق العمل: عمارة',
+        image: p.cover || p.coverImage || p.cover_image || '/images/project-private-residence.png',
+        alt: p.title_en || p.name || p.title || 'Project Detail',
+        descEn: p.description || p.details_en || '',
+        descAr: p.descriptionAr || p.details_ar || '',
+        scopeListEn: Array.isArray(p.scope) ? p.scope : [],
+        scopeListAr: Array.isArray(p.scopeAr) ? p.scopeAr : [],
+        slug: p.slug,
+      }))
+
+      // Combine dynamic projects with existing subProjects so initial projects are preserved
+      const filteredExistingSub = cat.subProjects.filter(
+        (sp) => !rest.some((rp) => rp.slug === sp.slug || rp.id === sp.id)
+      )
 
       return {
         ...cat,
         featured: updatedFeatured,
-        subProjects: updatedSubProjects,
+        subProjects: [...dynamicSub, ...filteredExistingSub],
       }
     })
 

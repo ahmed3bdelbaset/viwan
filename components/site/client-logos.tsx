@@ -7,22 +7,22 @@ interface LogoProps {
 /**
  * 1. EMAAR Properties Logo
  */
-export function EmaarLogo({ className = 'h-5 w-auto' }: LogoProps) {
+export function EmaarLogo({ className = 'h-8 sm:h-9 md:h-10 lg:h-11 w-auto' }: LogoProps) {
   return (
     <svg
       viewBox="0 0 160 36"
       fill="currentColor"
-      className={className}
+      className={`${className} max-w-[130px] sm:max-w-[155px] max-h-10 sm:max-h-12 w-auto transition-transform duration-300 select-none`}
       aria-label="EMAAR"
     >
       <text
         x="50%"
-        y="68%"
+        y="70%"
         textAnchor="middle"
         fontFamily="'Times New Roman', Times, 'Cormorant Garamond', Georgia, serif"
-        fontSize="25"
-        fontWeight="700"
-        letterSpacing="6"
+        fontSize="28"
+        fontWeight="800"
+        letterSpacing="8"
       >
         EMAAR
       </text>
@@ -33,31 +33,28 @@ export function EmaarLogo({ className = 'h-5 w-auto' }: LogoProps) {
 /**
  * 2. SODIC Logo (Isometric 3D Cube + Bold SODIC)
  */
-export function SodicLogo({ className = 'h-6 w-auto' }: LogoProps) {
+export function SodicLogo({ className = 'h-8 sm:h-9 md:h-10 lg:h-11 w-auto' }: LogoProps) {
   return (
     <svg
-      viewBox="0 0 165 38"
+      viewBox="0 0 170 42"
       fill="currentColor"
-      className={className}
+      className={`${className} max-w-[130px] sm:max-w-[155px] max-h-10 sm:max-h-12 w-auto transition-transform duration-300 select-none`}
       aria-label="SODIC"
     >
       {/* 3D Isometric Cube Symbol */}
-      <g transform="translate(4, 3)">
-        {/* Top Face */}
-        <polygon points="16,3 29,10 16,17 3,10" opacity="0.95" />
-        {/* Left Face */}
-        <polygon points="3,12 15,19 15,33 3,26" opacity="0.65" />
-        {/* Right Face */}
-        <polygon points="17,19 29,12 29,26 17,33" opacity="0.8" />
+      <g transform="translate(4, 5)">
+        <polygon points="17,3 31,11 17,19 3,11" opacity="0.95" />
+        <polygon points="3,13 16,21 16,35 3,27" opacity="0.65" />
+        <polygon points="18,21 31,13 31,27 18,35" opacity="0.8" />
       </g>
       {/* SODIC Wordmark */}
       <text
-        x="42"
-        y="26"
+        x="45"
+        y="28"
         fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-        fontSize="21"
+        fontSize="24"
         fontWeight="900"
-        letterSpacing="1.5"
+        letterSpacing="2.5"
       >
         SODIC
       </text>
@@ -66,173 +63,94 @@ export function SodicLogo({ className = 'h-6 w-auto' }: LogoProps) {
 }
 
 /**
- * 3. TMG (Talaat Moustafa Group - Stepped Pyramid Triangle + TMG)
+ * 3. TMG (Talaat Moustafa Group - Real Gold Foil Texture Logo)
  */
-export function TmgLogo({ className = 'h-6 w-auto' }: LogoProps) {
+export function TmgLogo({ className = 'h-9 sm:h-11 md:h-12 lg:h-14 w-auto' }: LogoProps) {
   return (
-    <svg
-      viewBox="0 0 155 38"
-      fill="currentColor"
-      className={className}
-      aria-label="TMG"
-    >
-      {/* Stepped Triangular Pyramid Icon */}
-      <g transform="translate(4, 5)">
-        {/* Peak */}
-        <polygon points="15,2 10,10 20,10" />
-        {/* Middle Tier */}
-        <polygon points="9,13 4,20 26,20 21,13" opacity="0.85" />
-        {/* Base Tier */}
-        <polygon points="3,23 0,28 30,28 27,23" opacity="0.7" />
-      </g>
-      {/* TMG Text */}
-      <text
-        x="42"
-        y="26"
-        fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-        fontSize="22"
-        fontWeight="800"
-        letterSpacing="2"
-      >
-        TMG
-      </text>
-    </svg>
+    <img
+      src="/images/clients/tmg.png"
+      alt="TMG - طلعت مصطفى"
+      className={`${className} max-w-[145px] sm:max-w-[170px] max-h-12 sm:max-h-14 w-auto object-contain transition-transform duration-300 select-none`}
+      loading="eager"
+      decoding="async"
+    />
   )
 }
 
 /**
- * 4. ALMARASEM Development Logo (Heraldic Crown Crest + Name)
+ * 4. ALMARASEM Development Logo (Real Golden Crest + Bilingual Wordmark)
  */
-export function AlMarasemLogo({ className = 'h-8 w-auto' }: LogoProps) {
+export function AlMarasemLogo({ className = 'h-10 sm:h-12 md:h-13 lg:h-15 w-auto' }: LogoProps) {
   return (
-    <svg
-      viewBox="0 0 160 48"
-      fill="currentColor"
-      className={className}
-      aria-label="ALMARASEM DEVELOPMENT"
-    >
-      {/* Royal Crest / Shield */}
-      <g transform="translate(68, 2)">
-        <path
-          d="M12,0 L16,4 L20,0 L22,6 L2,6 L4,0 L8,4 Z"
-          opacity="0.9"
-        />
-        <path
-          d="M2,8 L22,8 L20,18 C19,23 12,26 12,26 C12,26 5,23 4,18 Z"
-          opacity="0.75"
-        />
-        <line x1="12" y1="9" x2="12" y2="24" stroke="currentColor" strokeWidth="1.5" />
-      </g>
-      {/* Name */}
-      <text
-        x="50%"
-        y="36"
-        textAnchor="middle"
-        fontFamily="'Times New Roman', Times, 'Cormorant Garamond', Georgia, serif"
-        fontSize="13"
-        fontWeight="700"
-        letterSpacing="2.5"
-      >
-        ALMARASEM
-      </text>
-      <text
-        x="50%"
-        y="45"
-        textAnchor="middle"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="6.5"
-        fontWeight="600"
-        letterSpacing="3"
-        opacity="0.8"
-      >
-        DEVELOPMENT
-      </text>
-    </svg>
+    <div className="flex items-center justify-center">
+      <img
+        src="/images/clients/almarasem-charcoal.png"
+        alt="Al Marasem Development"
+        className={`${className} max-w-[140px] sm:max-w-[160px] max-h-12 sm:max-h-14 w-auto object-contain block dark:hidden transition-transform duration-300 select-none`}
+        loading="eager"
+        decoding="async"
+      />
+      <img
+        src="/images/clients/almarasem.png"
+        alt="Al Marasem Development"
+        className={`${className} max-w-[140px] sm:max-w-[160px] max-h-12 sm:max-h-14 w-auto object-contain hidden dark:block transition-transform duration-300 select-none`}
+        loading="eager"
+        decoding="async"
+      />
+    </div>
   )
 }
 
 /**
- * 5. HYDE PARK Developments (Geometric Grid Cross + Name)
+ * 5. HYDE PARK Developments (Real Official Hyde Park Logo)
  */
-export function HydeParkLogo({ className = 'h-6 w-auto' }: LogoProps) {
+export function HydeParkLogo({ className = 'h-8 sm:h-10 md:h-11 lg:h-13 w-auto' }: LogoProps) {
   return (
-    <svg
-      viewBox="0 0 170 38"
-      fill="currentColor"
-      className={className}
-      aria-label="HYDE PARK"
-    >
-      {/* Geometric Grid Cross Symbol */}
-      <g transform="translate(6, 6)">
-        <rect x="0" y="0" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
-        <line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" strokeWidth="2" />
-        <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="2" />
-        <circle cx="12" cy="12" r="3" fill="currentColor" />
-        <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" strokeWidth="1" opacity="0.5" />
-        <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" strokeWidth="1" opacity="0.5" />
-      </g>
-      {/* Text */}
-      <text
-        x="38"
-        y="20"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="14"
-        fontWeight="700"
-        letterSpacing="2"
-      >
-        HYDE PARK
-      </text>
-      <text
-        x="39"
-        y="30"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="6.5"
-        fontWeight="500"
-        letterSpacing="2.5"
-        opacity="0.75"
-      >
-        DEVELOPMENTS
-      </text>
-    </svg>
+    <img
+      src="/images/clients/hydepark.png"
+      alt="Hyde Park Developments"
+      className={`${className} max-w-[150px] sm:max-w-[175px] max-h-11 sm:max-h-13 w-auto object-contain dark:invert transition-transform duration-300 select-none`}
+      loading="eager"
+      decoding="async"
+    />
   )
 }
 
 /**
  * 6. MISR ITALIA Properties (Square M Emblem + Name)
  */
-export function MisrItaliaLogo({ className = 'h-6 w-auto' }: LogoProps) {
+export function MisrItaliaLogo({ className = 'h-8 sm:h-9 md:h-10 lg:h-11 w-auto' }: LogoProps) {
   return (
     <svg
-      viewBox="0 0 175 38"
+      viewBox="0 0 185 40"
       fill="currentColor"
-      className={className}
+      className={`${className} max-w-[140px] sm:max-w-[160px] max-h-10 sm:max-h-12 w-auto transition-transform duration-300 select-none`}
       aria-label="MISR ITALIA"
     >
       {/* Square M Icon */}
       <g transform="translate(4, 5)">
-        <rect x="0" y="0" width="26" height="26" rx="2" fill="currentColor" />
-        {/* Cutout Stylized M */}
+        <rect x="0" y="0" width="28" height="28" rx="2" fill="currentColor" />
         <polygon
-          points="5,21 5,6 9,6 13,14 17,6 21,6 21,21 17.5,21 17.5,10 14,17 12,17 8.5,10 8.5,21"
+          points="5.5,22.5 5.5,6.5 9.5,6.5 14,15 18.5,6.5 22.5,6.5 22.5,22.5 19,22.5 19,11 15,18.5 13,18.5 9,11 9,22.5"
           fill="#FAF8F5"
         />
       </g>
       {/* Text */}
       <text
-        x="37"
-        y="20"
+        x="40"
+        y="21"
         fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="14.5"
+        fontSize="15"
         fontWeight="800"
         letterSpacing="1"
       >
         MISR ITALIA
       </text>
       <text
-        x="38"
-        y="30"
+        x="41"
+        y="31"
         fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="6.5"
+        fontSize="7"
         fontWeight="600"
         letterSpacing="3"
         opacity="0.75"

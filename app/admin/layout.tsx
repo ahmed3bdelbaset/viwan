@@ -8,7 +8,6 @@ import { AuthService } from '@/lib/auth';
 import { AdminUser } from '@/lib/types';
 import { AdminLanguageProvider, useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { ViwanModalProvider, useViwanModal } from '@/components/ui/ViwanModalProvider';
-import { CommandPalette } from '@/components/ui/CommandPalette';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -19,15 +18,14 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Bell,
   Menu,
   X,
   ExternalLink,
   Globe,
   Users,
-  Command,
   Images,
-  MessageSquare
+  MessageSquare,
+  UserCheck
 } from 'lucide-react';
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
@@ -79,6 +77,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     { label: t.sidebar.projects, href: '/admin/projects', icon: <FolderKanban className="w-4 h-4" /> },
     { label: t.sidebar.services, href: '/admin/services', icon: <Briefcase className="w-4 h-4" /> },
     { label: (t.sidebar as any).media || (isRtl ? 'إدارة صور وهيدرز الموقع' : 'SITE IMAGES & HEROES'), href: '/admin/media', icon: <Images className="w-4 h-4" /> },
+    { label: isRtl ? 'إدارة الوظائف والكفاءات' : 'CAREERS & JOBS', href: '/admin/jobs', icon: <UserCheck className="w-4 h-4" /> },
     { label: t.sidebar.companyInfo, href: '/admin/settings', icon: <Building className="w-4 h-4" /> },
     { label: t.sidebar.users, href: '/admin/users', icon: <Users className="w-4 h-4" /> },
   ];
@@ -208,21 +207,6 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center space-x-3 sm:space-x-4 rtl:space-x-reverse">
-            {/* Command Palette Quick Shortcut */}
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('viwan_open_command_palette'))}
-              className="border border-[#E7E2D8] bg-white hover:border-gold px-3 py-1.5 text-xs text-stone-600 hover:text-charcoal flex items-center space-x-2 rtl:space-x-reverse shadow-sm transition-colors group"
-              title={isRtl ? 'لوحة الأوامر السريعة (Ctrl+K)' : 'Command Palette (Ctrl+K)'}
-            >
-              <Command className="w-3.5 h-3.5 text-gold group-hover:scale-110 transition-transform" />
-              <span className="hidden md:inline font-sans text-xs text-charcoal">
-                {isRtl ? 'الأوامر السريعة' : 'Commands'}
-              </span>
-              <kbd className="hidden sm:inline-block text-[10px] font-mono uppercase bg-[#FAF6EE] border border-stone-300 px-1 py-0.5 text-stone-500 rounded">
-                ⌘K
-              </kbd>
-            </button>
-
             {/* Language Switcher */}
             <button
               onClick={toggleLocale}
@@ -230,23 +214,6 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             >
               <Globe className="w-3.5 h-3.5 text-gold" />
               <span className="font-semibold">{t.header.switchLang}</span>
-            </button>
-
-            {/* Notification Bell */}
-            <button
-              onClick={() =>
-                showNotification(
-                  isRtl
-                    ? 'النظام يعمل بكفاءة وأمان تام.\nلا توجد تنبيهات جديدة في الوقت الحالي.'
-                    : 'All systems are operating normally and securely.\nNo new alerts at this time.',
-                  isRtl ? 'مركز التنبيهات' : 'System Notifications'
-                )
-              }
-              className="relative p-2 text-charcoal hover:text-gold transition-colors"
-              title={isRtl ? 'التنبيهات' : 'Notifications'}
-            >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-gold rounded-full" />
             </button>
 
             {/* Profile Avatar & Name (Matches user request) */}
@@ -286,9 +253,6 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
         </header>
-
-        {/* Global Command Palette */}
-        <CommandPalette />
 
         {/* Dynamic Page Canvas with Luxury V Watermark */}
         <div className="relative flex-1 min-h-[calc(100vh-5rem)]">

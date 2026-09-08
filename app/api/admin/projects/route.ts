@@ -205,7 +205,9 @@ export async function PUT(req: Request) {
       philosophy: updates.philosophy || updates.vision_en || current.philosophy,
       vision_en: updates.vision_en || updates.philosophy || current.vision_en,
       vision_ar: updates.vision_ar || updates.philosophyAr || current.vision_ar,
-      disciplines: Array.isArray(updates.disciplines) ? updates.disciplines : current.disciplines,
+      disciplines: Array.isArray(updates.disciplines) && updates.disciplines.length > 0
+        ? updates.disciplines 
+        : (updates.category || updates.type ? [updatedCategory] : current.disciplines),
       scope: Array.isArray(updates.scope) ? updates.scope : current.scope,
       gallery: Array.isArray(updates.gallery) ? updates.gallery : current.gallery,
       gallery_images: Array.isArray(updates.gallery_images) 

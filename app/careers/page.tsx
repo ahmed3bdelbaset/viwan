@@ -26,8 +26,9 @@ export default function CareersPage() {
   const { t, lang } = useLanguage()
   const isAr = lang === 'ar'
   const [heroImgUrl, setHeroImgUrl] = useState('/images/careers-hero-viwan.jpg')
+  const [jobsList, setJobsList] = useState<Job[]>(JOBS)
 
-  // Load dynamic hero image from site settings
+  // Load dynamic hero image from site settings & live jobs
   useEffect(() => {
     fetch('/api/settings')
       .then((res) => res.json())
@@ -37,6 +38,15 @@ export default function CareersPage() {
           if (img?.currentUrl) {
             setHeroImgUrl(img.currentUrl)
           }
+        }
+      })
+      .catch(() => {})
+
+    fetch('/api/jobs')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.jobs && Array.isArray(data.jobs) && data.jobs.length > 0) {
+          setJobsList(data.jobs)
         }
       })
       .catch(() => {})
@@ -334,7 +344,7 @@ export default function CareersPage() {
 
               {/* Positions Grid matching Reference layout (2 columns of positions) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {JOBS.map((job) => {
+                {jobsList.map((job) => {
                   const isExpanded = expandedSlug === job.slug
                   const title = isAr ? job.titleAr.replace(/\(.*?\)/g, '').trim() : job.title
                   const loc = isAr ? 'دوام كامل | القاهرة' : 'Full Time | Cairo, Egypt'

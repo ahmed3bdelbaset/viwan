@@ -65,11 +65,11 @@ export interface AdminProjectItem {
 }
 
 const DISCIPLINES_LIST = [
-  { id: 'Architecture', labelEn: 'Architecture', labelAr: 'الهندسة المعمارية' },
-  { id: 'Interior Design', labelEn: 'Interior Design', labelAr: 'التصميم الداخلي' },
-  { id: 'Landscape', labelEn: 'Landscape Architecture', labelAr: 'تنسيق المواقع (اللاندسكيب)' },
-  { id: 'Urban Design', labelEn: 'Urban Design & Masterplanning', labelAr: 'التخطيط والتصميم العمراني' },
-  { id: 'Engineering', labelEn: 'Integrated Engineering', labelAr: 'الهندسة المتكاملة' },
+  { id: 'Architecture', labelEn: 'Architecture', labelAr: 'الهندسة المعمارية', code: '01', slug: 'architecture' },
+  { id: 'Interior Design', labelEn: 'Interior Design', labelAr: 'التصميم الداخلي', code: '02', slug: 'interior-design' },
+  { id: 'Landscape', labelEn: 'Landscape Architecture', labelAr: 'اللاندسكيب', code: '03', slug: 'landscape' },
+  { id: 'Urban Design', labelEn: 'Urban Design & Masterplanning', labelAr: 'التخطيط العمراني', code: '04', slug: 'urban-design' },
+  { id: 'Engineering', labelEn: 'Integrated Engineering', labelAr: 'الهندسة المتكاملة', code: '05', slug: 'engineering' },
 ];
 
 export default function AdminProjectsPage() {
@@ -635,42 +635,80 @@ export default function AdminProjectsPage() {
                 </div>
               </div>
 
-              {/* Row 2: Category & Discipline + Year */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'التخصص المعماري الرئيسي *' : 'PRIMARY DISCIPLINE *'}
-                  </label>
-                  <select
-                    value={form.category || 'Architecture'}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setForm((prev) => ({
-                        ...prev,
-                        category: val,
-                        disciplines: [val],
-                      }));
-                    }}
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
-                  >
-                    {DISCIPLINES_LIST.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {isRtl ? d.labelAr : d.labelEn}
-                      </option>
-                    ))}
-                  </select>
+              {/* Row 2: The 5 Disciplines (الخصائص الـ 5 والتخصص المعماري) */}
+              <div className="space-y-3 p-4 bg-[#FAF6EE] border border-[#E7E2D8]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                      {isRtl ? 'الخصائص الـ 5 والتخصص المعماري للمشروع *' : 'THE 5 DISCIPLINES (PROJECT CATEGORY) *'}
+                    </label>
+                    <p className="text-[11px] text-stone-500 mt-0.5">
+                      {isRtl ? 'اختر التخصص الذي ينتمي إليه المشروع ليتم ربطه وعرضه معه في صفحة المشاريع العامة.' : 'Select the primary discipline to group this project with in the public portfolio.'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <span className="text-xs font-semibold text-charcoal uppercase tracking-wider">{isRtl ? 'السنة:' : 'Year:'}</span>
+                    <input
+                      type="number"
+                      value={form.year || 2026}
+                      onChange={(e) => setForm((prev) => ({ ...prev, year: parseInt(e.target.value) || 2026 }))}
+                      className="w-24 bg-white border border-[#E7E2D8] px-2 py-1 text-xs text-charcoal focus:outline-none focus:border-gold font-mono text-center"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'السنة' : 'YEAR'}
-                  </label>
-                  <input
-                    type="number"
-                    value={form.year || 2026}
-                    onChange={(e) => setForm((prev) => ({ ...prev, year: parseInt(e.target.value) || 2026 }))}
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
-                  />
+                {/* 5 Disciplines Interactive Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1">
+                  {DISCIPLINES_LIST.map((d) => {
+                    const isSelected = form.category === d.id || form.category === d.slug || (Array.isArray(form.disciplines) && (form.disciplines.includes(d.id) || form.disciplines.includes(d.slug)));
+                    return (
+                      <button
+                        type="button"
+                        key={d.id}
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            category: d.id,
+                            disciplines: [d.id],
+                          }));
+                        }}
+                        className={`p-3 text-start border transition-all flex flex-col justify-between gap-2 cursor-pointer rounded-xs ${
+                          isSelected
+                            ? 'border-gold bg-charcoal text-ivory ring-1 ring-gold shadow-xs'
+                            : 'border-[#E7E2D8] bg-white hover:border-gold/60 text-charcoal'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className={`text-[10px] font-mono font-bold ${isSelected ? 'text-gold' : 'text-stone-400'}`}>
+                            {d.code}
+                          </span>
+                          {isSelected ? (
+                            <Check className="w-3.5 h-3.5 text-gold" />
+                          ) : (
+                            <span className="size-2 rounded-full bg-stone-300" />
+                          )}
+                        </div>
+                        <div>
+                          <div className={`text-xs font-bold ${isSelected ? 'text-ivory' : 'text-charcoal'} font-cairo`}>
+                            {d.labelAr}
+                          </div>
+                          <div className={`text-[9px] uppercase tracking-wider truncate mt-0.5 ${isSelected ? 'text-stone-300' : 'text-stone-500'}`}>
+                            {d.labelEn}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Clear visual feedback */}
+                <div className="p-2.5 bg-white border border-[#E7E2D8] text-[11px] text-stone-600 flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-gold shrink-0 mt-0.5" />
+                  <span>
+                    {isRtl
+                      ? `سيتم ربط هذا المشروع بقسم (${DISCIPLINES_LIST.find(d => d.id === form.category)?.labelAr || 'التصميم الداخلي'}) في صفحة المشاريع العامة (/projects) بجانب المشاريع الأخرى من نفس التخصص.`
+                      : `This project is linked to (${form.category || 'Architecture'}) and will be displayed in that discipline section on the public /projects page.`}
+                  </span>
                 </div>
               </div>
 
@@ -873,20 +911,68 @@ export default function AdminProjectsPage() {
                 )}
               </div>
 
-              {/* Featured Checkbox */}
-              <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
-                <input
-                  type="checkbox"
-                  id="is_featured"
-                  checked={Boolean(form.is_featured)}
-                  onChange={(e) => setForm((prev) => ({ ...prev, is_featured: e.target.checked, featured: e.target.checked }))}
-                  className="w-4 h-4 text-gold border-stone-300 rounded focus:ring-gold"
-                />
-                <label htmlFor="is_featured" className="text-xs text-charcoal font-medium cursor-pointer">
-                  {isRtl
-                    ? 'تمييز هذا المشروع كدراسة حالة مميزة (Featured Case Study) في الموقع العام'
-                    : 'Pin as a Featured Case Study on the Public Website'}
+              {/* Display Position in Public Page (Featured vs Related Subproject) */}
+              <div className="p-4 bg-[#FAF6EE] border border-[#E7E2D8] space-y-3">
+                <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                  {isRtl ? 'مكان عرض المشروع في صفحة المشاريع العامة (/projects) *' : 'DISPLAY POSITION ON /PROJECTS PAGE *'}
                 </label>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div
+                    onClick={() => setForm((prev) => ({ ...prev, is_featured: false, featured: false }))}
+                    className={`p-3 border flex items-start gap-2.5 cursor-pointer transition-all rounded-xs ${
+                      !form.is_featured
+                        ? 'border-gold bg-white shadow-xs ring-1 ring-gold/40'
+                        : 'border-[#E7E2D8] bg-white/60 hover:border-stone-400'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="display_position"
+                      checked={!Boolean(form.is_featured)}
+                      onChange={() => setForm((prev) => ({ ...prev, is_featured: false, featured: false }))}
+                      className="mt-0.5 text-gold focus:ring-gold"
+                    />
+                    <div className="space-y-0.5 text-start">
+                      <div className="text-xs font-bold text-charcoal">
+                        {isRtl ? 'المشاريع المرتبطة (القائمة الجانبية على اليسار)' : 'Related Subproject (Left Column)'}
+                      </div>
+                      <div className="text-[10px] text-stone-500 leading-normal">
+                        {isRtl
+                          ? 'يضاف بجانب المشاريع الأخرى لنفس التخصص (مثل فندق الريفييرا ومطعم أوليف في قسم التصميم الداخلي).'
+                          : 'Appears in the left column alongside existing projects of this category.'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => setForm((prev) => ({ ...prev, is_featured: true, featured: true }))}
+                    className={`p-3 border flex items-start gap-2.5 cursor-pointer transition-all rounded-xs ${
+                      Boolean(form.is_featured)
+                        ? 'border-gold bg-white shadow-xs ring-1 ring-gold/40'
+                        : 'border-[#E7E2D8] bg-white/60 hover:border-stone-400'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="display_position"
+                      checked={Boolean(form.is_featured)}
+                      onChange={() => setForm((prev) => ({ ...prev, is_featured: true, featured: true }))}
+                      className="mt-0.5 text-gold focus:ring-gold"
+                    />
+                    <div className="space-y-0.5 text-start">
+                      <div className="text-xs font-bold text-charcoal flex items-center gap-1.5">
+                        <span>{isRtl ? 'مشروع رئيسي مميز (Featured في المنتصف)' : 'Featured Primary Project (Center)'}</span>
+                        <Star className="w-3 h-3 text-gold fill-gold" />
+                      </div>
+                      <div className="text-[10px] text-stone-500 leading-normal">
+                        {isRtl
+                          ? 'يظهر كالمشروع الرئيسي الكبير في منتصف قسم التخصص بصورة عريضة وتفاصيل كاملة.'
+                          : 'Appears as the large prominent hero project in the center of the discipline section.'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Modal Actions Footer */}

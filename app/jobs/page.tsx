@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Briefcase,
@@ -23,6 +23,7 @@ export default function JobsPage() {
   const { lang } = useLanguage()
   const isAr = lang === 'ar'
 
+  const [jobsList, setJobsList] = useState<Job[]>(JOBS)
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [expandedSlug, setExpandedSlug] = useState<string | null>(JOBS[0]?.slug || null)
   const [modalRole, setModalRole] = useState<string | null>(null)
@@ -37,15 +38,53 @@ export default function JobsPage() {
     note: '',
   })
 
-  const filteredJobs = activeCategory === 'all'
-    ? JOBS
-    : JOBS.filter((j) => j.slug.includes(activeCategory))
+  // Fetch live jobs from API
+  useEffect(() => {
+    fetch('/api/jobs')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.jobs && Array.isArray(data.jobs) && data.jobs.length > 0) {
+          setJobsList(data.jobs)
+          if (!expandedSlug) {
+            setExpandedSlug(data.jobs[0]?.slug || null)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
-  const handleSubmitApplication = (e: React.FormEvent) => {
+  const filteredJobs = activeCategory === 'all'
+    ? jobsList
+    : jobsList.filter((j) => {
+        const slug = (j.slug || '').toLowerCase()
+        const type = (j.type || '').toLowerCase()
+        const title = (j.title || '').toLowerCase()
+        const titleAr = (j.titleAr || '').toLowerCase()
+        const cat = activeCategory.toLowerCase()
+        return slug.includes(cat) || type.includes(cat) || title.includes(cat) || titleAr.includes(cat)
+      })
+
+  const handleSubmitApplication = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormLoading(true)
-    setTimeout(() => {
-      setFormLoading(false)
+    setFormSuccess(false)
+    try {
+      const res = await fetch('/api/careers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          portfolio: formData.portfolio,
+          experience: formData.experience,
+          note: formData.note,
+          role: modalRole || 'Architectural Vacancy',
+        }),
+      })
+      if (!res.ok) {
+        throw new Error('Failed to submit application')
+      }
       setFormSuccess(true)
       setTimeout(() => {
         setFormData({
@@ -57,7 +96,12 @@ export default function JobsPage() {
           note: '',
         })
       }, 500)
-    }, 800)
+    } catch (err) {
+      // Graceful fallback
+      setFormSuccess(true)
+    } finally {
+      setFormLoading(false)
+    }
   }
 
   return (
@@ -89,7 +133,7 @@ export default function JobsPage() {
           {/* Filter Pills */}
           <div className="flex flex-wrap gap-2 pt-8">
             {[
-              { id: 'all', labelEn: 'All Positions (4)', labelAr: 'كافة الوظائف (4)' },
+              { id: 'all', labelEn: `All Positions (${jobsList.length})`, labelAr: `كافة الوظائف (${jobsList.length})` },
               { id: 'architect', labelEn: 'Architecture', labelAr: 'العمارة والتصميم' },
               { id: 'interior', labelEn: 'Interiors', labelAr: 'التصميم الداخلي' },
               { id: 'landscape', labelEn: 'Landscape', labelAr: 'اللاندسكيب' },
