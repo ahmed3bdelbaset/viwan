@@ -319,19 +319,26 @@ export default function AdminLoginPage() {
       className="min-h-screen w-full relative flex flex-col lg:flex-row overflow-x-hidden select-none bg-[#F7F4EC]"
     >
       {/* ========================================================================= */}
-      {/* MOBILE FULL-SCREEN BACKGROUND (Visible on < lg screens) */}
+      {/* MOBILE SPLIT BACKGROUND (Visible on < lg screens) */}
+      {/* Left 50% = Olive Tree Terrace Image | Right 50% = Warm Cream Stone */}
       {/* ========================================================================= */}
-      <div className="lg:hidden fixed inset-0 z-0 pointer-events-none">
-        <Image
-          src="/images/admin-login-terrace.jpg"
-          alt="VIWAN Architectural Courtyard Terrace"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        {/* Soft atmospheric gradient for text and card readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/20 to-black/55" />
+      <div className="lg:hidden fixed inset-0 z-0 pointer-events-none flex">
+        {/* Left Half: Architectural Terrace Photo */}
+        <div className="w-1/2 h-full relative overflow-hidden">
+          <Image
+            src="/images/admin-login-terrace.jpg"
+            alt="VIWAN Architectural Courtyard Terrace"
+            fill
+            priority
+            sizes="50vw"
+            className="object-cover object-center"
+          />
+          {/* Subtle atmospheric vignette */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/45" />
+        </div>
+
+        {/* Right Half: Warm White/Cream Stone Background */}
+        <div className="w-1/2 h-full bg-[#F7F4EC] relative" />
       </div>
 
       {/* ========================================================================= */}
@@ -403,7 +410,7 @@ export default function AdminLoginPage() {
           <button
             type="button"
             onClick={toggleLanguage}
-            className="px-3.5 py-1.5 rounded-full border border-stone-300/80 lg:border-[#E5DFD3] bg-white/80 lg:bg-white text-xs text-[#1C1B19] hover:text-[#8C6D45] hover:border-[#8C6D45] transition-all flex items-center gap-1.5 shadow-2xs backdrop-blur-sm cursor-pointer active:scale-95 font-medium"
+            className="px-3.5 py-1.5 rounded-full border border-white/50 lg:border-[#E5DFD3] bg-white/80 lg:bg-white text-xs text-[#1C1B19] hover:text-[#8C6D45] hover:border-[#8C6D45] transition-all flex items-center gap-1.5 shadow-2xs backdrop-blur-md cursor-pointer active:scale-95 font-medium"
             title={isRtl ? 'التبديل إلى الإنجليزية' : 'Switch to Arabic'}
           >
             <Globe className="w-3.5 h-3.5 text-[#8C6D45]" />
@@ -414,23 +421,19 @@ export default function AdminLoginPage() {
 
           {/* Right Pillar Mark (Desktop: ADMIN PORTAL / Mobile: Brand Pill) */}
           <div className="flex items-center gap-3">
-            <span className="hidden lg:inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.25em] text-[#8C6D45] uppercase">
+            <span className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.25em] text-[#8C6D45] uppercase">
               <span className="w-4 h-[1px] bg-[#8C6D45]" />
               ADMIN PORTAL
-            </span>
-            <span className="lg:hidden text-[10px] font-mono tracking-[0.2em] text-stone-200/90 uppercase">
-              SPACES / PEOPLE
             </span>
           </div>
         </div>
 
         {/* Center Stage: The Luxury Floating Form Card */}
-        {/* On Mobile: Translucent with backdrop-blur so the background terrace shows through */}
-        {/* On Desktop: Crisp luxury card on warm stone */}
+        {/* Centered on mobile across the 50/50 split (half over image, half over white) */}
         <div className="w-full flex items-center justify-center my-auto py-8">
           <div
             dir={isRtl ? 'rtl' : 'ltr'}
-            className={`w-full max-w-[460px] bg-[#FAF6EE]/70 sm:bg-[#FAF6EE]/80 lg:bg-[#FAF6EE] backdrop-blur-xl lg:backdrop-blur-none rounded-[26px] p-7 sm:p-10 border border-white/50 lg:border-[#E7E1D4] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-6 transition-all duration-300 ${
+            className={`w-full max-w-[460px] bg-gradient-to-r from-[#FAF6EE]/50 via-[#FAF6EE]/75 to-[#FAF6EE]/95 lg:from-[#FAF6EE] lg:to-[#FAF6EE] lg:bg-[#FAF6EE] backdrop-blur-xl lg:backdrop-blur-none rounded-[26px] p-7 sm:p-10 border border-white/50 lg:border-[#E7E1D4] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-6 transition-all duration-300 ${
               isRtl ? 'font-cairo' : 'font-sans'
             }`}
           >
@@ -486,7 +489,7 @@ export default function AdminLoginPage() {
                 <form onSubmit={handleLogin} className="space-y-4">
                   {/* Email Input */}
                   <div className="space-y-1">
-                    <div className="relative flex items-center bg-white/85 sm:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all">
+                    <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
                       <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
                         <Mail className="w-4 h-4" />
                       </div>
@@ -504,7 +507,7 @@ export default function AdminLoginPage() {
 
                   {/* Password Input */}
                   <div className="space-y-1">
-                    <div className="relative flex items-center bg-white/85 sm:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all">
+                    <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
                       <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
                         <Lock className="w-4 h-4" />
                       </div>
@@ -678,7 +681,7 @@ export default function AdminLoginPage() {
 
                     <form onSubmit={handleRequestOtp} className="space-y-4">
                       <div className="space-y-1">
-                        <div className="relative flex items-center bg-white/85 sm:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all">
+                        <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
                           <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
                             <Mail className="w-4 h-4" />
                           </div>
@@ -747,7 +750,7 @@ export default function AdminLoginPage() {
 
                     <form onSubmit={handleVerifyOtp} className="space-y-4">
                       <div className="space-y-1.5">
-                        <div className="relative flex items-center bg-white/90 sm:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all">
+                        <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
                           <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
                             <KeyRound className="w-4 h-4" />
                           </div>
@@ -849,7 +852,7 @@ export default function AdminLoginPage() {
                     <form onSubmit={handleResetPassword} className="space-y-4">
                       {/* New Password */}
                       <div className="space-y-1">
-                        <div className="relative flex items-center bg-white/85 sm:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all">
+                        <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
                           <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
                             <Lock className="w-4 h-4" />
                           </div>
@@ -874,7 +877,7 @@ export default function AdminLoginPage() {
 
                       {/* Confirm Password */}
                       <div className="space-y-1">
-                        <div className="relative flex items-center bg-white/85 sm:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all">
+                        <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
                           <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
                             <Lock className="w-4 h-4" />
                           </div>
