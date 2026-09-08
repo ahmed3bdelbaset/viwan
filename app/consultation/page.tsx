@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { PageHero, Display, Eyebrow, SectionIndex } from '@/components/site/primitives'
 import { CheckCircle2, Clock, Calendar, ShieldCheck, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
-import { FeasibilityCalculator } from '@/components/site/feasibility-calculator'
+import { PhoneInput } from '@/components/ui/phone-input'
 
 export default function ConsultationPage() {
   const [loading, setLoading] = useState(false)
@@ -103,21 +103,8 @@ export default function ConsultationPage() {
         </div>
       </section>
 
-      {/* 00 — Architectural Feasibility & Timeline Estimator */}
-      <section className="section-gap surface-dark border-t border-stone/40 overflow-hidden">
-        <div className="container-viwan flex flex-col gap-10">
-          <FeasibilityCalculator
-            onSelectParameters={(summary) => {
-              setForm((prev) => ({
-                ...prev,
-                notes: prev.notes ? `${prev.notes}\n[Estimator: ${summary}]` : `[Estimator: ${summary}]`,
-              }))
-            }}
-          />
-        </div>
-      </section>
-
-      <section id="booking-form" className="section-gap border-t border-stone/40">
+      {/* 01 — Consultation Booking Form & Architecture Session */}
+      <section id="booking-form" className="section-gap border-t border-stone/40 bg-[#FAF7F2] dark:bg-[#12110F] architectural-hairline-grid">
         <div className="container-viwan grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20">
           {/* Left Column: What to expect in 30 mins */}
           <div className="lg:col-span-5 flex flex-col gap-10 reveal">
@@ -251,17 +238,13 @@ export default function ConsultationPage() {
                     <label htmlFor="consult-phone" className="eyebrow text-xs text-charcoal cursor-pointer">
                       {lang === 'ar' ? 'رقم الهاتف / الواتساب' : 'WhatsApp / Phone'} <span className="text-gold">*</span>
                     </label>
-                    <input
+                    <PhoneInput
                       id="consult-phone"
                       name="phone"
                       required
-                      type="tel"
-                      autoComplete="tel"
-                      spellCheck={false}
-                      placeholder="+20 1… or +966 5…"
+                      placeholder="100 000 0000"
                       value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="bg-background border border-stone/60 p-3.5 text-sm focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors"
+                      onChange={(val) => setForm({ ...form, phone: val })}
                     />
                   </div>
                   <div className="flex flex-col gap-2">

@@ -599,4 +599,36 @@ html[data-scroll-dir="up"] .reveal:not(.is-visible) {
   border-color: var(--gold);
 }
 
+/* ==============================================================================
+   ARCHITECTURAL ULTRA-FINE DRAFTING GRID (الشبكة المتناهية في الرفع)
+   ============================================================================== */
+.architectural-hairline-grid {
+  background-image:
+    linear-gradient(to right, rgba(177, 139, 88, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(177, 139, 88, 0.055) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center center;
+}
+
+.architectural-hairline-grid-subtle {
+  background-image:
+    linear-gradient(to right, rgba(177, 139, 88, 0.038) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(177, 139, 88, 0.038) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center center;
+}
+
+.dark .architectural-hairline-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+.dark .architectural-hairline-grid-subtle {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+}
+
+
 

@@ -19,6 +19,7 @@ import { Display, Eyebrow } from '@/components/site/primitives'
 import { CairoMapCard } from '@/components/site/cairo-map-card'
 import { CONTACT } from '@/lib/site'
 import { useLanguage } from '@/lib/i18n'
+import { PhoneInput } from '@/components/ui/phone-input'
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -52,23 +53,29 @@ export default function ContactPage() {
     email: '',
     phone: '',
     projectLocation: '',
-    projectType: '',
-    projectSize: '',
-    budget: '',
-    stage: '',
     message: '',
   })
+  const [isCustomLocation, setIsCustomLocation] = useState(false)
+  const [customLocationText, setCustomLocationText] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
+    const finalLocation =
+      form.projectLocation === 'custom'
+        ? customLocationText.trim() || (lang === 'ar' ? 'موقع مخصص' : 'Custom Location')
+        : form.projectLocation
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          projectLocation: finalLocation,
+        }),
       })
       const data = await res.json()
 
@@ -83,12 +90,10 @@ export default function ContactPage() {
         email: '',
         phone: '',
         projectLocation: '',
-        projectType: '',
-        projectSize: '',
-        budget: '',
-        stage: '',
         message: '',
       })
+      setIsCustomLocation(false)
+      setCustomLocationText('')
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.')
     } finally {
@@ -96,110 +101,24 @@ export default function ContactPage() {
     }
   }
 
-  // Location Dropdown Options
+  // Location Options: Egypt, Saudi Arabia, Syria, Middle East, or Custom
   const locationOptions =
     lang === 'ar'
       ? [
           { value: '', label: 'اختر موقع المشروع' },
-          { value: 'Cairo / New Cairo, Egypt', label: 'القاهرة / القاهرة الجديدة، مصر' },
-          { value: 'Sheikh Zayed / 6th October, Egypt', label: 'الشيخ زايد / 6 أكتوبر، مصر' },
-          { value: 'North Coast / Sahel, Egypt', label: 'الساحل الشمالي، مصر' },
-          { value: 'Riyadh, Saudi Arabia', label: 'الرياض، المملكة العربية السعودية' },
-          { value: 'Jeddah / Red Sea, Saudi Arabia', label: 'جدة / البحر الأحمر، السعودية' },
-          { value: 'Damascus, Syria', label: 'دمشق، سوريا' },
-          { value: 'International / Other', label: 'دولي / موقع آخر' },
+          { value: 'مصر', label: 'مصر' },
+          { value: 'المملكة العربية السعودية', label: 'المملكة العربية السعودية' },
+          { value: 'سوريا', label: 'سوريا' },
+          { value: 'الشرق الأوسط', label: 'الشرق الأوسط' },
+          { value: 'custom', label: 'مخصص / دولة أخرى (اكتب موقعك)' },
         ]
       : [
-          { value: '', label: 'Select location' },
-          { value: 'Cairo / New Cairo, Egypt', label: 'Cairo / New Cairo, Egypt' },
-          { value: 'Sheikh Zayed / 6th October, Egypt', label: 'Sheikh Zayed / 6th October, Egypt' },
-          { value: 'North Coast / Sahel, Egypt', label: 'North Coast / Sahel, Egypt' },
-          { value: 'Riyadh, Saudi Arabia', label: 'Riyadh, Saudi Arabia' },
-          { value: 'Jeddah / Red Sea, Saudi Arabia', label: 'Jeddah / Red Sea, Saudi Arabia' },
-          { value: 'Damascus, Syria', label: 'Damascus, Syria' },
-          { value: 'International / Other', label: 'International / Other' },
-        ]
-
-  // Type Dropdown Options
-  const typeOptions =
-    lang === 'ar'
-      ? [
-          { value: '', label: 'اختر نوع المشروع' },
-          { value: 'Private Residence / Luxury Villa', label: 'فيلا سكنية خاصة فاخرة' },
-          { value: 'Palace / Private Estate', label: 'قصر / ملكية خاصة' },
-          { value: 'Commercial & Office HQ', label: 'مقر إداري وتجاري' },
-          { value: 'Hospitality & Boutique Resort', label: 'منتجع وضيافة سياحية' },
-          { value: 'Landscape Masterplanning', label: 'مخطط عام ولاندسكيب' },
-          { value: 'Interior Design & Fit-Out', label: 'تصميم داخلي وتشطيب فاخر' },
-        ]
-      : [
-          { value: '', label: 'Select project type' },
-          { value: 'Private Residence / Luxury Villa', label: 'Private Residence / Luxury Villa' },
-          { value: 'Palace / Private Estate', label: 'Palace / Private Estate' },
-          { value: 'Commercial & Office HQ', label: 'Commercial & Office HQ' },
-          { value: 'Hospitality & Boutique Resort', label: 'Hospitality & Boutique Resort' },
-          { value: 'Landscape Masterplanning', label: 'Landscape Masterplanning' },
-          { value: 'Interior Design & Fit-Out', label: 'Interior Design & Fit-Out' },
-        ]
-
-  // Size Dropdown Options
-  const sizeOptions =
-    lang === 'ar'
-      ? [
-          { value: '', label: 'اختر مساحة المشروع' },
-          { value: 'Under 500 m²', label: 'أقل من 500 م²' },
-          { value: '500 – 1,500 m²', label: '500 – 1,500 م²' },
-          { value: '1,500 – 3,500 m²', label: '1,500 – 3,500 م²' },
-          { value: '3,500 – 10,000 m²', label: '3,500 – 10,000 م²' },
-          { value: 'Over 10,000 m² / Masterplan', label: 'أكثر من 10,000 م² / مخطط رئيسي' },
-        ]
-      : [
-          { value: '', label: 'Select project size' },
-          { value: 'Under 500 m²', label: 'Under 500 m²' },
-          { value: '500 – 1,500 m²', label: '500 – 1,500 m²' },
-          { value: '1,500 – 3,500 m²', label: '1,500 – 3,500 m²' },
-          { value: '3,500 – 10,000 m²', label: '3,500 – 10,000 m²' },
-          { value: 'Over 10,000 m² / Masterplan', label: 'Over 10,000 m² / Masterplan' },
-        ]
-
-  // Budget Dropdown Options
-  const budgetOptions =
-    lang === 'ar'
-      ? [
-          { value: '', label: 'اختر الميزانية التقديرية' },
-          { value: '$150,000 – $300,000', label: '150,000$ – 300,000$' },
-          { value: '$300,000 – $600,000', label: '300,000$ – 600,000$' },
-          { value: '$600,000 – $1,500,000', label: '600,000$ – 1,500,000$' },
-          { value: '$1,500,000 – $3,000,000', label: '1,500,000$ – 3,000,000$' },
-          { value: '$3,000,000+', label: 'أكثر من 3,000,000$' },
-        ]
-      : [
-          { value: '', label: 'Select estimated budget' },
-          { value: '$150,000 – $300,000', label: '$150,000 – $300,000' },
-          { value: '$300,000 – $600,000', label: '$300,000 – $600,000' },
-          { value: '$600,000 – $1,500,000', label: '$600,000 – $1,500,000' },
-          { value: '$1,500,000 – $3,000,000', label: '$1,500,000 – $3,000,000' },
-          { value: '$3,000,000+', label: '$3,000,000+' },
-        ]
-
-  // Stage Dropdown Options
-  const stageOptions =
-    lang === 'ar'
-      ? [
-          { value: '', label: 'اختر مرحلة المشروع' },
-          { value: 'Concept & Feasibility', label: 'الفكرة والجدوى الأولية' },
-          { value: 'Land Acquired / Early Planning', label: 'تم شراء الأرض / التخطيط الأولي' },
-          { value: 'Architectural Development', label: 'التطوير المعماري والتفاصيل' },
-          { value: 'Ready for BIM & Construction', label: 'جاهز للتنفيذ والـ BIM' },
-          { value: 'Renovation & Adaptive Reuse', label: 'ترميم وتطوير فراغات قائمة' },
-        ]
-      : [
-          { value: '', label: 'Select project stage' },
-          { value: 'Concept & Feasibility', label: 'Concept & Feasibility' },
-          { value: 'Land Acquired / Early Planning', label: 'Land Acquired / Early Planning' },
-          { value: 'Architectural Development', label: 'Architectural Development' },
-          { value: 'Ready for BIM & Construction', label: 'Ready for BIM & Construction' },
-          { value: 'Renovation & Adaptive Reuse', label: 'Renovation & Adaptive Reuse' },
+          { value: '', label: 'Select project location' },
+          { value: 'Egypt', label: 'Egypt' },
+          { value: 'Saudi Arabia', label: 'Saudi Arabia' },
+          { value: 'Syria', label: 'Syria' },
+          { value: 'Middle East', label: 'Middle East' },
+          { value: 'custom', label: 'Custom / Other location (Specify)' },
         ]
 
   return (
@@ -263,7 +182,7 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       <section
         id="inquiry"
-        className="py-16 sm:py-24 bg-[#FAF7F2] dark:bg-[#12110F] text-charcoal dark:text-ivory border-b border-stone/30 transition-colors duration-500"
+        className="py-16 sm:py-24 bg-[#FAF7F2] dark:bg-[#12110F] text-charcoal dark:text-ivory border-b border-stone/30 transition-colors duration-500 architectural-hairline-grid"
       >
         <div className="container-viwan grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* --------------------------------------------------------------------- */}
@@ -368,130 +287,41 @@ export default function ContactPage() {
 
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="inquiry-phone" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
-                      {t.contactPage.phone}
+                      {t.contactPage.phone} <span className="text-gold">*</span>
                     </label>
-                    <input
+                    <PhoneInput
                       id="inquiry-phone"
                       name="phone"
-                      type="tel"
-                      autoComplete="tel"
-                      spellCheck={false}
-                      placeholder={t.contactPage.phonePlaceholder}
+                      required
+                      placeholder="100 000 0000"
                       value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full bg-white dark:bg-[#181614] border border-stone/40 p-3.5 text-sm text-charcoal dark:text-ivory placeholder:text-stone/70 focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-xs shadow-2xs"
+                      onChange={(val) => setForm({ ...form, phone: val })}
                     />
                   </div>
                 </div>
 
-                {/* Row 3: Project Location & Project Type */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="inquiry-location" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
-                      {t.contactPage.location}
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="inquiry-location"
-                        name="projectLocation"
-                        value={form.projectLocation}
-                        onChange={(e) => setForm({ ...form, projectLocation: e.target.value })}
-                        className="w-full appearance-none bg-white dark:bg-[#181614] border border-stone/40 p-3.5 pe-10 text-sm text-charcoal dark:text-ivory focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-xs cursor-pointer shadow-2xs"
-                      >
-                        {locationOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value} className="bg-white dark:bg-charcoal text-charcoal dark:text-ivory">
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute end-3.5 top-1/2 -translate-y-1/2 size-4 text-stone/80 pointer-events-none" aria-hidden="true" />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="inquiry-type" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
-                      {t.contactPage.type}
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="inquiry-type"
-                        name="projectType"
-                        value={form.projectType}
-                        onChange={(e) => setForm({ ...form, projectType: e.target.value })}
-                        className="w-full appearance-none bg-white dark:bg-[#181614] border border-stone/40 p-3.5 pe-10 text-sm text-charcoal dark:text-ivory focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-xs cursor-pointer shadow-2xs"
-                      >
-                        {typeOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value} className="bg-white dark:bg-charcoal text-charcoal dark:text-ivory">
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute end-3.5 top-1/2 -translate-y-1/2 size-4 text-stone/80 pointer-events-none" aria-hidden="true" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Row 4: Project Size & Estimated Budget */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="inquiry-size" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
-                      {t.contactPage.size}
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="inquiry-size"
-                        name="projectSize"
-                        value={form.projectSize}
-                        onChange={(e) => setForm({ ...form, projectSize: e.target.value })}
-                        className="w-full appearance-none bg-white dark:bg-[#181614] border border-stone/40 p-3.5 pe-10 text-sm text-charcoal dark:text-ivory focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-xs cursor-pointer shadow-2xs"
-                      >
-                        {sizeOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value} className="bg-white dark:bg-charcoal text-charcoal dark:text-ivory">
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute end-3.5 top-1/2 -translate-y-1/2 size-4 text-stone/80 pointer-events-none" aria-hidden="true" />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="inquiry-budget" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
-                      {t.contactPage.budget}
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="inquiry-budget"
-                        name="budget"
-                        value={form.budget}
-                        onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                        className="w-full appearance-none bg-white dark:bg-[#181614] border border-stone/40 p-3.5 pe-10 text-sm text-charcoal dark:text-ivory focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-xs cursor-pointer shadow-2xs"
-                      >
-                        {budgetOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value} className="bg-white dark:bg-charcoal text-charcoal dark:text-ivory">
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute end-3.5 top-1/2 -translate-y-1/2 size-4 text-stone/80 pointer-events-none" aria-hidden="true" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Row 5: Project Stage (Full Width) */}
+                {/* Row 3: Project Location (Egypt, Saudi Arabia, Syria, Middle East, or Custom) */}
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="inquiry-stage" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
-                    {t.contactPage.stage}
+                  <label htmlFor="inquiry-location" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
+                    {t.contactPage.location}
                   </label>
                   <div className="relative">
                     <select
-                      id="inquiry-stage"
-                      name="stage"
-                      value={form.stage}
-                      onChange={(e) => setForm({ ...form, stage: e.target.value })}
+                      id="inquiry-location"
+                      name="projectLocation"
+                      value={form.projectLocation}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setForm({ ...form, projectLocation: val })
+                        if (val === 'custom') {
+                          setIsCustomLocation(true)
+                        } else {
+                          setIsCustomLocation(false)
+                        }
+                      }}
                       className="w-full appearance-none bg-white dark:bg-[#181614] border border-stone/40 p-3.5 pe-10 text-sm text-charcoal dark:text-ivory focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-xs cursor-pointer shadow-2xs"
                     >
-                      {stageOptions.map((opt) => (
+                      {locationOptions.map((opt) => (
                         <option key={opt.value} value={opt.value} className="bg-white dark:bg-charcoal text-charcoal dark:text-ivory">
                           {opt.label}
                         </option>
@@ -499,9 +329,27 @@ export default function ContactPage() {
                     </select>
                     <ChevronDown className="absolute end-3.5 top-1/2 -translate-y-1/2 size-4 text-stone/80 pointer-events-none" aria-hidden="true" />
                   </div>
+
+                  {/* Custom Location Input (Revealed when "custom" is selected) */}
+                  {isCustomLocation && (
+                    <div className="mt-2 flex flex-col gap-1.5 animate-fade-in">
+                      <label htmlFor="custom-location-text" className="text-xs font-medium text-gold">
+                        {lang === 'ar' ? 'حدد موقع المشروع المخصص بالتفصيل' : 'Specify Custom Project Location'} <span className="text-gold">*</span>
+                      </label>
+                      <input
+                        id="custom-location-text"
+                        type="text"
+                        required={isCustomLocation}
+                        placeholder={lang === 'ar' ? 'مثال: دبي، الشارقة، بيروت، لندن...' : 'e.g. Dubai, Sharjah, Beirut, London...'}
+                        value={customLocationText}
+                        onChange={(e) => setCustomLocationText(e.target.value)}
+                        className="w-full bg-white dark:bg-[#181614] border border-gold/60 p-3.5 text-sm text-charcoal dark:text-ivory placeholder:text-stone/70 focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-xs shadow-2xs"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                {/* Row 6: Message (Full Width) */}
+                {/* Row 4: Message (Full Width) */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="inquiry-message" className="text-xs font-medium text-charcoal dark:text-ivory/90 cursor-pointer">
                     {t.contactPage.message} <span className="text-gold">*</span>

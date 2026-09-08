@@ -20,6 +20,7 @@ import {
 import { Eyebrow } from '@/components/site/primitives'
 import { useLanguage } from '@/lib/i18n'
 import { JOBS, Job } from '@/lib/jobs'
+import { PhoneInput } from '@/components/ui/phone-input'
 
 export default function CareersPage() {
   const { t, lang } = useLanguage()
@@ -583,12 +584,11 @@ export default function CareersPage() {
                     <label className="eyebrow text-xs text-charcoal">
                       {t.careersPage.phone} *
                     </label>
-                    <input
+                    <PhoneInput
                       required
-                      type="tel"
+                      placeholder="100 000 0000"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full bg-background border border-stone/50 p-2.5 text-sm focus:outline-none focus:border-gold"
+                      onChange={(val) => setFormData({ ...formData, phone: val })}
                     />
                   </div>
                   <div className="space-y-1">

@@ -534,7 +534,7 @@ export function HomeImpactSection() {
   ]
 
   return (
-    <section id="impact" className="relative py-12 sm:py-16 md:py-20 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30">
+    <section id="impact" className="relative py-12 sm:py-16 md:py-20 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30 architectural-hairline-grid">
       <div className="container-viwan">
         {/* Main Architectural Unified Grid Box */}
         <div className="border border-[#E7E2D8] dark:border-stone-800 bg-white dark:bg-[#161513] shadow-xs">
