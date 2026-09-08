@@ -306,7 +306,7 @@ export default function CareersPage() {
       {/* =========================================================================
           SECTION 02 / OPEN POSITIONS (Dark Split Section: Quote Photo + Positions)
          ========================================================================= */}
-      <section id="open-positions" className="bg-[#11110F] text-ivory py-16 md:py-24 border-b border-stone/30 architectural-hairline-grid-dark">
+      <section id="open-positions" className="bg-[#11110F] text-ivory py-16 md:py-24 border-b border-stone/30">
         <div className="container-viwan">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             {/* Left Image (5 cols): "GOOD DESIGN BUILDS BETTER LIVES." */}
@@ -484,7 +484,7 @@ export default function CareersPage() {
       {/* =========================================================================
           BOTTOM CTA BANNER (Ready to take the next step?)
          ========================================================================= */}
-      <section className="bg-[#11110F] text-ivory py-16 md:py-20 border-t border-stone/30 architectural-hairline-grid-dark">
+      <section className="bg-[#11110F] text-ivory py-16 md:py-20 border-t border-stone/30">
         <div className="container-viwan flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div className="flex flex-col gap-2 max-w-xl">
             <span className="eyebrow text-xs text-gold tracking-widest uppercase">

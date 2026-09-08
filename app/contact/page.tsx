@@ -576,8 +576,6 @@ export default function ContactPage() {
           className="absolute inset-0 bg-gradient-to-t from-[#11110F] via-[#11110F]/65 to-transparent pointer-events-none"
           aria-hidden="true"
         />
-        {/* Architectural Ultra-Fine Drafting Grid Overlay */}
-        <div className="pointer-events-none absolute inset-0 architectural-hairline-grid-dark opacity-35 z-[1]" />
 
         {/* CTA Content Container */}
         <div className="container-viwan relative z-10 w-full flex flex-col gap-8">

@@ -92,8 +92,6 @@ export function FinalCta({
         </div>
         {/* Luxury Vignette & Dark Tint for perfect readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0C0B0A]/85 via-[#0C0B0A]/50 to-[#0C0B0A]/90 pointer-events-none" />
-        {/* Architectural Ultra-Fine Drafting Grid Overlay */}
-        <div className="pointer-events-none absolute inset-0 architectural-hairline-grid-dark opacity-45 z-[1]" />
       </div>
 
       <div className="relative z-10 container-viwan section-gap flex flex-col lg:flex-row lg:items-end justify-between gap-12">

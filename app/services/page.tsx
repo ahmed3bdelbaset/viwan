@@ -592,7 +592,7 @@ export default function ServicesPage() {
       )}
 
       {/* 5. READY TO START? BOTTOM CALL-TO-ACTION (Matching Reference Image) */}
-      <section className="surface-dark bg-[#11110F] architectural-hairline-grid-dark border-t border-stone/30 py-16 md:py-24 relative overflow-hidden reveal">
+      <section className="surface-dark bg-[#11110F] border-t border-stone/30 py-16 md:py-24 relative overflow-hidden reveal">
         <div className="container-viwan flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
           {/* Left: Eyebrow & Headline */}
           <div className="flex flex-col gap-2 max-w-2xl">

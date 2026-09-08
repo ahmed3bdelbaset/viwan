@@ -267,8 +267,6 @@ export function DisciplinesShowcase() {
         {/* Ambient Dark Gradients matching Mona Hussein Atmosphere */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0C0B0A] via-[#0C0B0A]/35 to-[#0C0B0A]/70" />
         <div className="absolute inset-0 bg-[#0C0B0A]/25 backdrop-brightness-90" />
-        {/* Architectural Ultra-Fine Drafting Grid Overlay */}
-        <div className="pointer-events-none absolute inset-0 architectural-hairline-grid-dark opacity-35" />
       </div>
 
       {/* Main Content Area */}

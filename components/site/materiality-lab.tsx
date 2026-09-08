@@ -127,7 +127,7 @@ export function MaterialityLab() {
   const tickerMaterials = [...MATERIALS, ...MATERIALS]
 
   return (
-    <section className="section-gap surface-dark border-t border-border overflow-hidden architectural-hairline-grid-dark">
+    <section className="section-gap surface-dark border-t border-border overflow-hidden">
       <div className="container-viwan flex flex-col gap-14">
         {/* Section Header */}
         <Reveal className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -193,7 +193,7 @@ export function MaterialityLab() {
         </div>
 
         {/* Active Material Interactive Showcase Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-[#141412]/90 architectural-hairline-grid-dark border border-white/10 p-6 sm:p-10 lg:p-12 relative overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-[#141412] border border-white/10 p-6 sm:p-10 lg:p-12 relative overflow-hidden">
           {/* Subtle Ambient Radial Glow */}
           <div className="absolute top-0 end-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -233,7 +233,7 @@ export function MaterialityLab() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/10 text-xs">
-              <div className="flex flex-col gap-1 p-3 bg-black/30 border border-white/10 hover:border-gold/30 transition-colors">
+              <div className="flex flex-col gap-1 p-3 bg-white/[0.02] border border-white/5">
                 <span className="eyebrow text-ivory/50 flex items-center gap-1.5">
                   <Compass className="size-3 text-gold" />
                   {lang === 'ar' ? 'التطبيق المعماري' : 'Application'}
@@ -243,7 +243,7 @@ export function MaterialityLab() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1 p-3 bg-black/30 border border-white/10 hover:border-gold/30 transition-colors">
+              <div className="flex flex-col gap-1 p-3 bg-white/[0.02] border border-white/5">
                 <span className="eyebrow text-ivory/50 flex items-center gap-1.5">
                   <ShieldCheck className="size-3 text-gold" />
                   {lang === 'ar' ? 'الإنهاء السطحي' : 'Surface Finish'}
@@ -253,7 +253,7 @@ export function MaterialityLab() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1 p-3 bg-black/30 border border-white/10 hover:border-gold/30 transition-colors">
+              <div className="flex flex-col gap-1 p-3 bg-white/[0.02] border border-white/5">
                 <span className="eyebrow text-ivory/50 flex items-center gap-1.5">
                   <Layers className="size-3 text-gold" />
                   {lang === 'ar' ? 'الأداء الحراري' : 'Thermal Behavior'}
@@ -263,7 +263,7 @@ export function MaterialityLab() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1 p-3 bg-black/30 border border-white/10 hover:border-gold/30 transition-colors">
+              <div className="flex flex-col gap-1 p-3 bg-white/[0.02] border border-white/5">
                 <span className="eyebrow text-ivory/50 flex items-center gap-1.5">
                   <Sparkles className="size-3 text-gold" />
                   {lang === 'ar' ? 'المعامل الصوتي' : 'Acoustic Performance'}
