@@ -17,6 +17,7 @@ import {
   TechnicalStamp,
   DraftingRuler,
 } from '@/components/site/architectural-frame'
+import { ProjectSiteMapCard } from './project-site-map-card'
 
 interface ProjectDetailClientProps {
   project: Project
@@ -214,26 +215,6 @@ export function ProjectDetailClient({
                   ))}
                 </ul>
               </div>
-              {(project.coordinates || (project.lat && project.lng)) && (
-                <div className="py-4 flex items-center justify-between gap-4">
-                  <span className="eyebrow text-muted-foreground flex items-center gap-1">
-                    <MapPin className="size-3 text-gold" />
-                    {lang === 'ar' ? 'إحداثيات الموقع' : 'Coordinates'}
-                  </span>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      project.lat && project.lng ? `${project.lat},${project.lng}` : (project.coordinates || '')
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-gold hover:underline flex items-center gap-1.5"
-                    title={lang === 'ar' ? 'عرض على خرائط جوجل' : 'View on Google Maps'}
-                  >
-                    <span>{project.coordinates || `${project.lat}° N, ${project.lng}° E`}</span>
-                    <ArrowUpRight className="size-3" />
-                  </a>
-                </div>
-              )}
               {project.projectUrl && (
                 <div className="py-4 flex items-center justify-between gap-4">
                   <span className="eyebrow text-muted-foreground flex items-center gap-1">
@@ -252,6 +233,16 @@ export function ProjectDetailClient({
                 </div>
               )}
             </div>
+
+            {/* Interactive Project Site & Coordinates Map Card (Matching Image 1) */}
+            <ProjectSiteMapCard
+              locationName={`${displayLocation}, ${displayCountry}`}
+              coordinates={project.coordinates}
+              lat={project.lat}
+              lng={project.lng}
+              projectType={project.type}
+              year={project.year}
+            />
 
             <div className="p-6 border border-gold/40 bg-background flex flex-col gap-4 corner-ticks">
               <div className="flex items-center justify-between">

@@ -48,7 +48,7 @@ export function CairoMapCard({
   }, [initialLat, initialLng, initialZoom, initialLocationName])
 
   const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`
-  const embedUrl = `https://maps.google.com/maps?q=${coords.lat},${coords.lng}&hl=${lang}&z=${coords.zoom}&output=embed`
+  const embedUrl = `https://www.google.com/maps?q=${coords.lat},${coords.lng}&hl=${lang}&z=${coords.zoom}&output=embed`
 
   return (
     <div className="border border-stone/30 bg-[#FAF7F2] dark:bg-[#161513] overflow-hidden flex flex-col sm:flex-row items-stretch transition-colors duration-500 rounded-xs shadow-sm">
