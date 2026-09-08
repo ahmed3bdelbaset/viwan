@@ -75,7 +75,7 @@ const MATERIALS: Material[] = [
     originAr: 'فلورنسا / مسابك القاهرة المعمارية',
     applicationEn: 'Monumental entrance framing, mashrabiya screens & hardware',
     applicationAr: 'بوابات المداخل الضخمة، المشربيات المعاصرة، وإكسسوارات الأبواب',
-    texture: '/images/project-coastal-villa.png',
+    texture: '/images/material-metal.png',
     thermalEn: 'Reflective surface minimizing solar heat gain',
     thermalAr: 'عاكس للإشعاع الشمسي المباشر',
     acousticEn: 'Solid mass damping unwanted vibration',

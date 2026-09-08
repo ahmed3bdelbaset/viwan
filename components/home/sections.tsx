@@ -238,7 +238,7 @@ export function SelectedProjects({ initialProjects }: { initialProjects?: any[] 
               >
                 <div className="zoom-img relative aspect-[4/5] overflow-hidden">
                   <Image
-                    src={third.cover || third.coverImage || '/images/project-urban-retreat.png'}
+                    src={third.cover || third.coverImage || '/images/hero-villa.png'}
                     alt={third.name}
                     fill
                     sizes="(min-width: 1024px) 40vw, 100vw"
@@ -629,47 +629,49 @@ export function HomeImpactSection() {
           </div>
 
           {/* ========================================================================= */}
-          {/* ROW 2: 07 SELECTED CLIENTS (Left) | 08 CLIENT FEEDBACK (Right) */}
+          {/* ROW 2: 07 / SELECTED CLIENTS (Full Width, 6 Logos Across The Entire Strip) */}
           {/* ========================================================================= */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-            {/* Left ~64%: 07 SELECTED CLIENTS (Clean Architectural Tiles on Mobile, Divider Row on Desktop) */}
-            <div className="lg:col-span-8 p-5 sm:p-8 md:p-10 flex flex-col justify-between gap-6">
-              {/* Tag / Eyebrow */}
-              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
-                <span className="text-gold font-bold">07</span>
-                <span className="text-stone-300 dark:text-stone-700">/</span>
-                <span className="font-semibold text-charcoal dark:text-ivory">
-                  {t.impact?.selectedClients?.label || (isRtl ? 'عملاؤنا المختارون' : 'SELECTED CLIENTS')}
-                </span>
-              </div>
-
-              {/* 6 Client Logos: Clean Cards on Mobile (Zero Overlap), Seamless Divider Row on Desktop */}
-              <div
-                ref={clientsRef}
-                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 lg:gap-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 items-center"
-              >
-                {clientLogos.map((client, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      transitionDelay: `${idx * 100}ms`,
-                    }}
-                    className={`bg-[#FAF8F5]/80 dark:bg-[#161513] lg:bg-transparent border border-[#E7E2D8] dark:border-stone-800/80 lg:border-none p-3.5 sm:p-5 flex items-center justify-center min-h-[92px] sm:min-h-[110px] lg:min-h-[130px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-all duration-700 ease-out group ${
-                      logosVisible
-                        ? 'opacity-100 translate-y-0 scale-100 filter-none'
-                        : 'opacity-0 translate-y-6 scale-90 blur-[1px]'
-                    }`}
-                  >
-                    <div className="w-full flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300 ease-out">
-                      {client.component}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className="p-6 sm:p-10 md:p-12 lg:p-14 border-b border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-8 sm:gap-10">
+            {/* Tag / Eyebrow */}
+            <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+              <span className="text-gold font-bold">07</span>
+              <span className="text-stone-300 dark:text-stone-700">/</span>
+              <span className="font-semibold text-charcoal dark:text-ivory">
+                {t.impact?.selectedClients?.label || (isRtl ? 'عملاؤنا المختارون' : 'SELECTED CLIENTS')}
+              </span>
             </div>
 
-            {/* Right ~36%: 08 CLIENT FEEDBACK */}
-            <div className="lg:col-span-4 p-5 sm:p-8 md:p-10 border-t lg:border-t-0 lg:border-s border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-4 bg-[#FAF8F5]/50 dark:bg-[#141311]/50">
+            {/* 6 Client Logos: Clean Cards on Mobile (Zero Overlap), Full-Width Spacious Architectural Divider Strip on Desktop */}
+            <div
+              ref={clientsRef}
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 items-center w-full"
+            >
+              {clientLogos.map((client, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    transitionDelay: `${idx * 80}ms`,
+                  }}
+                  className={`bg-[#FAF8F5]/80 dark:bg-[#161513] lg:bg-transparent border border-[#E7E2D8] dark:border-stone-800/80 lg:border-none p-4 sm:p-6 lg:px-6 lg:py-8 flex items-center justify-center min-h-[92px] sm:min-h-[110px] lg:min-h-[140px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-all duration-700 ease-out group ${
+                    logosVisible
+                      ? 'opacity-100 translate-y-0 scale-100 filter-none'
+                      : 'opacity-0 translate-y-6 scale-90 blur-[1px]'
+                  }`}
+                >
+                  <div className="w-full flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300 ease-out">
+                    {client.component}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* ROW 3: 08 / CLIENT FEEDBACK (Full Width, Underneath Section 07)           */}
+          {/* ========================================================================= */}
+          <div className="p-6 sm:p-10 md:p-12 lg:p-14 bg-[#FAF8F5]/50 dark:bg-[#141311]/50 flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-12">
+            <div className="flex flex-col gap-3 max-w-3xl">
+              {/* Tag / Eyebrow */}
               <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
                 <span className="text-gold font-bold">08</span>
                 <span className="text-stone-300 dark:text-stone-700">/</span>
@@ -678,18 +680,25 @@ export function HomeImpactSection() {
                 </span>
               </div>
 
-              <div className="flex items-start gap-3 pt-2">
-                <span className="text-2xl sm:text-3xl text-gold font-serif leading-none shrink-0 select-none">“</span>
-                <p className="font-serif text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-light italic">
+              {/* Quote */}
+              <div className="flex items-start gap-3.5 pt-1">
+                <span className="text-3xl sm:text-4xl text-gold font-serif leading-none shrink-0 select-none">“</span>
+                <p className="font-serif text-sm sm:text-base md:text-lg text-stone-800 dark:text-stone-200 leading-relaxed font-light italic">
                   {isRtl
                     ? '“فهمت VIWAN المشروع كتجربة معمارية متكاملة، وليس مجرد مجموعة من القرارات التصميمية المنفصلة.”'
                     : '“VIWAN understood the project as a complete experience, not a collection of separate design decisions.”'}
                 </p>
               </div>
+            </div>
 
-              <div className="text-[11px] text-stone-500 font-mono tracking-wider pt-2 border-t border-[#E7E2D8]/60 dark:border-stone-800/60">
-                {isRtl ? '— عميل إقامة خاصة' : '— Private Residence Client'}
-              </div>
+            {/* Attribution with fine hairline border on desktop */}
+            <div className="shrink-0 flex md:flex-col md:items-end justify-start gap-1 font-mono text-xs text-stone-500 border-t md:border-t-0 md:border-s rtl:md:border-s-0 rtl:md:border-e border-[#E7E2D8] dark:border-stone-800 pt-3 md:pt-0 md:ps-8 rtl:md:ps-0 rtl:md:pe-8">
+              <span className="font-semibold text-charcoal dark:text-ivory tracking-wide">
+                {isRtl ? 'عميل إقامة خاصة' : 'Private Residence Client'}
+              </span>
+              <span className="text-gold text-[10px] tracking-widest">
+                {isRtl ? 'القاهرة الجديدة · مصر' : 'NEW CAIRO · EGYPT'}
+              </span>
             </div>
           </div>
 

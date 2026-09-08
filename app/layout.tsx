@@ -68,7 +68,7 @@ export default function RootLayout({
             <SiteFooter />
           </RevealProvider>
         </LanguageProvider>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.VERCEL === '1' && <Analytics />}
       </body>
     </html>
   )

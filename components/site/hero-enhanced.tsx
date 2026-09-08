@@ -21,7 +21,7 @@ export function Hero({
   headline = "Architecture Redefined",
   subline = "We design spaces that endure — where precision meets vision, and every line carries meaning.",
   eyebrow = "Est. 2015 — Cairo, Egypt",
-  imageSrc = "/images/hero.jpg",
+  imageSrc = "/images/hero-villa.png",
   videoSrc,
   ctaPrimary = { label: "Explore Work", href: "/projects" },
   ctaSecondary = { label: "Our Studio", href: "/about" },

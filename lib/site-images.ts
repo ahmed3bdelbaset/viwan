@@ -252,7 +252,7 @@ export const DEFAULT_SITE_IMAGES: SiteImageItem[] = [
     labelEn: 'King Fahd Commercial Tower',
     labelAr: 'برج طريق الملك فهد التجاري',
     section: 'Featured Projects',
-    currentUrl: '/images/project-commercial-tower.png',
+    currentUrl: '/images/project-commercial-riyadh.png',
     year: '2024',
     location: 'King Fahd Rd, Riyadh, KSA',
     locationAr: 'طريق الملك فهد، الرياض، السعودية',
