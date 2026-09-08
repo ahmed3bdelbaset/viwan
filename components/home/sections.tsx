@@ -526,6 +526,8 @@ export function HomeImpactSection() {
   const { t, lang, isRtl } = useLanguage()
   const [logosVisible, setLogosVisible] = useState(false)
   const clientsRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const bgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const el = clientsRef.current
@@ -561,6 +563,45 @@ export function HomeImpactSection() {
     }
   }, [])
 
+  // Parallax flight effect on scroll (up and down)
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReduced) return
+
+    let animId: number
+
+    const updateParallax = () => {
+      if (!sectionRef.current || !bgRef.current) return
+      const rect = sectionRef.current.getBoundingClientRect()
+      const winHeight = window.innerHeight
+
+      if (rect.bottom > -200 && rect.top < winHeight + 200) {
+        const sectionCenter = rect.top + rect.height / 2
+        const viewportCenter = winHeight / 2
+        const diff = sectionCenter - viewportCenter
+        // Fluid vertical parallax + gentle horizontal drift for flight dynamics
+        const translateY = -diff * 0.28
+        const translateX = diff * 0.05
+        bgRef.current.style.transform = `translate3d(${translateX.toFixed(1)}px, ${translateY.toFixed(1)}px, 0) scale(1.15)`
+      }
+    }
+
+    const onScroll = () => {
+      if (animId) cancelAnimationFrame(animId)
+      animId = requestAnimationFrame(updateParallax)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    updateParallax()
+
+    return () => {
+      if (animId) cancelAnimationFrame(animId)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
   const metrics = t.impact?.metrics || [
     { value: '50+', label: lang === 'ar' ? 'مشروعاً منجزاً' : 'Projects' },
     { value: '1M+ m²', label: lang === 'ar' ? 'تم تصميمه' : 'Designed' },
@@ -578,10 +619,51 @@ export function HomeImpactSection() {
   ]
 
   return (
-    <section id="impact" className="relative py-12 sm:py-16 md:py-24 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30 architectural-hairline-grid">
-      <div className="container-viwan">
-        {/* Main Architectural Unified Grid Box */}
-        <div className="border border-[#E7E2D8] dark:border-stone-800 bg-white dark:bg-[#161513] shadow-xs">
+    <section
+      ref={sectionRef}
+      id="impact"
+      className="relative py-16 sm:py-24 md:py-32 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30 overflow-hidden select-none"
+    >
+      {/* Realistic Parallax Airplane Banner Background */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 select-none">
+        <div
+          ref={bgRef}
+          className="absolute -top-[20%] start-0 w-full h-[140%] will-change-transform transition-transform duration-75 ease-out"
+          style={{ transform: 'translate3d(0, 0px, 0) scale(1.15)' }}
+        >
+          {/* Desktop realistic airplane image */}
+          <div className="hidden sm:block absolute inset-0">
+            <Image
+              src="/images/airplane-banner-viwan.jpg"
+              alt="Realistic Airplane Towing VIWAN Architecture Banner Over Coastal Sea"
+              fill
+              sizes="100vw"
+              className="object-cover object-center"
+              priority={false}
+            />
+          </div>
+          {/* Mobile realistic airplane image */}
+          <div className="sm:hidden absolute inset-0">
+            <Image
+              src="/images/airplane-banner-viwan-mobile.jpg"
+              alt="Realistic Airplane Towing VIWAN Architecture Banner Over Coastal Sea"
+              fill
+              sizes="100vw"
+              className="object-cover object-center"
+              priority={false}
+            />
+          </div>
+        </div>
+
+        {/* Luxury Vignette & Soft Gradient Transition for Clean Architectural Integration */}
+        <div className="absolute inset-0 bg-[#FAF8F5]/30 dark:bg-black/50 pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#FAF8F5] dark:from-[#12110F] via-[#FAF8F5]/60 dark:via-[#12110F]/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAF8F5] dark:from-[#12110F] via-[#FAF8F5]/60 dark:via-[#12110F]/60 to-transparent pointer-events-none" />
+      </div>
+
+      <div className="container-viwan relative z-10">
+        {/* Main Architectural Unified Grid Box with Frosted Transparency */}
+        <div className="border border-[#E7E2D8] dark:border-stone-800 bg-white/94 dark:bg-[#161513]/94 backdrop-blur-md shadow-lg">
           
           {/* ========================================================================= */}
           {/* ROW 1: 06 / OUR IMPACT (Full Width, Big High-Impact Typography) */}
