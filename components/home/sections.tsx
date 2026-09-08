@@ -687,15 +687,15 @@ export function HomeImpactSection() {
                 return (
                   <div
                     key={idx}
-                    className="py-2.5 sm:py-6 lg:py-2 px-2 sm:px-6 lg:px-10 first:ps-0 last:pe-0 flex flex-col justify-center"
+                    className="py-3 sm:py-6 lg:py-2 px-2 sm:px-6 lg:px-10 first:ps-0 last:pe-0 flex flex-col justify-center"
                   >
-                    <div className="font-serif text-2xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-light text-charcoal dark:text-ivory tracking-tight leading-none mb-1 sm:mb-2">
+                    <div className="font-serif text-[32px] sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-light text-charcoal dark:text-ivory tracking-tight leading-none mb-1 sm:mb-2">
                       <CountUp value={rawNum} />
                     </div>
-                    <div className="text-[10px] sm:text-xs md:text-sm text-stone-600 dark:text-stone-300 font-medium tracking-wide">
+                    <div className="text-[11px] sm:text-xs md:text-sm text-stone-600 dark:text-stone-300 font-medium tracking-wide">
                       {isArea ? (
                         <div className="flex flex-col">
-                          <span className="font-serif text-xs sm:text-base md:text-lg font-normal text-charcoal dark:text-ivory leading-tight">
+                          <span className="font-serif text-[13px] sm:text-base md:text-lg font-normal text-charcoal dark:text-ivory leading-tight">
                             {lang === 'ar' ? 'م²' : 'm²'}
                           </span>
                           <span className="mt-0.5">{m.label}</span>
