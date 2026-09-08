@@ -178,10 +178,10 @@ export default function AdminDashboardOverviewPage() {
       route: '/contact',
       descEn: 'Direct inquiries, 30-minute consultation scheduler, studio map coordinates.',
       descAr: 'استفسارات العملاء المباشرة، حجز جلسة استشارية 30 دقيقة، وإحداثيات الخريطة.',
-      manageRoute: '/admin/inbox',
-      manageLabelEn: 'View Inquiries & Bookings',
-      manageLabelAr: 'استعراض الرسائل والحجوزات',
-      icon: <MessageSquare className="w-5 h-5 text-gold" />,
+      manageRoute: '/admin/settings',
+      manageLabelEn: 'Configure Email Forwarding & Routing',
+      manageLabelAr: 'إدارة توجيه البريد والتواصل الرسمي',
+      icon: <Mail className="w-5 h-5 text-gold" />,
     },
   ];
 
@@ -274,26 +274,26 @@ export default function AdminDashboardOverviewPage() {
           </div>
         </Link>
 
-        {/* KPI 3: CLIENT INQUIRIES & CONSULTATIONS */}
+        {/* KPI 3: OFFICIAL EMAIL ROUTING GATEWAY */}
         <Link
-          href="/admin/inbox"
+          href="/admin/settings"
           className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
         >
           <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
-            <MessageSquare className="w-14 h-14 text-charcoal" />
+            <Mail className="w-14 h-14 text-charcoal" />
           </div>
 
           <div className="space-y-1 relative z-10">
             <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
-              {isRtl ? 'الاستفسارات والاستشارات' : 'CLIENT INQUIRIES'}
+              {isRtl ? 'بوابة البريد الرسمي (GoDaddy)' : 'OFFICIAL EMAIL GATEWAY'}
             </span>
-            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
-              {stats.inquiriesCount}
+            <div className="font-cinzel text-xl text-charcoal font-semibold group-hover:text-gold transition-colors truncate pt-1">
+              info@viwan.net
             </div>
           </div>
 
           <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
-            <span>{isRtl ? 'رسائل الموقع وحجوزات 30 دقيقة' : 'Inquiries & 30-Min Bookings'}</span>
+            <span>{isRtl ? 'توجيه فوري للاستشارات والرسائل' : 'Live Forwarding to Corporate Inbox'}</span>
             <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
           </div>
         </Link>
@@ -390,79 +390,97 @@ export default function AdminDashboardOverviewPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. RECENT INQUIRIES & LIVE SUBMISSIONS STREAM */}
+      {/* 3. OFFICIAL EMAIL AUTOMATED DISPATCH & ROUTING MONITOR */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* Left: Recent Contact Inquiries */}
-        <div className="bg-white border border-[#E7E2D8] p-6 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between border-b border-[#E7E2D8] pb-3">
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+      <div className="bg-white border border-[#E7E2D8] p-7 space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#E7E2D8] gap-3">
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            <div className="w-8 h-8 bg-[#FAF6EE] border border-[#E7E2D8] flex items-center justify-center text-charcoal">
               <Mail className="w-4 h-4 text-gold" />
-              <h3 className="font-cinzel text-sm font-semibold text-charcoal uppercase tracking-wider">
-                {isRtl ? 'أحدث استفسارات التواصل' : 'RECENT CONTACT INQUIRIES'}
-              </h3>
             </div>
-            <Link href="/admin/inbox" className="text-xs text-gold hover:underline font-mono">
-              {isRtl ? 'عرض الكل' : 'VIEW ALL'}
-            </Link>
+            <div>
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <h3 className="font-cinzel text-sm font-semibold text-charcoal uppercase tracking-wider">
+                  {isRtl ? 'منظومة توجيه الإشعارات للبريد الاحترافي' : 'OFFICIAL EMAIL DISPATCH & ROUTING SYSTEM'}
+                </h3>
+                <span className="text-[10px] bg-[#FAF6EE] border border-[#E7E2D8] text-charcoal font-mono px-2 py-0.5">
+                  GoDaddy SMTP Active
+                </span>
+              </div>
+              <p className="text-[11px] text-stone-500 font-light mt-0.5">
+                {isRtl
+                  ? 'يتم تحويل كافة الطلبات الواردة فوراً إلى البريد الرسمي المحدد لكل قسم دون إشغال لوحة التحكم.'
+                  : 'All incoming submissions are instantly forwarded to the designated corporate inboxes.'}
+              </p>
+            </div>
           </div>
 
-          {stats.recentContacts.length === 0 ? (
-            <div className="py-8 text-center text-xs text-stone-400">
-              {isRtl ? 'لا توجد استفسارات مسجلة حديثاً.' : 'No recent contact inquiries.'}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {stats.recentContacts.map((c) => (
-                <div key={c.id} className="p-3 bg-[#FAF6EE] border border-[#E7E2D8] text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-charcoal">{c.name}</span>
-                    <span className="text-[10px] text-stone-400 font-mono">
-                      {new Date(c.submittedAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
-                    </span>
-                  </div>
-                  <div className="text-stone-500 truncate">{c.email} • {c.phone}</div>
-                  <p className="text-stone-700 italic truncate">"{c.message || 'No message provided'}"</p>
-                </div>
-              ))}
-            </div>
-          )}
+          <Link
+            href="/admin/settings"
+            className="inline-flex items-center space-x-1.5 rtl:space-x-reverse bg-charcoal hover:bg-gold text-white text-[11px] font-semibold tracking-wider uppercase px-4 py-2 transition-all shadow-xs"
+          >
+            <span>{isRtl ? 'تخصيص الإيميلات في الإعدادات' : 'CONFIGURE IN SETTINGS'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        {/* Right: Recent Consultation Bookings */}
-        <div className="bg-white border border-[#E7E2D8] p-6 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between border-b border-[#E7E2D8] pb-3">
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              <Calendar className="w-4 h-4 text-gold" />
-              <h3 className="font-cinzel text-sm font-semibold text-charcoal uppercase tracking-wider">
-                {isRtl ? 'أحدث حجوزات الاستشارات (30 دقيقة)' : 'RECENT 30-MIN CONSULTATIONS'}
-              </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Channel 1: Consultations */}
+          <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 01</span>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono">ACTIVE</span>
             </div>
-            <Link href="/admin/inbox" className="text-xs text-gold hover:underline font-mono">
-              {isRtl ? 'عرض الكل' : 'VIEW ALL'}
-            </Link>
+            <div>
+              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal">
+                {isRtl ? 'حجوزات الاستشارات المعمارية' : '30-Min Architectural Consultations'}
+              </div>
+              <div className="text-xs font-mono text-gold font-semibold mt-1">
+                info@viwan.net
+              </div>
+            </div>
+            <p className="text-[11px] text-stone-500 font-light pt-2 border-t border-[#E7E2D8]">
+              {isRtl ? 'إشعار رسمي فوري ببيانات العميل والموعد المفضل وتفاصيل المشروع.' : 'Instant executive dispatch with client profile, preferred slot and scope.'}
+            </p>
           </div>
 
-          {stats.recentConsultations.length === 0 ? (
-            <div className="py-8 text-center text-xs text-stone-400">
-              {isRtl ? 'لا توجد حجوزات استشارات جديدة.' : 'No recent consultation bookings.'}
+          {/* Channel 2: General Inquiries */}
+          <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 02</span>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono">ACTIVE</span>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {stats.recentConsultations.map((cb) => (
-                <div key={cb.id} className="p-3 bg-[#FAF6EE] border border-[#E7E2D8] text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-charcoal">{cb.name}</span>
-                    <span className="text-[10px] text-stone-400 font-mono">
-                      {cb.preferredDate || new Date(cb.submittedAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
-                    </span>
-                  </div>
-                  <div className="text-stone-500 truncate">{cb.projectType} • {cb.phone}</div>
-                  <p className="text-stone-700 italic truncate">"{cb.notes || 'No notes provided'}"</p>
-                </div>
-              ))}
+            <div>
+              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal">
+                {isRtl ? 'استفسارات تواصل معنا والمشاريع' : 'General Contact & Inquiries'}
+              </div>
+              <div className="text-xs font-mono text-gold font-semibold mt-1">
+                info@viwan.net
+              </div>
             </div>
-          )}
+            <p className="text-[11px] text-stone-500 font-light pt-2 border-t border-[#E7E2D8]">
+              {isRtl ? 'إشعار رسمي ببيانات العميل، الشركة، موقع المشروع، والميزانية.' : 'Instant dispatch with company, project location, budget and client brief.'}
+            </p>
+          </div>
+
+          {/* Channel 3: Careers */}
+          <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 03</span>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono">ACTIVE</span>
+            </div>
+            <div>
+              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal">
+                {isRtl ? 'طلبات التوظيف واستقطاب الكفاءات' : 'Careers & Talent Acquisition'}
+              </div>
+              <div className="text-xs font-mono text-gold font-semibold mt-1">
+                info@viwan.net
+              </div>
+            </div>
+            <p className="text-[11px] text-stone-500 font-light pt-2 border-t border-[#E7E2D8]">
+              {isRtl ? 'إشعار رسمي بملف أعمال المتقدم (Portfolio) وسنوات الخبرة ورقم هاتفه.' : 'Instant dispatch with applicant CV portfolio link, experience and contact info.'}
+            </p>
+          </div>
         </div>
       </div>
     </div>

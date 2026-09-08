@@ -774,7 +774,10 @@
     "egyptPhone": "+20 100 000 9999",
     "cairoProjectsCount": "30+",
     "riyadhProjectsCount": "20+",
-    "syriaProjectsCount": "10+"
+    "syriaProjectsCount": "10+",
+    "emailConsultations": "info@viwan.net",
+    "emailGeneral": "info@viwan.net",
+    "emailCareers": "info@viwan.net"
   },
   "adminAuth": {
     "password": "viwan_admin_2026",

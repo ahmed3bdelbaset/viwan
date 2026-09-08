@@ -79,7 +79,6 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     { label: t.sidebar.projects, href: '/admin/projects', icon: <FolderKanban className="w-4 h-4" /> },
     { label: t.sidebar.services, href: '/admin/services', icon: <Briefcase className="w-4 h-4" /> },
     { label: (t.sidebar as any).media || (isRtl ? 'إدارة صور وهيدرز الموقع' : 'SITE IMAGES & HEROES'), href: '/admin/media', icon: <Images className="w-4 h-4" /> },
-    { label: (t.sidebar as any).inbox || (isRtl ? 'الرسائل والاستشارات (07)' : 'INQUIRIES & BOOKINGS'), href: '/admin/inbox', icon: <MessageSquare className="w-4 h-4" /> },
     { label: t.sidebar.companyInfo, href: '/admin/settings', icon: <Building className="w-4 h-4" /> },
     { label: t.sidebar.users, href: '/admin/users', icon: <Users className="w-4 h-4" /> },
   ];

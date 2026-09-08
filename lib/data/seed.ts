@@ -740,14 +740,20 @@ export const INITIAL_COMPANY_INFO: CompanyInfo = {
     {
       id: 'e-1',
       label_en: 'General Inquiries',
-      label_ar: 'الاستفسارات العامة',
-      email: 'info@viwan.com'
+      label_ar: 'الاستفسارات العامة والتواصل',
+      email: 'info@viwan.net'
     },
     {
       id: 'e-2',
-      label_en: 'New Projects & Tenders',
-      label_ar: 'المشاريع والمناقصات',
-      email: 'studio@viwan.com'
+      label_en: 'Architectural Consultations',
+      label_ar: 'استشارة هندسية وحجوزات',
+      email: 'info@viwan.net'
+    },
+    {
+      id: 'e-3',
+      label_en: 'Careers & Talent',
+      label_ar: 'التوظيف وشؤون الكفاءات',
+      email: 'info@viwan.net'
     }
   ],
   social: {

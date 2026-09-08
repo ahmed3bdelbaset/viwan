@@ -78,8 +78,26 @@ export default function CareersPage() {
     setFormLoading(true)
     setFormError(null)
 
-    setTimeout(() => {
-      setFormLoading(false)
+    try {
+      const res = await fetch('/api/careers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          portfolio: formData.portfolio,
+          experience: formData.experience,
+          note: formData.note,
+          role: modalRole || 'Architectural Designer',
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || (isAr ? 'فشل إرسال الطلب، يرجى المحاولة لاحقاً.' : 'Failed to submit application.'))
+      }
+
       setFormSuccess(true)
       setTimeout(() => {
         setFormData({
@@ -91,7 +109,11 @@ export default function CareersPage() {
           note: '',
         })
       }, 400)
-    }, 800)
+    } catch (err: any) {
+      setFormError(err.message || (isAr ? 'تعذر إرسال الطلب، يرجى التحقق من اتصالك والمحاولة لاحقاً.' : 'Error submitting application.'))
+    } finally {
+      setFormLoading(false)
+    }
   }
 
   const pillarsData = [

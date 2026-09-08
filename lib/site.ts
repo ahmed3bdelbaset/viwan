@@ -10,7 +10,7 @@ export const NAV = [
 
 export const CONTACT = {
   city: 'Cairo, Egypt',
-  email: 'info@viwan.studio',
+  email: 'info@viwan.net',
   phone: '+20 100 000 0000',
   whatsapp: 'https://wa.me/201000000000',
   website: 'viwan.net',

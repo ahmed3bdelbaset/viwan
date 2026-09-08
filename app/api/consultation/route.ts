@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { readDb, writeDb, ConsultationBooking } from '@/lib/db'
+import { sendConsultationNotification } from '@/lib/mailer'
 
 export async function POST(req: Request) {
   try {
@@ -30,6 +31,23 @@ export async function POST(req: Request) {
 
     db.consultations.unshift(newBooking)
     writeDb(db)
+
+    // Trigger instant official notification to designated professional email
+    try {
+      await sendConsultationNotification({
+        name: newBooking.name,
+        email: newBooking.email,
+        phone: newBooking.phone,
+        projectType: newBooking.projectType,
+        preferredDate: newBooking.preferredDate,
+        preferredTime: newBooking.preferredTime,
+        location: newBooking.location,
+        notes: newBooking.notes,
+        submittedAt: newBooking.submittedAt,
+      })
+    } catch (mailErr) {
+      console.error('[CONSULTATION] Error sending email notification:', mailErr)
+    }
 
     return NextResponse.json({ success: true, id: newBooking.id })
   } catch (error) {

@@ -21,7 +21,8 @@ import {
   BarChart3,
   Check,
   Images,
-  MessageSquare
+  MessageSquare,
+  Mail
 } from 'lucide-react';
 import { DataStore } from '@/lib/store';
 import { Project, InsightArticle } from '@/lib/types';
@@ -187,15 +188,15 @@ export const CommandPalette: React.FC = () => {
       },
     },
     {
-      id: 'nav-inbox',
+      id: 'nav-email-routing',
       category: 'NAVIGATION',
       categoryAr: 'التنقل',
-      title: isRtl ? 'صندوق الوارد وحجوزات الاستشارات' : 'Inbox & Consultation Bookings',
-      subtitle: isRtl ? 'متابعة رسائل العملاء ومواعيد الـ 30 دقيقة' : 'Client inquiries and 30-min consultation bookings',
-      icon: <MessageSquare className="w-4 h-4 text-stone-400" />,
+      title: isRtl ? 'توجيه البريد الرسمي (GoDaddy)' : 'Official Email Forwarding',
+      subtitle: isRtl ? 'إدارة توجيه إشعارات الاستشارات والرسائل والتوظيف' : 'Manage instant forwarding to info@viwan.net',
+      icon: <Mail className="w-4 h-4 text-stone-400" />,
       action: () => {
         setIsOpen(false);
-        router.push('/admin/inbox');
+        router.push('/admin/settings');
       },
     },
     {

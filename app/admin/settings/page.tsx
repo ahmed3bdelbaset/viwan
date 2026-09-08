@@ -49,6 +49,10 @@ export default function AdminSettingsPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     DataStore.saveCompanyInfo(info);
+    const generalEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('general') || e.label_ar.includes('عام'))?.email || info.emails?.[0]?.email || 'info@viwan.net';
+    const consultEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('consult') || e.label_ar.includes('استشار'))?.email || info.emails?.[1]?.email || generalEmail;
+    const careersEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('career') || e.label_ar.includes('توظيف'))?.email || info.emails?.[2]?.email || generalEmail;
+
     fetch('/api/admin/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -56,7 +60,10 @@ export default function AdminSettingsPage() {
         settings: {
           phoneCairo: info.phones?.[0]?.number,
           phoneRiyadh: info.phones?.[1]?.number,
-          email: info.emails?.[0]?.email,
+          email: generalEmail,
+          emailGeneral: generalEmail,
+          emailConsultations: consultEmail,
+          emailCareers: careersEmail,
           linkedin: info.social?.linkedin,
           instagram: info.social?.instagram,
           facebook: info.social?.facebook,
@@ -344,17 +351,24 @@ export default function AdminSettingsPage() {
         {/* 3. MULTIPLE EMAIL INQUIRY ADDRESSES */}
         {/* ========================================================================= */}
         <div className="bg-white p-7 border border-[#E7E2D8] shadow-sm space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-[#E7E2D8]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#E7E2D8] gap-4">
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
               <div className="w-8 h-8 bg-[#FAF6EE] border border-[#E7E2D8] flex items-center justify-center text-charcoal">
                 <Mail className="w-4 h-4 text-gold" />
               </div>
               <div>
-                <h2 className="font-cinzel text-sm font-semibold uppercase text-charcoal">
-                  {t.settings.emailsTitle}
-                </h2>
-                <p className="text-[11px] text-stone-text font-light">
-                  {t.settings.emailsSubtitle}
+                <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <h2 className="font-cinzel text-sm font-semibold uppercase text-charcoal">
+                    {isRtl ? 'توجيه إشعارات البريد الإلكتروني الرسمي للأقسام' : 'OFFICIAL DEPARTMENT EMAIL ROUTING'}
+                  </h2>
+                  <span className="text-[10px] bg-[#FAF6EE] border border-[#E7E2D8] text-charcoal font-mono px-2 py-0.5">
+                    GoDaddy SMTP
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-text font-light mt-0.5">
+                  {isRtl
+                    ? 'أي حجز استشارة أو استفسار أو طلب توظيف يُحوّل تلقائياً وفوراً كإشعار رسمي للبريد المحدد بدون تكديس في لوحة التحكم.'
+                    : 'Client inquiries, 30-min consultation bookings, and job applications are dispatched directly to the addresses below.'}
                 </p>
               </div>
             </div>
@@ -362,11 +376,28 @@ export default function AdminSettingsPage() {
             <button
               type="button"
               onClick={handleAddEmail}
-              className="bg-charcoal hover:bg-gold text-white text-[11px] font-semibold tracking-wider uppercase px-4 py-2 transition-all flex items-center space-x-1.5 rtl:space-x-reverse shadow-sm"
+              className="bg-charcoal hover:bg-gold text-white text-[11px] font-semibold tracking-wider uppercase px-4 py-2 transition-all flex items-center space-x-1.5 rtl:space-x-reverse shadow-sm shrink-0"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>{t.settings.addEmail}</span>
             </button>
+          </div>
+
+          {/* GoDaddy SMTP Status Alert */}
+          <div className="p-3.5 bg-[#FAF6EE] border border-[#E7E2D8] flex items-center justify-between text-xs">
+            <div className="space-y-0.5">
+              <span className="font-semibold text-charcoal block">
+                {isRtl ? 'البريد الرسمي الأساسي للاستوديو: info@viwan.net' : 'Primary Studio Gateway: info@viwan.net'}
+              </span>
+              <span className="text-[11px] text-stone-500 font-mono">
+                {isRtl
+                  ? 'يتم إرسال الرسائل بتنسيق رسمي ومُهندم بدون أي إيموجي ومباشرة إلى صندوق بريدكم.'
+                  : 'Formal executive formatting with zero emojis dispatched directly to your corporate inbox.'}
+              </span>
+            </div>
+            <div className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 font-mono uppercase tracking-wider">
+              {isRtl ? 'نظام التوجيه نشط' : 'ROUTING ACTIVE'}
+            </div>
           </div>
 
           <div className="space-y-4">

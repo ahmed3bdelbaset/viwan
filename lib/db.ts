@@ -127,6 +127,8 @@ export interface SiteSettings {
   phoneSyria?: string
   whatsapp?: string
   email: string
+  emailConsultations?: string
+  emailGeneral?: string
   emailCareers?: string
   emailPress?: string
   city: string
@@ -134,6 +136,13 @@ export interface SiteSettings {
   addressCairo?: string
   addressRiyadh?: string
   addressSyria?: string
+
+  // SMTP Configuration (GoDaddy / Office 365 / Custom)
+  smtpHost?: string
+  smtpPort?: number
+  smtpUser?: string
+  smtpPass?: string
+  smtpFrom?: string
 
   // Social
   linkedin: string
@@ -277,7 +286,15 @@ function getInitialData(): DatabaseSchema {
       phoneRiyadh: '+966 50 123 4567',
       phoneSyria: '+963 11 000 0000',
       whatsapp: '+20 100 000 0000',
-      email: 'info@viwan.studio',
+      email: 'info@viwan.net',
+      emailConsultations: 'info@viwan.net',
+      emailGeneral: 'info@viwan.net',
+      emailCareers: 'info@viwan.net',
+      emailPress: 'info@viwan.net',
+      smtpHost: 'smtp.office365.com',
+      smtpPort: 587,
+      smtpUser: 'info@viwan.net',
+      smtpFrom: 'VIWAN Architecture Studio <info@viwan.net>',
       city: 'Cairo, Egypt',
       secondaryCity: 'Riyadh, Saudi Arabia',
       addressCairo: 'Sheikh Zayed, Giza & New Cairo, Egypt',
@@ -352,6 +369,9 @@ export function readDb(): DatabaseSchema {
       if (!data.settings.mapEgyptCount) { data.settings.mapEgyptCount = 28; changed = true }
       if (!data.settings.mapSaudiCount) { data.settings.mapSaudiCount = 14; changed = true }
       if (!data.settings.mapSyriaCount) { data.settings.mapSyriaCount = 5; changed = true }
+      if (!data.settings.emailConsultations) { data.settings.emailConsultations = data.settings.email || 'info@viwan.net'; changed = true }
+      if (!data.settings.emailGeneral) { data.settings.emailGeneral = data.settings.email || 'info@viwan.net'; changed = true }
+      if (!data.settings.emailCareers) { data.settings.emailCareers = data.settings.email || 'info@viwan.net'; changed = true }
     }
 
     if (changed) {
