@@ -30,7 +30,20 @@ export function ProjectDetailClient({
   prevProject,
 }: ProjectDetailClientProps) {
   const { t, lang } = useLanguage()
+  const isAr = lang === 'ar'
   const [blueprintMode, setBlueprintMode] = useState(false)
+
+  const displayName = isAr && project.nameAr ? project.nameAr : project.name
+  const displayLocation = isAr && project.locationAr ? project.locationAr : project.location
+  const displayCountry = isAr && project.countryAr ? project.countryAr : project.country
+  const displayTagline = isAr && project.taglineAr ? project.taglineAr : project.tagline
+  const displayHeading = isAr && project.headingAr ? project.headingAr : project.heading
+  const displayDescription = isAr && project.descriptionAr ? project.descriptionAr : project.description
+  const displayPhilosophy = isAr && project.philosophyAr ? project.philosophyAr : project.philosophy
+  const displayScope = isAr && project.scopeAr && project.scopeAr.length > 0 ? project.scopeAr : project.scope
+
+  const prevName = isAr && prevProject.nameAr ? prevProject.nameAr : prevProject.name
+  const nextName = isAr && nextProject.nameAr ? nextProject.nameAr : nextProject.name
 
   const disciplineTranslations: Record<string, string> = {
     Architecture: 'عمارة',
@@ -115,13 +128,13 @@ export function ProjectDetailClient({
         {/* Main Title & Tagline */}
         <div className="relative z-10 container-viwan flex flex-col gap-6 max-w-4xl mt-auto">
           <Eyebrow gold className="animate-fade-up">
-            {project.type} · {project.location}, {project.country}
+            {project.type} · {displayLocation}, {displayCountry}
           </Eyebrow>
           <Display as="h1" size="xl" className="animate-fade-up [animation-delay:100ms] text-ivory">
-            {project.name}
+            {displayName}
           </Display>
           <p className="text-base md:text-xl text-ivory/85 leading-relaxed max-w-2xl animate-fade-up [animation-delay:200ms]">
-            {project.tagline}
+            {displayTagline}
           </p>
         </div>
       </section>
@@ -131,7 +144,7 @@ export function ProjectDetailClient({
         <div className="container-viwan mb-10">
           <ArchitecturalDivider
             axis="AXIS 01"
-            label={project.name.toUpperCase()}
+            label={displayName.toUpperCase()}
             level="ARCHITECTURAL MONOGRAPH"
           />
         </div>
@@ -141,10 +154,10 @@ export function ProjectDetailClient({
           <div className="lg:col-span-7 flex flex-col gap-8">
             <SectionIndex n="01" label={lang === 'ar' ? 'الموجز المعماري' : 'ARCHITECTURAL BRIEF'} axis="BRIEF-01" />
             <Display as="h2" size="sm" className="text-charcoal leading-tight">
-              {project.heading}
+              {displayHeading}
             </Display>
             <div className="flex flex-col gap-6 text-base md:text-lg leading-relaxed text-muted-foreground font-sans">
-              <p>{project.description}</p>
+              <p>{displayDescription}</p>
             </div>
 
             {/* Architecture philosophy block */}
@@ -154,7 +167,7 @@ export function ProjectDetailClient({
                 <span className="font-mono text-[9px] text-stone-400 uppercase tracking-widest">[DATUM // CONCEPT]</span>
               </div>
               <p className="font-serif italic text-xl md:text-2xl text-charcoal leading-relaxed">
-                &ldquo;{project.philosophy}&rdquo;
+                &ldquo;{displayPhilosophy}&rdquo;
               </p>
             </div>
           </div>
@@ -169,7 +182,7 @@ export function ProjectDetailClient({
             <div className="flex flex-col divide-y divide-stone/40 border-y border-stone/40 text-sm">
               <div className="py-4 flex items-center justify-between gap-4">
                 <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'الموقع' : 'Location'}</span>
-                <span className="font-medium text-charcoal">{project.location}, {project.country}</span>
+                <span className="font-medium text-charcoal">{displayLocation}, {displayCountry}</span>
               </div>
               <div className="py-4 flex items-center justify-between gap-4">
                 <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'السنة' : 'Year'}</span>
@@ -196,7 +209,7 @@ export function ProjectDetailClient({
               <div className="py-4 flex items-start justify-between gap-4">
                 <span className="eyebrow text-muted-foreground">{lang === 'ar' ? 'مراحل العمل' : 'Scope of Work'}</span>
                 <ul className="text-right rtl:text-left flex flex-col gap-1 text-xs text-charcoal">
-                  {project.scope.map((s) => (
+                  {displayScope.map((s) => (
                     <li key={s}>{s}</li>
                   ))}
                 </ul>
@@ -323,7 +336,7 @@ export function ProjectDetailClient({
               <ArrowLeft className="size-3 rtl:rotate-180" /> {lang === 'ar' ? 'المشروع السابق' : 'Previous Project'}
             </span>
             <span className="display text-2xl md:text-3xl text-charcoal group-hover:text-gold transition-colors">
-              {prevProject.name}
+              {prevName}
             </span>
           </Link>
 
@@ -342,7 +355,7 @@ export function ProjectDetailClient({
               {lang === 'ar' ? 'المشروع التالي' : 'Next Project'} <ArrowRight className="size-3 rtl:rotate-180" />
             </span>
             <span className="display text-2xl md:text-3xl text-charcoal group-hover:text-gold transition-colors">
-              {nextProject.name}
+              {nextName}
             </span>
           </Link>
         </div>

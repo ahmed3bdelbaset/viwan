@@ -18,6 +18,7 @@ interface SubProject {
   year?: string
   descEn?: string
   descAr?: string
+  slug?: string
 }
 
 interface DisciplineCategory {
@@ -37,6 +38,7 @@ interface DisciplineCategory {
     descAr: string
     scopeEn: string[]
     scopeAr: string[]
+    slug?: string
   }
   subProjects: [SubProject, SubProject]
 }
@@ -414,6 +416,7 @@ export default function ProjectsPage() {
     alt: string
     desc: string
     scope?: string[]
+    slug?: string
   } | null>(null)
 
   const [dbProjects, setDbProjects] = useState<any[]>([])
@@ -459,56 +462,82 @@ export default function ProjectsPage() {
   const displayedCategories = useMemo(() => {
     let result = PORTFOLIO_DATA.map((cat) => {
       // Find dynamic projects matching this category/discipline
-      const matched = dbProjects.filter(
-        (p) =>
-          p.discipline === cat.id ||
-          p.category?.toLowerCase() === cat.id ||
-          p.category?.toLowerCase() === cat.titleEn.toLowerCase()
-      )
+      const matched = dbProjects.filter((p) => {
+        const catNorm = cat.id.toLowerCase().replace(/[^a-z0-9]/g, '')
+        const titleNorm = cat.titleEn.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+        if (p.discipline && typeof p.discipline === 'string') {
+          const dNorm = p.discipline.toLowerCase().replace(/[^a-z0-9]/g, '')
+          if (dNorm === catNorm || dNorm === titleNorm) return true
+        }
+        if (p.category && typeof p.category === 'string') {
+          const cNorm = p.category.toLowerCase().replace(/[^a-z0-9]/g, '')
+          if (cNorm === catNorm || cNorm === titleNorm || cNorm.includes(catNorm)) return true
+        }
+        if (p.type && typeof p.type === 'string') {
+          const tNorm = p.type.toLowerCase().replace(/[^a-z0-9]/g, '')
+          if (tNorm.includes(catNorm) || catNorm.includes(tNorm)) return true
+        }
+        if (Array.isArray(p.disciplines)) {
+          return p.disciplines.some((d: string) => {
+            const dNorm = d.toLowerCase().replace(/[^a-z0-9]/g, '')
+            return (
+              dNorm.includes(catNorm) ||
+              catNorm.includes(dNorm) ||
+              dNorm.includes(titleNorm) ||
+              titleNorm.includes(dNorm)
+            )
+          })
+        }
+        return false
+      })
       if (!matched.length) return cat
 
-      const feat = matched.find((p) => p.featured) || matched[0]
-      const rest = matched.filter((p) => p.id !== feat.id)
+      const feat = matched.find((p) => p.featured || p.is_featured) || matched[0]
+      const rest = matched.filter((p) => p.id !== feat.id && p.slug !== feat.slug)
 
       const updatedFeatured = {
-        titleEn: feat.title || cat.featured.titleEn,
-        titleAr: feat.titleAr || cat.featured.titleAr,
-        locationEn: feat.location || cat.featured.locationEn,
-        locationAr: feat.locationAr || cat.featured.locationAr,
-        year: feat.year || cat.featured.year,
-        image: feat.coverImage || cat.featured.image,
-        alt: feat.title || cat.featured.alt,
-        descEn: feat.description || cat.featured.descEn,
-        descAr: feat.descriptionAr || cat.featured.descAr,
-        scopeEn: feat.scope?.length ? feat.scope : cat.featured.scopeEn,
-        scopeAr: feat.scopeAr?.length ? feat.scopeAr : cat.featured.scopeAr,
+        titleEn: feat.name || feat.title || cat.featured.titleEn,
+        titleAr: feat.nameAr || feat.titleAr || feat.title_ar || cat.featured.titleAr,
+        locationEn: feat.location || feat.location_en || cat.featured.locationEn,
+        locationAr: feat.locationAr || feat.location_ar || cat.featured.locationAr,
+        year: String(feat.year || cat.featured.year),
+        image: feat.cover || feat.coverImage || feat.cover_image || cat.featured.image,
+        alt: feat.name || feat.title || cat.featured.alt,
+        descEn: feat.description || feat.details_en || cat.featured.descEn,
+        descAr: feat.descriptionAr || feat.details_ar || cat.featured.descAr,
+        scopeEn: Array.isArray(feat.scope) && feat.scope.length ? feat.scope : cat.featured.scopeEn,
+        scopeAr: Array.isArray(feat.scopeAr) && feat.scopeAr.length ? feat.scopeAr : cat.featured.scopeAr,
+        slug: feat.slug,
       }
 
       const updatedSubProjects = [...cat.subProjects] as [SubProject, SubProject]
       if (rest[0]) {
         updatedSubProjects[0] = {
-          titleEn: rest[0].title,
-          titleAr: rest[0].titleAr || rest[0].title,
-          locationEn: rest[0].location,
-          locationAr: rest[0].locationAr || rest[0].location,
-          image: rest[0].coverImage || cat.subProjects[0].image,
-          alt: rest[0].title,
-          year: rest[0].year,
-          descEn: rest[0].description,
-          descAr: rest[0].descriptionAr,
+          titleEn: rest[0].name || rest[0].title || cat.subProjects[0].titleEn,
+          titleAr: rest[0].nameAr || rest[0].titleAr || rest[0].title_ar || cat.subProjects[0].titleAr,
+          locationEn: rest[0].location || rest[0].location_en || cat.subProjects[0].locationEn,
+          locationAr: rest[0].locationAr || rest[0].location_ar || cat.subProjects[0].locationAr,
+          image: rest[0].cover || rest[0].coverImage || rest[0].cover_image || cat.subProjects[0].image,
+          alt: rest[0].name || rest[0].title || cat.subProjects[0].alt,
+          year: String(rest[0].year || cat.subProjects[0].year || '2025'),
+          descEn: rest[0].description || rest[0].details_en || cat.subProjects[0].descEn,
+          descAr: rest[0].descriptionAr || rest[0].details_ar || cat.subProjects[0].descAr,
+          slug: rest[0].slug,
         }
       }
       if (rest[1]) {
         updatedSubProjects[1] = {
-          titleEn: rest[1].title,
-          titleAr: rest[1].titleAr || rest[1].title,
-          locationEn: rest[1].location,
-          locationAr: rest[1].locationAr || rest[1].location,
-          image: rest[1].coverImage || cat.subProjects[1].image,
-          alt: rest[1].title,
-          year: rest[1].year,
-          descEn: rest[1].description,
-          descAr: rest[1].descriptionAr,
+          titleEn: rest[1].name || rest[1].title || cat.subProjects[1].titleEn,
+          titleAr: rest[1].nameAr || rest[1].titleAr || rest[1].title_ar || cat.subProjects[1].titleAr,
+          locationEn: rest[1].location || rest[1].location_en || cat.subProjects[1].locationEn,
+          locationAr: rest[1].locationAr || rest[1].location_ar || cat.subProjects[1].locationAr,
+          image: rest[1].cover || rest[1].coverImage || rest[1].cover_image || cat.subProjects[1].image,
+          alt: rest[1].name || rest[1].title || cat.subProjects[1].alt,
+          year: String(rest[1].year || cat.subProjects[1].year || '2025'),
+          descEn: rest[1].description || rest[1].details_en || cat.subProjects[1].descEn,
+          descAr: rest[1].descriptionAr || rest[1].details_ar || cat.subProjects[1].descAr,
+          slug: rest[1].slug,
         }
       }
 
@@ -699,6 +728,7 @@ export default function ProjectsPage() {
                           alt: featured.alt,
                           desc: isAr ? featured.descAr : featured.descEn,
                           scope: isAr ? featured.scopeAr : featured.scopeEn,
+                          slug: featured.slug,
                         })
                       }
                       className="group/card relative aspect-[16/10] w-full overflow-hidden mb-3 bg-stone/20 border border-stone/20 cursor-pointer corner-ticks"
@@ -738,9 +768,11 @@ export default function ProjectsPage() {
                                 title: sTitle,
                                 category: catTitle,
                                 location: sLoc,
+                                year: sub.year,
                                 image: sub.image,
                                 alt: sub.alt,
                                 desc: isAr ? sub.descAr || '' : sub.descEn || '',
+                                slug: sub.slug,
                               })
                             }
                             className="group/sub flex flex-col cursor-pointer"
@@ -874,6 +906,15 @@ export default function ProjectsPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-stone/20">
+                {selectedProject.slug && (
+                  <Link
+                    href={`/projects/${selectedProject.slug}`}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-gold text-charcoal font-semibold text-xs uppercase tracking-wider text-center hover:bg-gold/90 transition-colors rounded-xs inline-flex items-center justify-center gap-2"
+                  >
+                    <span>{isAr ? 'عرض صفحة المشروع بالكامل' : 'View Full Monograph'}</span>
+                    <ArrowRight className="size-3.5 rtl:rotate-180" />
+                  </Link>
+                )}
                 <ButtonLink
                   href="/consultation"
                   variant="solid"
@@ -884,7 +925,7 @@ export default function ProjectsPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedProject(null)}
-                  className="w-full sm:w-auto px-5 py-2.5 eyebrow text-xs text-charcoal/70 hover:text-charcoal transition-colors text-center"
+                  className="w-full sm:w-auto px-5 py-2.5 eyebrow text-xs text-charcoal/70 hover:text-charcoal transition-colors text-center cursor-pointer"
                 >
                   {isAr ? 'إغلاق' : 'Close'}
                 </button>

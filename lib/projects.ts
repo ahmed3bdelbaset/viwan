@@ -3,24 +3,37 @@ export type Discipline = 'Architecture' | 'Interior Design' | 'Landscape' | 'Eng
 export type GalleryItem = {
   src: string
   caption: string
-  category: 'Architecture' | 'Interiors' | 'Landscape' | 'Details'
+  captionAr?: string
+  category: 'Architecture' | 'Interiors' | 'Landscape' | 'Details' | string
 }
 
 export type Project = {
   slug: string
   index: string
   name: string
+  nameAr?: string
+  title?: string
+  titleAr?: string
   location: string
+  locationAr?: string
   country: string
+  countryAr?: string
   year: string
   type: string
-  disciplines: Discipline[]
+  category?: string
+  disciplines: Discipline[] | string[]
   scope: string[]
+  scopeAr?: string[]
   tagline: string
+  taglineAr?: string
   heading: string
+  headingAr?: string
   description: string
+  descriptionAr?: string
   philosophy: string
+  philosophyAr?: string
   cover: string
+  coverImage?: string
   interior: string
   cinematic: string
   gallery: GalleryItem[]

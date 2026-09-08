@@ -18,8 +18,7 @@ interface HeroProps {
 }
 
 export function Hero({
-  headline = "Architecture
-Redefined",
+  headline = "Architecture Redefined",
   subline = "We design spaces that endure — where precision meets vision, and every line carries meaning.",
   eyebrow = "Est. 2015 — Cairo, Egypt",
   imageSrc = "/images/hero.jpg",

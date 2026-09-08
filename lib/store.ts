@@ -23,13 +23,14 @@ function syncWithServerDB() {
   if (typeof window === 'undefined' || hasSyncedWithServer) return;
   hasSyncedWithServer = true;
 
-  // Sync Projects from SQLite Server DB
-  fetch('/api/projects')
+  // Sync Projects from Server DB
+  fetch('/api/admin/projects')
     .then((res) => res.json())
     .then((json) => {
-      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        inMemoryProjects = json.data;
-        localStorage.setItem('viwan_projects', JSON.stringify(json.data));
+      const list = json.projects || json.data;
+      if (Array.isArray(list) && list.length > 0) {
+        inMemoryProjects = list;
+        localStorage.setItem('viwan_projects', JSON.stringify(list));
       }
     })
     .catch(() => {});
@@ -87,7 +88,12 @@ export const DataStore = {
       const stored = localStorage.getItem('viwan_projects');
       if (stored) {
         try {
-          return JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          // Purge stale mock hospital projects from local storage
+          const hasStaleMock = Array.isArray(parsed) && parsed.some(p => p.slug === 'specialized-hospital' || p.slug === 'oasis-residential-complex');
+          if (!hasStaleMock && Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
         } catch (e) {
           console.error(e);
         }
@@ -104,19 +110,20 @@ export const DataStore = {
 
   saveProject: (project: Project): Project => {
     const projects = DataStore.getProjects();
-    const existingIndex = projects.findIndex((p) => p.id === project.id);
+    const existingIndex = projects.findIndex((p) => p.id === project.id || p.slug === project.slug);
     let updated: Project[];
-    if (existingIndex >= 0) {
+    const isEdit = existingIndex >= 0;
+    if (isEdit) {
       updated = [...projects];
-      updated[existingIndex] = project;
+      updated[existingIndex] = { ...updated[existingIndex], ...project };
     } else {
       updated = [project, ...projects];
     }
     if (typeof window !== 'undefined') {
       localStorage.setItem('viwan_projects', JSON.stringify(updated));
-      // Save permanently to SQLite physical database
-      fetch('/api/projects', {
-        method: 'POST',
+      // Save permanently to Server DB
+      fetch('/api/admin/projects', {
+        method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(project)
       }).catch((e) => console.error('Error saving to DB:', e));
@@ -127,11 +134,13 @@ export const DataStore = {
 
   deleteProject: (id: string): boolean => {
     const projects = DataStore.getProjects();
-    const updated = projects.filter((p) => p.id !== id);
+    const target = projects.find(p => p.id === id || p.slug === id);
+    const slugToDelete = target?.slug || id;
+    const updated = projects.filter((p) => p.id !== id && p.slug !== id);
     if (typeof window !== 'undefined') {
       localStorage.setItem('viwan_projects', JSON.stringify(updated));
-      // Delete permanently from SQLite physical database
-      fetch(`/api/projects/${id}`, {
+      // Delete permanently from Server DB
+      fetch(`/api/admin/projects?slug=${encodeURIComponent(slugToDelete)}`, {
         method: 'DELETE'
       }).catch((e) => console.error('Error deleting from DB:', e));
     }

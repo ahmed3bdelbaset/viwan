@@ -2,226 +2,588 @@ import { Project, InsightArticle, CompanyInfo, ServiceItem, AdminUser, Expertise
 
 export const INITIAL_PROJECTS: Project[] = [
   {
-    id: 'prj-1',
-    code: 'PRJ-2023-042',
-    slug: 'specialized-hospital',
-    title_en: 'Specialized Hospital',
-    title_ar: 'المستشفى التخصصي',
-    subtitle_en: 'Healthcare Centre of Excellence',
-    subtitle_ar: 'مركز رعاية صحية متميز ومعلم طبي حديث',
-    sector_en: 'Healthcare',
-    sector_ar: 'الرعاية الصحية',
-    services_en: ['Architecture', 'Structural Design', 'MEP Engineering', 'Project Management'],
-    services_ar: ['الاستشارات المعمارية', 'التصميم الإنشائي', 'الهندسة الكهروميكانيكية', 'إدارة المشاريع'],
-    location_en: 'Riyadh, Saudi Arabia',
-    location_ar: 'الرياض، المملكة العربية السعودية',
-    country_en: 'KSA',
-    country_ar: 'السعودية',
-    client_en: 'Ministry of Health',
-    client_ar: 'وزارة الصحة',
-    year: 2023,
-    area_sqm: '32,000 m²',
-    status: 'completed',
-    publish_status: 'Featured',
-    is_featured: true,
-    cover_image: '/images/project1.png',
-    gallery_images: [
-      '/images/project1.png',
-      '/images/project2.png',
-      'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop'
+    "id": "prj-private-residence-01",
+    "code": "PRJ-2026-01",
+    "slug": "private-residence-01",
+    "index": "01",
+    "name": "Private Residence 01",
+    "nameAr": "إقامة خاصة 01",
+    "title": "Private Residence 01",
+    "title_en": "Private Residence 01",
+    "title_ar": "إقامة خاصة 01",
+    "location": "New Cairo",
+    "location_en": "New Cairo, Egypt",
+    "location_ar": "القاهرة الجديدة، مصر",
+    "country": "Egypt",
+    "country_en": "Egypt",
+    "country_ar": "مصر",
+    "client_en": "Private VIP Client",
+    "client_ar": "عميل خاص",
+    "year": 2026,
+    "area_sqm": "1,850 m²",
+    "type": "Private Residence",
+    "category": "Private Residence",
+    "sector_en": "Residential",
+    "sector_ar": "القطاع السكني",
+    "disciplines": [
+      "Architecture",
+      "Interior Design",
+      "Landscape"
     ],
-    vision_en: 'The Specialized Hospital in Riyadh represents a paradigm shift in healthcare facility design. Our approach centered on creating an environment that promotes healing while ensuring maximum operational efficiency. The architectural language is deliberately calm, utilizing natural light and serene materials to reduce patient stress.',
-    vision_ar: 'يمثل المستشفى التخصصي بالرياض نقلة نوعية في تصميم المنشآت الطبية الحديثة. تركزت رؤيتنا على خلق بيئة تعزز الاستشفاء النفسي والجسدي مع ضمان أعلى درجات الكفاءة التشغيلية والتدفق الحركي للمرضى والطواقم الطبية، مع الاستفادة القصوى من الإضاءة الطبيعية والمواد المستدامة.',
-    details_en: 'Every spatial decision was driven by a commitment to value—balancing the rigorous technical requirements of a modern hospital with an elegant, humane aesthetic. From the intuitive wayfinding strategies to the integration of sustainable systems, the project exemplifies our philosophy of delivering consultancy that translates complex needs into clear, purposeful design.',
-    details_ar: 'تم توجيه كل قرار معماري بالتزام تام بتحقيق أعلى قيمة وظيفية وجمالية، محققين التوازن الدقيق بين المتطلبات الهندسية الفائقة للمستشفيات والجمالية الإنسانية المريحة، مع حلول توجيه حركي ذكية وأنظمة مستدامة تقلل استهلاك الطاقة بنسبة 30%.',
-    lat: 24.7136,
-    lng: 46.6753,
-    display_order: 1
+    "services_en": [
+      "Architecture",
+      "Interior Design",
+      "Landscape"
+    ],
+    "services_ar": [
+      "الاستشارات المعمارية",
+      "التصميم الداخلي",
+      "تصميم اللاندسكيب"
+    ],
+    "scope": [
+      "Architecture Design",
+      "Interior Design",
+      "Landscape Design",
+      "Technical Documentation",
+      "Engineering Coordination"
+    ],
+    "tagline": "A home in harmony with its surroundings.",
+    "subtitle_en": "A home in harmony with its surroundings.",
+    "subtitle_ar": "منزل متناغم مع محيطه الطبيعي ويوفر ملاذاً هادئاً.",
+    "heading": "A refined balance of architecture and nature.",
+    "headingAr": "توازن دقيق بين روعة العمارة وجمال الطبيعة.",
+    "description": "This private residence was designed as a serene retreat where modern architecture meets a warm, timeless atmosphere. The design embraces open spaces, natural materials and a strong connection to the outdoors, creating a home that feels both elegant and personal. Travertine volumes are layered with vertical wood screens and expansive glazing, allowing the garden and pool to become part of daily life inside the house.",
+    "descriptionAr": "صُممت هذه الإقامة الخاصة كملاذ هادئ حيث تلتقي العمارة الحديثة بالأجواء الدافئة الخالدة. يتبنى التصميم الفراغات المفتوحة والمواد الطبيعية والاتصال القوي بالطبيعة الخارجية، مع كتل الترافيرتين وشاشات الخشب الرأسية والواجهات الزجاجية الممتدة.",
+    "details_en": "This private residence was designed as a serene retreat where modern architecture meets a warm, timeless atmosphere.",
+    "details_ar": "صُممت هذه الإقامة الخاصة كملاذ هادئ يجمع بين العمارة الحديثة والدفء الكلاسيكي.",
+    "philosophy": "A dialogue between modern living and natural serenity, where every space is intentionally crafted to enhance the way people live.",
+    "vision_en": "A dialogue between modern living and natural serenity, where every space is intentionally crafted to enhance the way people live.",
+    "vision_ar": "حوار هندسي بين متطلبات المعيشة العصرية والسكينة الطبيعية، حيث تم تصميم كل فراغ بعناية لتعزيز جودة الحياة اليومية.",
+    "cover": "/images/project-private-residence.png",
+    "cover_image": "/images/project-private-residence.png",
+    "coverImage": "/images/project-private-residence.png",
+    "interior": "/images/interior-living-marble.jpg",
+    "cinematic": "/images/hero-villa.png",
+    "featured": true,
+    "is_featured": true,
+    "status": "completed",
+    "publish_status": "Featured",
+    "lat": 30.0131,
+    "lng": 31.4913,
+    "display_order": 1,
+    "lifecycle_stage": "handover",
+    "gallery": [
+      {
+        "src": "/images/project-private-residence.png",
+        "caption": "Exterior View",
+        "category": "Architecture"
+      },
+      {
+        "src": "/images/interior-living-marble.jpg",
+        "caption": "Living Area",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/interior-dining.png",
+        "caption": "Dining Area",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/interior-bedroom.png",
+        "caption": "Master Bedroom",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/detail-courtyard.png",
+        "caption": "Courtyard",
+        "category": "Landscape"
+      },
+      {
+        "src": "/images/material-stone.png",
+        "caption": "Travertine Detail",
+        "category": "Details"
+      }
+    ],
+    "gallery_images": [
+      "/images/project-private-residence.png",
+      "/images/interior-living-marble.jpg",
+      "/images/interior-dining.png",
+      "/images/interior-bedroom.png",
+      "/images/detail-courtyard.png",
+      "/images/material-stone.png"
+    ]
   },
   {
-    id: 'prj-2',
-    code: 'PRJ-2024-001',
-    slug: 'oasis-residential-complex',
-    title_en: 'Oasis Residential Complex',
-    title_ar: 'مجمع الواحة السكني',
-    subtitle_en: 'Coastal Luxury Residences',
-    subtitle_ar: 'مجمع سكني فاخر بإطلالات ساحلية',
-    sector_en: 'Residential',
-    sector_ar: 'القطاع السكني',
-    services_en: ['Architecture', 'Supervision & Site Services'],
-    services_ar: ['الاستشارات المعمارية', 'الإشراف الهندسي والموقع'],
-    location_en: 'New Alamein, Egypt',
-    location_ar: 'العلمين الجديدة، مصر',
-    country_en: 'Egypt',
-    country_ar: 'مصر',
-    client_en: 'Alamein Urban Development',
-    client_ar: 'شركة العلمين للتطوير العمراني',
-    year: 2024,
-    area_sqm: '48,500 m²',
-    status: 'ongoing',
-    publish_status: 'Published',
-    is_featured: true,
-    cover_image: '/images/project2.png',
-    gallery_images: [
-      '/images/project2.png',
-      '/images/project1.png',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop'
+    "id": "prj-lake-house",
+    "code": "PRJ-2025-02",
+    "slug": "lake-house",
+    "index": "02",
+    "name": "Lake House",
+    "nameAr": "منزل البحيرة",
+    "title": "Lake House",
+    "title_en": "Lake House",
+    "title_ar": "منزل البحيرة",
+    "location": "Ain Sokhna",
+    "location_en": "Ain Sokhna, Egypt",
+    "location_ar": "العين السخنة، مصر",
+    "country": "Egypt",
+    "country_en": "Egypt",
+    "country_ar": "مصر",
+    "client_en": "Private Owner",
+    "client_ar": "مالك خاص",
+    "year": 2025,
+    "area_sqm": "1,200 m²",
+    "type": "Private Residence",
+    "category": "Private Residence",
+    "sector_en": "Residential",
+    "sector_ar": "القطاع السكني",
+    "disciplines": [
+      "Architecture",
+      "Landscape"
     ],
-    vision_en: 'Contemporary residential complex featuring 80 units with optimized urban views, private courtyards, and integrated sustainable design elements.',
-    vision_ar: 'مجمع سكني معاصر يضم 80 وحدة سكنية فاخرة بإطلالات بحرية مفتوحة ومساحات خضراء خاصة وتصميم مستدام يحقق التهوية الطبيعية.',
-    details_en: 'A harmonic blend between limestone textures and glass curtain walls that creates an airy, Mediterranean-inspired contemporary lifestyle.',
-    details_ar: 'تناغم فريد بين حجر الحجر الجيري والواجهات الزجاجية المتطورة لتوفير نمط حياة معاصر مستوحى من طبيعة البحر الأبيض المتوسط.',
-    lat: 30.8347,
-    lng: 28.9567,
-    display_order: 2
+    "services_en": [
+      "Architecture",
+      "Landscape"
+    ],
+    "services_ar": [
+      "الاستشارات المعمارية",
+      "تصميم اللاندسكيب"
+    ],
+    "scope": [
+      "Architecture Design",
+      "Landscape Design",
+      "Technical Documentation"
+    ],
+    "tagline": "Rooted in the landscape. Designed for a slower, richer life.",
+    "subtitle_en": "Rooted in the landscape. Designed for a slower, richer life.",
+    "subtitle_ar": "متجذر في تضاريس الموقع، ومصمم لحياة أكثر عمقاً وهدوءاً.",
+    "heading": "A quiet structure resting on water.",
+    "headingAr": "كتلة معمارية هادئة تستقر فوق سطح الماء.",
+    "description": "The Lake House is a low, horizontal composition that extends over calm water on a timber deck. A cantilevered roof shelters the living spaces while travertine walls anchor the house to its site. Reeds, olive trees and native planting soften the edge between architecture and landscape, so the building appears to have always belonged there.",
+    "descriptionAr": "تكوين أفقي منخفض يمتد فوق سطح الماء الهادئ عبر منصات خشبية متدرجة وسقف كابولي يحمي المساحات المعيشية وجدران الترافيرتين الراسية.",
+    "details_en": "The Lake House is a low, horizontal composition that extends over calm water on a timber deck.",
+    "details_ar": "تكوين أفقي منخفض يمتد فوق سطح الماء عبر منصات خشبية متدرجة.",
+    "philosophy": "Architecture lives longer when it belongs.",
+    "vision_en": "Architecture lives longer when it belongs.",
+    "vision_ar": "تدوم العمارة طويلاً حين تنتمي بتناغم تام إلى بيئتها وطبيعتها.",
+    "cover": "/images/project-lake-house.png",
+    "cover_image": "/images/project-lake-house.png",
+    "coverImage": "/images/project-lake-house.png",
+    "interior": "/images/interior-living-fireplace.jpg",
+    "cinematic": "/images/project-lake-house.png",
+    "featured": false,
+    "is_featured": false,
+    "status": "completed",
+    "publish_status": "Published",
+    "lat": 29.6,
+    "lng": 32.3167,
+    "display_order": 2,
+    "lifecycle_stage": "handover",
+    "gallery": [
+      {
+        "src": "/images/project-lake-house.png",
+        "caption": "Exterior at Dawn",
+        "category": "Architecture"
+      },
+      {
+        "src": "/images/interior-living-fireplace.jpg",
+        "caption": "Living Area",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/project-hillside-villa.png",
+        "caption": "Terraces",
+        "category": "Landscape"
+      },
+      {
+        "src": "/images/material-wood.png",
+        "caption": "Timber Cladding",
+        "category": "Details"
+      }
+    ],
+    "gallery_images": [
+      "/images/project-lake-house.png",
+      "/images/interior-living-fireplace.jpg",
+      "/images/project-hillside-villa.png",
+      "/images/material-wood.png"
+    ]
   },
   {
-    id: 'prj-3',
-    code: 'PRJ-2022-088',
-    slug: 'dammam-east-masterplan',
-    title_en: 'Dammam East Masterplan',
-    title_ar: 'المخطط العام لشرق الدمام',
-    subtitle_en: 'Integrated Waterfront Smart Community',
-    subtitle_ar: 'مجتمع حضري ذكي متكامل على الواجهة البحرية',
-    sector_en: 'Masterplan',
-    sector_ar: 'المخططات العامة',
-    services_en: ['Planning', 'Urban Design', 'Sustainability Consulting'],
-    services_ar: ['التخطيط العمراني', 'التصميم الحضري', 'استشارات الاستدامة'],
-    location_en: 'Dammam, KSA',
-    location_ar: 'الدمام، المملكة العربية السعودية',
-    country_en: 'KSA',
-    country_ar: 'السعودية',
-    client_en: 'Eastern Province Municipality',
-    client_ar: 'أمانة المنطقة الشرقية',
-    year: 2022,
-    area_sqm: '500 Acres',
-    status: 'completed',
-    publish_status: 'Published',
-    is_featured: true,
-    cover_image: '/images/pinterest-villa.jpg',
-    gallery_images: [
-      '/images/pinterest-villa.jpg',
-      '/images/pinterest-courtyard.jpg',
-      '/images/pinterest-facade.jpg'
+    "id": "prj-the-urban-retreat",
+    "code": "PRJ-2025-03",
+    "slug": "the-urban-retreat",
+    "index": "03",
+    "name": "The Urban Retreat",
+    "nameAr": "الملاذ الحضري",
+    "title": "The Urban Retreat",
+    "title_en": "The Urban Retreat",
+    "title_ar": "الملاذ الحضري",
+    "location": "Cairo",
+    "location_en": "Cairo, Egypt",
+    "location_ar": "القاهرة، مصر",
+    "country": "Egypt",
+    "country_en": "Egypt",
+    "country_ar": "مصر",
+    "client_en": "Private Collector",
+    "client_ar": "عميل خاص",
+    "year": 2025,
+    "area_sqm": "650 m²",
+    "type": "Apartment",
+    "category": "Apartment",
+    "sector_en": "Interior Architecture",
+    "sector_ar": "العمارة الداخلية",
+    "disciplines": [
+      "Interior Design"
     ],
-    vision_en: 'A visionary urban development project spanning over 500 acres, integrating sustainable residential districts, state-of-the-art commercial hubs, and extensive public amenities to create a cohesive, future-ready community ecosystem.',
-    vision_ar: 'مشروع تطوير حضري ريادي يمتد لأكثر من 500 فدان، يدمج بين الأحياء السكنية المستدامة والمراكز التجارية الحديثة والمساحات العامة المفتوحة لخلق منظومة مجتمعية متكاملة ومستقبلية.',
-    details_en: 'Structured along a dynamic canal spine, the masterplan provides 100% pedestrian accessibility, multi-modal transport hubs, and zero-carbon public corridors.',
-    details_ar: 'تم تخطيط المشروع حول محور مائي مركزي مع توفير مسارات مشاة مظللة بنسبة 100% ومحطات نقل ذكية وشبكات بنية تحتية مستدامة.',
-    lat: 26.4207,
-    lng: 50.0888,
-    display_order: 3
+    "services_en": [
+      "Interior Design"
+    ],
+    "services_ar": [
+      "التصميم الداخلي والديكور"
+    ],
+    "scope": [
+      "Interior Design",
+      "FF&E",
+      "Lighting Design",
+      "Styling"
+    ],
+    "tagline": "A refined urban sanctuary that balances warmth, materiality and modern living.",
+    "subtitle_en": "A refined urban sanctuary that balances warmth, materiality and modern living.",
+    "subtitle_ar": "ملاذ حضري فاخر يوازن بين الدفء والمواد النبيلة والحياة العصرية.",
+    "heading": "Calm, material and deeply personal.",
+    "headingAr": "هدوء وأناقة ومواد تعبر عن الخصوصية العميقة.",
+    "description": "A complete interior transformation of a city apartment into a warm, layered retreat. Dark walnut panelling, travertine surfaces and a linear fireplace create a sense of stillness, while carefully controlled lighting shapes the mood from morning to night. Every piece of furniture and every finish was selected to feel timeless rather than fashionable.",
+    "descriptionAr": "تحول داخلي شامل لشقة في قلب المدينة إلى ملاذ دافئ من خشب الجوز والترافيرتين الطبيعي والمدفأة الخطية مع إضاءة مدروسة بعناية.",
+    "details_en": "A complete interior transformation of a city apartment into a warm, layered retreat.",
+    "details_ar": "تحول داخلي شامل لشقة في قلب المدينة إلى ملاذ دافئ وهادئ.",
+    "philosophy": "Spaces shaped by purpose, character and detail.",
+    "vision_en": "Spaces shaped by purpose, character and detail.",
+    "vision_ar": "فراغات معمارية تشكلها الغاية والخصوصية والدقة في أدق التفاصيل.",
+    "cover": "/images/interior-living-fireplace.jpg",
+    "cover_image": "/images/interior-living-fireplace.jpg",
+    "coverImage": "/images/interior-living-fireplace.jpg",
+    "interior": "/images/interior-dining.png",
+    "cinematic": "/images/interior-living-fireplace.jpg",
+    "featured": false,
+    "is_featured": false,
+    "status": "completed",
+    "publish_status": "Published",
+    "lat": 30.0444,
+    "lng": 31.2357,
+    "display_order": 3,
+    "lifecycle_stage": "handover",
+    "gallery": [
+      {
+        "src": "/images/interior-living-fireplace.jpg",
+        "caption": "Living Area",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/interior-dining.png",
+        "caption": "Dining",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/interior-bedroom.png",
+        "caption": "Bedroom",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/material-fabric.png",
+        "caption": "Textiles",
+        "category": "Details"
+      },
+      {
+        "src": "/images/material-metal.png",
+        "caption": "Bronze & Stone",
+        "category": "Details"
+      }
+    ],
+    "gallery_images": [
+      "/images/interior-living-fireplace.jpg",
+      "/images/interior-dining.png",
+      "/images/interior-bedroom.png",
+      "/images/material-fabric.png",
+      "/images/material-metal.png"
+    ]
   },
   {
-    id: 'prj-4',
-    code: 'PRJ-2024-015',
-    slug: 'jeddah-commercial-hub',
-    title_en: 'Jeddah Commercial Hub',
-    title_ar: 'المركز التجاري بجدة',
-    subtitle_en: 'The Arcade Lifestyle Destination',
-    subtitle_ar: 'وجهة تجارية وثقافية عصرية متكاملة',
-    sector_en: 'Commercial',
-    sector_ar: 'القطاع التجاري',
-    services_en: ['Architecture', 'Supervision', 'Concept Design'],
-    services_ar: ['الاستشارات المعمارية', 'الإشراف الهندسي', 'التصميم المفاهيمي'],
-    location_en: 'Jeddah, KSA',
-    location_ar: 'جدة، المملكة العربية السعودية',
-    country_en: 'KSA',
-    country_ar: 'السعودية',
-    client_en: 'Red Sea Real Estate Co.',
-    client_ar: 'شركة البحر الأحمر العقارية',
-    year: 2024,
-    area_sqm: '28,000 m²',
-    status: 'ongoing',
-    publish_status: 'Published',
-    is_featured: true,
-    cover_image: '/images/pinterest-facade.jpg',
-    gallery_images: [
-      '/images/pinterest-facade.jpg',
-      '/images/pinterest-interior.jpg',
-      '/images/pinterest-villa.jpg'
+    "id": "prj-hillside-villa",
+    "code": "PRJ-2026-04",
+    "slug": "hillside-villa",
+    "index": "04",
+    "name": "Hillside Villa",
+    "nameAr": "فيلا المنحدر الجبلي",
+    "title": "Hillside Villa",
+    "title_en": "Hillside Villa",
+    "title_ar": "فيلا المنحدر الجبلي",
+    "location": "Ain Sokhna",
+    "location_en": "Ain Sokhna, Egypt",
+    "location_ar": "العين السخنة، مصر",
+    "country": "Egypt",
+    "country_en": "Egypt",
+    "country_ar": "مصر",
+    "client_en": "Real Estate Developer",
+    "client_ar": "مطور عقاري",
+    "year": 2026,
+    "area_sqm": "2,400 m²",
+    "type": "Private Villa",
+    "category": "Private Villa",
+    "sector_en": "Residential",
+    "sector_ar": "القطاع السكني",
+    "disciplines": [
+      "Architecture",
+      "Landscape",
+      "Engineering"
     ],
-    vision_en: 'A premier retail, dining, and lifestyle destination defined by an undulating kinetic timber roof structure that shields outdoor plazas from intense sun.',
-    vision_ar: 'وجهة راقية للتسوق والمطاعم والأنشطة الترفيهية تتميز بسقف انسيابي خشبي مظلل يوفر بيئة مريحة وساحات خارجية حيوية على مدار العام.',
-    details_en: 'Integrating active streetfronts with biophilic terraces, creating an unprecedented indoor-outdoor urban experience in Jeddah.',
-    details_ar: 'دمج الواجهات المفتوحة مع شرفات نباتية خضراء لخلق تجربة تسوق داخلية وخارجية لا مثيل لها في قلب مدينة جدة.',
-    lat: 21.5433,
-    lng: 39.1728,
-    display_order: 4
+    "services_en": [
+      "Architecture",
+      "Landscape",
+      "Engineering"
+    ],
+    "services_ar": [
+      "الاستشارات المعمارية",
+      "تصميم اللاندسكيب",
+      "الهندسة الإنشائية والتنسيق"
+    ],
+    "scope": [
+      "Architecture Design",
+      "Landscape Design",
+      "Structural Coordination",
+      "BIM"
+    ],
+    "tagline": "Rooted in the landscape.",
+    "subtitle_en": "Rooted in the landscape.",
+    "subtitle_ar": "منحوتة في تضاريس الموقع ومطلة على زرقة البحر.",
+    "heading": "Built into the slope, open to the sea.",
+    "headingAr": "منحوتة في تضاريس الجبل، ومفتوحة على زرقة البحر.",
+    "description": "Set into a steep coastal site, the villa steps down the hillside in a series of stone terraces. Wide external stairs move through native planting toward the sea, and each level opens onto its own shaded outdoor room. Structural and MEP coordination through BIM allowed the complex terracing to be resolved precisely before construction began.",
+    "descriptionAr": "فيلا مدرجة على منحدر ساحلي عبر مصاطب حجرية وأدراج واسعة وسط نباتات المنطقة نحو البحر، منسقة بدقة عبر نمذجة الـ BIM الهندسية.",
+    "details_en": "Set into a steep coastal site, the villa steps down the hillside in a series of stone terraces.",
+    "details_ar": "فيلا ساحلية متدرجة عبر مصاطب حجرية وأدراج واسعة.",
+    "philosophy": "Nature. Architecture. People.",
+    "vision_en": "Nature. Architecture. People.",
+    "vision_ar": "الطبيعة. العمارة. الإنسان.",
+    "cover": "/images/project-hillside-villa.png",
+    "cover_image": "/images/project-hillside-villa.png",
+    "coverImage": "/images/project-hillside-villa.png",
+    "interior": "/images/interior-bedroom.png",
+    "cinematic": "/images/project-hillside-villa.png",
+    "featured": false,
+    "is_featured": false,
+    "status": "ongoing",
+    "publish_status": "Published",
+    "lat": 29.58,
+    "lng": 32.33,
+    "display_order": 4,
+    "lifecycle_stage": "supervision",
+    "gallery": [
+      {
+        "src": "/images/project-hillside-villa.png",
+        "caption": "Approach",
+        "category": "Landscape"
+      },
+      {
+        "src": "/images/interior-bedroom.png",
+        "caption": "Master Suite",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/detail-courtyard.png",
+        "caption": "Stone Courtyard",
+        "category": "Architecture"
+      },
+      {
+        "src": "/images/material-stone.png",
+        "caption": "Stone Detail",
+        "category": "Details"
+      }
+    ],
+    "gallery_images": [
+      "/images/project-hillside-villa.png",
+      "/images/interior-bedroom.png",
+      "/images/detail-courtyard.png",
+      "/images/material-stone.png"
+    ]
   },
   {
-    id: 'prj-5',
-    code: 'PRJ-2023-019',
-    slug: 'linear-lofts-residences',
-    title_en: 'Linear Lofts Residences',
-    title_ar: 'مساكن لينيار لوفتس',
-    subtitle_en: 'Minimalist Contemporary Living',
-    subtitle_ar: 'سكن معاصر بأسلوب البساطة المعمارية الراقية',
-    sector_en: 'Residential',
-    sector_ar: 'القطاع السكني',
-    services_en: ['Architecture', 'Interior Design', 'MEP Engineering'],
-    services_ar: ['الاستشارات المعمارية', 'التصميم الداخلي', 'الهندسة الكهروميكانيكية'],
-    location_en: 'New Cairo, Egypt',
-    location_ar: 'القاهرة الجديدة، مصر',
-    country_en: 'Egypt',
-    country_ar: 'مصر',
-    client_en: 'Private Development Group',
-    client_ar: 'مجموعة التطوير الخاصة',
-    year: 2023,
-    area_sqm: '18,500 m²',
-    status: 'completed',
-    publish_status: 'Published',
-    is_featured: false,
-    cover_image: '/images/pinterest-interior.jpg',
-    gallery_images: [
-      '/images/pinterest-interior.jpg',
-      '/images/pinterest-courtyard.jpg'
+    "id": "prj-commercial-project-03",
+    "code": "PRJ-2025-05",
+    "slug": "commercial-project-03",
+    "index": "05",
+    "name": "Urban Commercial Hub",
+    "nameAr": "المركز التجاري الحضري",
+    "title": "Urban Commercial Hub",
+    "title_en": "Urban Commercial Hub",
+    "title_ar": "المركز التجاري الحضري",
+    "location": "Riyadh",
+    "location_en": "Riyadh, KSA",
+    "location_ar": "الرياض، المملكة العربية السعودية",
+    "country": "KSA",
+    "country_en": "KSA",
+    "country_ar": "السعودية",
+    "client_en": "Riyadh Holdings Group",
+    "client_ar": "مجموعة الرياض القابضة",
+    "year": 2025,
+    "area_sqm": "18,500 m²",
+    "type": "Commercial",
+    "category": "Commercial",
+    "sector_en": "Commercial",
+    "sector_ar": "تجاري وإداري",
+    "disciplines": [
+      "Architecture",
+      "Interior Design",
+      "Engineering"
     ],
-    vision_en: 'A multi-unit loft building focusing on natural light, double-height volumes, and raw material purity.',
-    vision_ar: 'مبنى لوفت سكني فاخر يركز على تدفق الضوء الطبيعي والأسقف المزدوجة ونقاء المواد الإنشائية الطبيعية.',
-    details_en: 'Crafted with exposed board-formed concrete and warm walnut joinery.',
-    details_ar: 'صُمم بتشطيبات الخرسانة المكشوفة وأخشاب الجوز الدافئة لتوفير إحساس أصيل بالرحابة والراحة.',
-    lat: 30.0131,
-    lng: 31.4989,
-    display_order: 5
+    "services_en": [
+      "Architecture",
+      "Interior Design",
+      "Engineering"
+    ],
+    "services_ar": [
+      "الاستشارات المعمارية",
+      "التصميم الداخلي",
+      "التنسيق الكهروميكانيكي"
+    ],
+    "scope": [
+      "Architecture Design",
+      "Interior Design",
+      "Technical Documentation",
+      "MEP Coordination"
+    ],
+    "tagline": "A civic presence in limestone and bronze.",
+    "subtitle_en": "A civic presence in limestone and bronze.",
+    "subtitle_ar": "حضور عمراني رائد بالحجر الجيري والبرونز في قلب الرياض.",
+    "heading": "Precision at an urban scale.",
+    "headingAr": "دقة هندسية وصرح عمراني رائد.",
+    "description": "A mixed-use commercial building on a prominent Riyadh plaza. Deep recessed windows and bronze vertical fins control the harsh desert light while giving the limestone façade rhythm and depth. Full technical documentation and MEP coordination were delivered alongside the design, ensuring a seamless transition from concept to construction.",
+    "descriptionAr": "مبنى تجاري متعدد الاستخدامات في ساحة بارزة بالرياض، يتميز بنوافذ عميقة وكواسر شمسية برونزية وتكسيات حجرية متطورة مع تنسيق MEP كامل.",
+    "details_en": "A mixed-use commercial building on a prominent Riyadh plaza.",
+    "details_ar": "مبنى تجاري متعدد الاستخدامات في ساحة بارزة بالرياض.",
+    "philosophy": "Design is not decoration. It is how space works, feels and lasts.",
+    "vision_en": "Design is not decoration. It is how space works, feels and lasts.",
+    "vision_ar": "التصميم ليس مجرد زخرفة، بل هو كيف يعمل الفراغ، وكيف يبدو شعوره، وكيف يدوم للأجيال.",
+    "cover": "/images/project-commercial-riyadh.png",
+    "cover_image": "/images/project-commercial-riyadh.png",
+    "coverImage": "/images/project-commercial-riyadh.png",
+    "interior": "/images/project-executive-office.png",
+    "cinematic": "/images/project-commercial-riyadh.png",
+    "featured": false,
+    "is_featured": false,
+    "status": "completed",
+    "publish_status": "Published",
+    "lat": 24.7136,
+    "lng": 46.6753,
+    "display_order": 5,
+    "lifecycle_stage": "handover",
+    "gallery": [
+      {
+        "src": "/images/project-commercial-riyadh.png",
+        "caption": "Plaza Façade",
+        "category": "Architecture"
+      },
+      {
+        "src": "/images/project-executive-office.png",
+        "caption": "Executive Office",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/material-metal.png",
+        "caption": "Bronze Fins",
+        "category": "Details"
+      }
+    ],
+    "gallery_images": [
+      "/images/project-commercial-riyadh.png",
+      "/images/project-executive-office.png",
+      "/images/material-metal.png"
+    ]
   },
   {
-    id: 'prj-6',
-    code: 'PRJ-2024-088',
-    slug: 'kafd-corporate-tower',
-    title_en: 'KAFD Corporate Headquarters',
-    title_ar: 'المقر الإداري بمركز الملك عبد الله المالي',
-    subtitle_en: 'Sustainable High-Performance Workplace',
-    subtitle_ar: 'مقر إداري ذكي وعالي الأداء ومستدام',
-    sector_en: 'Commercial',
-    sector_ar: 'القطاع الإداري والتجاري',
-    services_en: ['Architecture', 'Structural Design', 'MEP Engineering', 'Sustainability'],
-    services_ar: ['الاستشارات المعمارية', 'التصميم الإنشائي', 'الهندسة الكهروميكانيكية', 'استشارات الاستدامة'],
-    location_en: 'Riyadh, KSA',
-    location_ar: 'الرياض، المملكة العربية السعودية',
-    country_en: 'KSA',
-    country_ar: 'السعودية',
-    client_en: 'Capital Investment Authority',
-    client_ar: 'هيئة الاستثمار المالي',
-    year: 2024,
-    area_sqm: '65,000 m²',
-    status: 'ongoing',
-    publish_status: 'Published',
-    is_featured: false,
-    cover_image: '/images/pinterest-courtyard.jpg',
-    gallery_images: [
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop'
+    "id": "prj-private-majlis",
+    "code": "PRJ-2024-06",
+    "slug": "private-majlis",
+    "index": "06",
+    "name": "Private Majlis",
+    "nameAr": "المجلس الخاص",
+    "title": "Private Majlis",
+    "title_en": "Private Majlis",
+    "title_ar": "المجلس الخاص",
+    "location": "Riyadh",
+    "location_en": "Riyadh, KSA",
+    "location_ar": "الرياض، المملكة العربية السعودية",
+    "country": "KSA",
+    "country_en": "KSA",
+    "country_ar": "السعودية",
+    "client_en": "Royal Family Office",
+    "client_ar": "مكتب عائلي مرموق",
+    "year": 2024,
+    "area_sqm": "480 m²",
+    "type": "Luxury Living",
+    "category": "Luxury Living",
+    "sector_en": "Hospitality & Heritage",
+    "sector_ar": "ضيافة وأصالة",
+    "disciplines": [
+      "Interior Design"
     ],
-    vision_en: 'A 34-story LEED Platinum office tower sculpted with parametric ceramic louvers to deflect high desert solar radiation.',
-    vision_ar: 'برج إداري بارتفاع 34 طابقاً وحاصل على تصنيف LEED البلاتيني للاستدامة، بواجهات ذكية تكسر أشعة الشمس الصحراوية وتوفر الطاقة.',
-    details_en: 'Designed with flexible column-free floor plates and high-efficiency smart envelope systems.',
-    details_ar: 'مساحات مكتبية مفتوحة بدون أعمدة داخلية مزودة بأحدث أنظمة إدارة المباني الذكية BMS.',
-    lat: 24.7677,
-    lng: 46.6384,
-    display_order: 6
+    "services_en": [
+      "Interior Design"
+    ],
+    "services_ar": [
+      "التصميم الداخلي الفاخر"
+    ],
+    "scope": [
+      "Interior Design",
+      "Bespoke Furniture",
+      "Lighting Design"
+    ],
+    "tagline": "Sophisticated spaces rooted in tradition, expressed with contemporary elegance.",
+    "subtitle_en": "Sophisticated spaces rooted in tradition, expressed with contemporary elegance.",
+    "subtitle_ar": "فضاءات راقية متجذرة في التراث ومعبر عنها بأناقة معاصرة.",
+    "heading": "Tradition, reinterpreted.",
+    "headingAr": "أصالة التراث برؤية معمارية معاصرة.",
+    "description": "A private majlis that honours the ritual of gathering. Backlit geometric screens in carved wood wrap the room, low seating follows the perimeter, and a single brass pendant marks the centre. Contemporary in its restraint, traditional in its generosity.",
+    "descriptionAr": "مجلس خاص يحتفي بتقاليد الضيافة الأصيلة، بقواطع خشبية هندسية مضيئة وجلسات محيطية وثريا نحاسية أيقونية.",
+    "details_en": "A private majlis that honours the ritual of gathering.",
+    "details_ar": "مجلس خاص يحتفي بتقاليد الضيافة الأصيلة.",
+    "philosophy": "Every detail contributes to a more meaningful way of living.",
+    "vision_en": "Every detail contributes to a more meaningful way of living.",
+    "vision_ar": "كل تفصيلة معمارية تساهم في إثراء التجربة الإنسانية والعيش الراقي.",
+    "cover": "/images/project-majlis.png",
+    "cover_image": "/images/project-majlis.png",
+    "coverImage": "/images/project-majlis.png",
+    "interior": "/images/project-majlis.png",
+    "cinematic": "/images/project-majlis.png",
+    "featured": false,
+    "is_featured": false,
+    "status": "completed",
+    "publish_status": "Published",
+    "lat": 24.7677,
+    "lng": 46.6384,
+    "display_order": 6,
+    "lifecycle_stage": "handover",
+    "gallery": [
+      {
+        "src": "/images/project-majlis.png",
+        "caption": "Majlis",
+        "category": "Interiors"
+      },
+      {
+        "src": "/images/material-wood.png",
+        "caption": "Carved Screens",
+        "category": "Details"
+      },
+      {
+        "src": "/images/material-fabric.png",
+        "caption": "Upholstery",
+        "category": "Details"
+      }
+    ],
+    "gallery_images": [
+      "/images/project-majlis.png",
+      "/images/material-wood.png",
+      "/images/material-fabric.png"
+    ]
   }
 ];
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
@@ -74,7 +74,7 @@ export function WhoWeAre() {
 }
 
 /* 03 — SELECTED PROJECTS */
-function ProjectMeta({ project, light = false }: { project: Project; light?: boolean }) {
+function ProjectMeta({ project, light = false }: { project: any; light?: boolean }) {
   const { t, lang } = useLanguage()
 
   const disciplineTranslations: Record<string, string> = {
@@ -84,27 +84,34 @@ function ProjectMeta({ project, light = false }: { project: Project; light?: boo
     Engineering: 'هندسة متكاملة',
   }
 
+  const pName = lang === 'ar' && (project.nameAr || project.titleAr) ? (project.nameAr || project.titleAr) : (project.name || project.title)
+  const pLocation = lang === 'ar' && project.locationAr ? project.locationAr : project.location
+  const pCountry = lang === 'ar' && project.countryAr ? project.countryAr : project.country
+  const disciplinesList = Array.isArray(project.disciplines)
+    ? project.disciplines
+    : [project.discipline || project.category || 'Architecture']
+
   return (
     <div className="flex items-start justify-between gap-6 pt-5">
       <div className="flex flex-col gap-2.5 flex-1">
         <div className="flex flex-wrap items-center gap-2 text-[9px] font-mono tracking-wider text-stone-500 uppercase">
           <span className="text-gold font-bold">+</span>
-          <span className="font-semibold text-foreground font-mono">{project.slug.toUpperCase()}</span>
+          <span className="font-semibold text-foreground font-mono">{(project.slug || '').toUpperCase()}</span>
           <span className="text-stone/40">|</span>
           <span>SCALE 1:100</span>
           <span className="text-stone/40">|</span>
           <span className="text-gold font-mono">LOD-400 BIM</span>
         </div>
-        <h3 className="eyebrow text-[0.8rem] font-medium">{project.name}</h3>
+        <h3 className="eyebrow text-[0.8rem] font-medium">{pName}</h3>
         <p className={`eyebrow ${light ? 'text-ivory/60' : 'text-muted-foreground'}`}>
-          {project.location}, {project.country} <span className="mx-2 text-stone">|</span>{' '}
+          {pLocation}, {pCountry} <span className="mx-2 text-stone">|</span>{' '}
           {project.year}
         </p>
         <div className="flex flex-col gap-1 pt-1">
           <span className="eyebrow text-gold">{t.selectedProjects.scope}</span>
           <span className={`text-xs ${light ? 'text-ivory/70' : 'text-muted-foreground'}`}>
-            {project.disciplines
-              .map((d) => (lang === 'ar' && disciplineTranslations[d] ? disciplineTranslations[d] : d))
+            {disciplinesList
+              .map((d: string) => (lang === 'ar' && disciplineTranslations[d] ? disciplineTranslations[d] : d))
               .join(' · ')}
           </span>
         </div>
@@ -119,9 +126,38 @@ function ProjectMeta({ project, light = false }: { project: Project; light?: boo
   )
 }
 
-export function SelectedProjects() {
-  const [first, second, third] = HOME_PROJECTS
-  const { t } = useLanguage()
+export function SelectedProjects({ initialProjects }: { initialProjects?: any[] }) {
+  const [projectsList, setProjectsList] = useState<any[]>(() => {
+    if (initialProjects && Array.isArray(initialProjects) && initialProjects.length >= 3) {
+      return initialProjects
+    }
+    return HOME_PROJECTS
+  })
+  const { t, lang } = useLanguage()
+
+  useEffect(() => {
+    fetch('/api/public/projects')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.projects && Array.isArray(d.projects) && d.projects.length >= 3) {
+          setProjectsList(d.projects)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const first = projectsList[0] || HOME_PROJECTS[0]
+  const second = projectsList[1] || HOME_PROJECTS[1]
+  const third = projectsList[2] || HOME_PROJECTS[2]
+
+  const firstName = lang === 'ar' && (first.nameAr || first.titleAr) ? (first.nameAr || first.titleAr) : (first.name || first.title)
+  const firstLoc = lang === 'ar' && first.locationAr ? first.locationAr : first.location
+
+  const secondName = lang === 'ar' && (second.nameAr || second.titleAr) ? (second.nameAr || second.titleAr) : (second.name || second.title)
+  const secondLoc = lang === 'ar' && second.locationAr ? second.locationAr : second.location
+
+  const thirdName = lang === 'ar' && (third.nameAr || third.titleAr) ? (third.nameAr || third.titleAr) : (third.name || third.title)
+  const thirdLoc = lang === 'ar' && third.locationAr ? third.locationAr : third.location
 
   return (
     <section className="section-gap relative">
@@ -146,13 +182,13 @@ export function SelectedProjects() {
           <Reveal as="article" className="lg:col-span-12">
             <Link href={`/projects/${first.slug}`} className="group block">
               <ArchitecturalFrame
-                label={`PROJECT FOLIO // ${first.name.toUpperCase()}`}
+                label={`PROJECT FOLIO // ${String(firstName).toUpperCase()}`}
                 scale="1:100"
-                coordinates={`${first.location.toUpperCase()} // ${first.year}`}
+                coordinates={`${String(firstLoc).toUpperCase()} // ${first.year}`}
               >
                 <div className="zoom-img relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden">
                   <Image
-                    src={first.cover}
+                    src={first.cover || first.coverImage || '/images/project-private-residence.png'}
                     alt={first.name}
                     fill
                     sizes="100vw"
@@ -167,13 +203,13 @@ export function SelectedProjects() {
           <Reveal as="article" className="lg:col-span-7">
             <Link href={`/projects/${second.slug}`} className="group block">
               <ArchitecturalFrame
-                label={`ELEVATION REF // ${second.name.toUpperCase()}`}
+                label={`ELEVATION REF // ${String(secondName).toUpperCase()}`}
                 scale="1:100"
-                coordinates={`${second.location.toUpperCase()} // ${second.year}`}
+                coordinates={`${String(secondLoc).toUpperCase()} // ${second.year}`}
               >
                 <div className="zoom-img relative aspect-[4/3] overflow-hidden">
                   <Image
-                    src={second.cover}
+                    src={second.cover || second.coverImage || '/images/project-lake-house.png'}
                     alt={second.name}
                     fill
                     sizes="(min-width: 1024px) 58vw, 100vw"
@@ -188,13 +224,13 @@ export function SelectedProjects() {
           <Reveal as="article" delay={120} className="lg:col-span-5 lg:pt-24">
             <Link href={`/projects/${third.slug}`} className="group block">
               <ArchitecturalFrame
-                label={`AXONOMETRIC // ${third.name.toUpperCase()}`}
+                label={`AXONOMETRIC // ${String(thirdName).toUpperCase()}`}
                 scale="1:100"
-                coordinates={`${third.location.toUpperCase()} // ${third.year}`}
+                coordinates={`${String(thirdLoc).toUpperCase()} // ${third.year}`}
               >
                 <div className="zoom-img relative aspect-[4/5] overflow-hidden">
                   <Image
-                    src={third.cover}
+                    src={third.cover || third.coverImage || '/images/project-urban-retreat.png'}
                     alt={third.name}
                     fill
                     sizes="(min-width: 1024px) 40vw, 100vw"
@@ -279,15 +315,41 @@ export function ServicesPreview() {
 }
 
 /* 05 — FEATURED PROJECT */
-export function FeaturedProject() {
-  const p = FEATURED_PROJECT
-  const { t } = useLanguage()
+export function FeaturedProject({ initialProject }: { initialProject?: any }) {
+  const [p, setP] = useState<any>(initialProject || FEATURED_PROJECT)
+  const { t, lang } = useLanguage()
+
+  useEffect(() => {
+    fetch('/api/public/projects')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.projects && Array.isArray(d.projects)) {
+          const feat = d.projects.find((item: any) => item.featured || item.is_featured) || d.projects[0]
+          if (feat) setP(feat)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const disciplineTranslations: Record<string, string> = {
+    Architecture: 'عمارة',
+    'Interior Design': 'تصميم داخلي',
+    Landscape: 'لاندسكيب',
+    Engineering: 'هندسة متكاملة',
+  }
+
+  const pName = lang === 'ar' && (p.nameAr || p.titleAr) ? (p.nameAr || p.titleAr) : (p.name || p.title)
+  const pLocation = lang === 'ar' && p.locationAr ? p.locationAr : p.location
+  const pCountry = lang === 'ar' && p.countryAr ? p.countryAr : p.country
+  const pDisciplines = Array.isArray(p.disciplines)
+    ? p.disciplines.map((d: string) => (lang === 'ar' && disciplineTranslations[d] ? disciplineTranslations[d] : d)).join(' · ')
+    : (p.type || 'Architecture')
 
   return (
     <section className="relative surface-dark min-h-[70svh] lg:min-h-[85svh] flex items-end overflow-hidden corner-ticks">
       <Image
-        src={p.cinematic}
-        alt={p.name}
+        src={p.cinematic || p.cover || p.coverImage || '/images/hero-villa.png'}
+        alt={pName}
         fill
         sizes="100vw"
         className="object-cover"
@@ -298,12 +360,12 @@ export function FeaturedProject() {
       <div className="absolute top-8 start-8 end-8 hidden sm:flex items-center justify-between z-10 text-[9px] font-mono uppercase tracking-widest text-ivory/60 select-none">
         <div className="flex items-center gap-2">
           <span className="text-gold font-bold">+</span>
-          <span>FEATURED MONOGRAPH // 01</span>
+          <span>FEATURED MONOGRAPH // {p.index || '01'}</span>
         </div>
         <TechnicalStamp
-          code="PRJ-2024-KAFD"
+          code={p.code || `VW-${p.year || '2026'}`}
           scale="SCALE 1:200"
-          location="RIYADH, KSA"
+          location={`${String(pLocation).toUpperCase()}${pCountry ? `, ${String(pCountry).toUpperCase()}` : ''}`}
           bim="LOD-400 VERIFIED"
           dark
         />
@@ -313,18 +375,18 @@ export function FeaturedProject() {
         <Reveal className="flex flex-col gap-6">
           <Eyebrow gold>{t.featuredProject.label}</Eyebrow>
           <Display size="lg" className="uppercase tracking-tight">
-            {t.featuredProject.name}
+            {pName}
             <br />
-            {t.featuredProject.location}
+            {pLocation}{pCountry ? `, ${pCountry}` : ''}
           </Display>
-          <p className="eyebrow text-ivory/70">{t.featuredProject.disciplines}</p>
+          <p className="eyebrow text-ivory/70">{pDisciplines}</p>
           <ButtonLink href={`/projects/${p.slug}`} variant="outline" className="self-start mt-2">
             {t.featuredProject.view}
           </ButtonLink>
         </Reveal>
         <Reveal delay={200} className="hidden lg:flex flex-col items-end rtl:items-start gap-1 eyebrow text-ivory/60 font-mono text-[10px]">
           <span>DATUM: ELEV +18.40m</span>
-          <span>LAT: 24.7677° N</span>
+          <span>LAT: {p.lat ? `${p.lat}° N` : '24.7677° N'}</span>
           <span className="text-gold">TIMELESS BY DESIGN</span>
           <span className="mt-3 h-12 w-px bg-gold/40" aria-hidden />
         </Reveal>

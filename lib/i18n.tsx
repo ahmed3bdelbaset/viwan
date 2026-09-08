@@ -10,7 +10,7 @@ export const DICTIONARY = {
       home: 'Home',
       projects: 'Projects',
       services: 'Services',
-      studio: 'The Firm',
+      studio: 'Studio',
       howWeWork: 'How We Work',
       careers: 'Careers',
       contact: 'Contact',
@@ -44,7 +44,7 @@ export const DICTIONARY = {
       label: 'About VIWAN',
       heading: 'We create places with purpose.',
       body: 'VIWAN is an integrated architecture, engineering and design consultancy creating thoughtful environments through architecture, interiors, landscape and multidisciplinary engineering.',
-      button: 'About the Firm',
+      button: 'About the Studio',
       badge1: 'A more',
       badge2: 'human',
       badge3: 'built',
@@ -243,7 +243,7 @@ export const DICTIONARY = {
         'Great architecture collapses without precise engineering. At VIWAN, structural feasibility, MEP systems, clash detection and construction documentation are embedded into the design from day one.',
     },
     studioPage: {
-      eyebrow: 'The Firm / 04',
+      eyebrow: 'Studio / 04',
       title: 'Integrated thinking. Precise execution.',
       subtitle:
         'VIWAN brings architecture, engineering, interiors, landscape, and technical expertise together under one integrated consultancy. We develop projects from concept through documentation and delivery, combining design clarity with engineering precision to create environments that are functional, enduring, and deeply connected to their context.',
@@ -283,6 +283,7 @@ export const DICTIONARY = {
       title: 'From initial sketch to built reality.',
       subtitle:
         'A disciplined, transparent, six-stage architectural process designed to eliminate uncertainty, ensure budget alignment, and deliver timeless spaces without compromise.',
+      milestones: 'KEY DELIVERABLES & MILESTONES',
       calloutEyebrow: 'EXCEPTIONAL PLACES • LASTING VALUE',
       calloutHeading: 'The right property\nchanges what comes next.',
       calloutSub:
@@ -510,7 +511,7 @@ export const DICTIONARY = {
       home: 'الرئيسية',
       projects: 'المشاريع',
       services: 'الخدمات',
-      studio: 'عن المكتب',
+      studio: 'استوديو',
       howWeWork: 'مراحل العمل',
       careers: 'الوظائف',
       contact: 'تواصل معنا',
@@ -544,7 +545,7 @@ export const DICTIONARY = {
       label: 'عن VIWAN',
       heading: 'نصنع أماكن ذات غاية وأثر مستدام.',
       body: 'VIWAN مكتب استشارات هندسية وتصميم متكامل للهندسة المعمارية والتصميم الداخلي واللاندسكيب، يبتكر بيئات فراغية متميزة عبر المزج بين أصالة النسب ودقة التنسيق الهندسي.',
-      button: 'عن المكتب',
+      button: 'عن الاستوديو',
       badge1: 'بيئة',
       badge2: 'عمرانية',
       badge3: 'أكثر',
@@ -743,7 +744,7 @@ export const DICTIONARY = {
         'العمارة العظيمة تفقد قيمتها بدون هندسة دقيقة. في VIWAN، تُدمج المخططات الإنشائية والأنظمة الكهروميكانيكية وكشف التعارضات منذ اليوم الأول.',
     },
     studioPage: {
-      eyebrow: 'عن المكتب / 04',
+      eyebrow: 'استوديو / 04',
       title: 'فكر متكامل. تنفيذ هندسي دقيق.',
       subtitle:
         'يجمع VIWAN بين العمارة والهندسة والتصميم الداخلي واللاندسكيب والخبرة التقنية تحت مظلة استشارية هندسية متكاملة. نطور المشاريع من الفكرة الأولية حتى المخططات التنفيذية والتسليم بالموقع، موازنين بين وضوح الرؤية التصميمية والدقة الهندسية لخلق بيئات وظيفية تدوم وترتبط بعمق بمحيطها.',

@@ -1,7 +1,7 @@
 "use client"
 import { useInView } from "@/hooks/use-in-view"
 import { cn } from "@/lib/utils"
-import type { ReactNode, CSSProperties } from "react"
+import type { ReactNode, CSSProperties, ElementType } from "react"
 
 type RevealVariant = "fade-up" | "fade-in" | "scale-in" | "clip-x" | "slide-right"
 
@@ -13,7 +13,7 @@ interface RevealProps {
   threshold?: number
   className?: string
   style?: CSSProperties
-  as?: keyof JSX.IntrinsicElements
+  as?: ElementType
 }
 
 const variantClasses: Record<RevealVariant, string> = {
@@ -58,8 +58,8 @@ interface StaggerProps {
   baseDelay?: number
   className?: string
   itemClassName?: string
-  as?: keyof JSX.IntrinsicElements
-  itemAs?: keyof JSX.IntrinsicElements
+  as?: ElementType
+  itemAs?: ElementType
 }
 
 export function Stagger({

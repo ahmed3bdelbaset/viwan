@@ -14,6 +14,14 @@ export interface FocalPoint {
   y: number;
 }
 
+export type Discipline = 'Architecture' | 'Interior Design' | 'Landscape' | 'Engineering';
+
+export interface GalleryItem {
+  src: string;
+  caption: string;
+  category: 'Architecture' | 'Interiors' | 'Landscape' | 'Details' | string;
+}
+
 export interface Project {
   id: string;
   code: string;
@@ -32,7 +40,7 @@ export interface Project {
   country_ar: string;
   client_en: string;
   client_ar: string;
-  year: number;
+  year: number | string;
   area_sqm: string;
   status: 'completed' | 'ongoing' | 'concept';
   publish_status: 'Published' | 'Featured' | 'Draft';
@@ -49,6 +57,34 @@ export interface Project {
   lifecycle_stage?: LifecycleStage;
   focal_point?: FocalPoint;
   as_built_image?: string;
+  // Synchronized Public Platform fields:
+  index?: string;
+  name?: string;
+  nameAr?: string;
+  title?: string;
+  titleAr?: string;
+  location?: string;
+  locationAr?: string;
+  country?: string;
+  countryAr?: string;
+  type?: string;
+  category?: string;
+  disciplines?: (Discipline | string)[];
+  scope?: string[];
+  tagline?: string;
+  taglineAr?: string;
+  heading?: string;
+  headingAr?: string;
+  description?: string;
+  descriptionAr?: string;
+  philosophy?: string;
+  philosophyAr?: string;
+  cover?: string;
+  coverImage?: string;
+  interior?: string;
+  cinematic?: string;
+  gallery?: GalleryItem[];
+  featured?: boolean;
 }
 
 export interface InsightArticle {

@@ -9,6 +9,7 @@ interface ProjectMonographPrintProps {
   project: Project;
   onClose: () => void;
   isRtl?: boolean;
+  locale?: string;
 }
 
 export const ProjectMonographPrint: React.FC<ProjectMonographPrintProps> = ({

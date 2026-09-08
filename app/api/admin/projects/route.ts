@@ -8,19 +8,53 @@ export async function GET() {
     const projects = (db.projects || []).map((p: any) => ({
       ...p,
       id: p.id || p.slug,
+      code: p.code || `PRJ-${p.index || '01'}`,
       slug: p.slug,
+      index: p.index || '01',
       title: p.title || p.name || 'Untitled Project',
       name: p.name || p.title || 'Untitled Project',
+      title_en: p.title_en || p.name || p.title || 'Untitled Project',
+      title_ar: p.title_ar || p.nameAr || p.titleAr || p.title || p.name,
       titleAr: p.titleAr || p.nameAr || p.title || p.name,
       nameAr: p.nameAr || p.titleAr || p.title || p.name,
-      cover: p.cover || p.coverImage || p.image || '/images/hero-villa.png',
-      coverImage: p.coverImage || p.cover || p.image || '/images/hero-villa.png',
+      tagline: p.tagline || p.subtitle_en || '',
+      subtitle_en: p.subtitle_en || p.tagline || '',
+      subtitle_ar: p.subtitle_ar || p.taglineAr || '',
+      heading: p.heading || '',
+      headingAr: p.headingAr || '',
+      description: p.description || p.details_en || '',
+      descriptionAr: p.descriptionAr || p.details_ar || '',
+      philosophy: p.philosophy || p.vision_en || '',
+      vision_en: p.vision_en || p.philosophy || '',
+      vision_ar: p.vision_ar || p.philosophyAr || '',
+      cover: p.cover || p.cover_image || p.coverImage || '/images/hero-villa.png',
+      cover_image: p.cover_image || p.cover || p.coverImage || '/images/hero-villa.png',
+      coverImage: p.coverImage || p.cover || p.cover_image || '/images/hero-villa.png',
+      interior: p.interior || p.interiorImage || '/images/interior-living-marble.jpg',
+      cinematic: p.cinematic || p.cover || p.cover_image || '/images/hero-villa.png',
       category: p.category || p.type || (p.disciplines && p.disciplines[0]) || 'Architecture',
       type: p.type || p.category || (p.disciplines && p.disciplines[0]) || 'Architecture',
-      categoryAr: p.categoryAr || p.typeAr || p.category || p.type || 'الهندسة المعمارية',
+      sector_en: p.sector_en || p.type || p.category || 'Residential',
+      sector_ar: p.sector_ar || 'سكني',
+      disciplines: Array.isArray(p.disciplines) && p.disciplines.length > 0 ? p.disciplines : (p.services_en || ['Architecture']),
+      services_en: Array.isArray(p.services_en) && p.services_en.length > 0 ? p.services_en : (p.disciplines || ['Architecture']),
+      services_ar: Array.isArray(p.services_ar) && p.services_ar.length > 0 ? p.services_ar : ['الاستشارات المعمارية'],
+      scope: Array.isArray(p.scope) ? p.scope : ['Concept Design', 'BIM Coordination'],
       location: p.location || 'Cairo',
-      year: p.year || '2026',
-      description: p.description || '',
+      location_en: p.location_en || p.location || 'Cairo',
+      location_ar: p.location_ar || p.locationAr || 'القاهرة',
+      country: p.country || 'Egypt',
+      country_en: p.country_en || p.country || 'Egypt',
+      country_ar: p.country_ar || 'مصر',
+      year: p.year || 2026,
+      status: p.status || 'completed',
+      publish_status: p.publish_status || (p.featured || p.is_featured ? 'Featured' : 'Published'),
+      featured: Boolean(p.featured || p.is_featured),
+      is_featured: Boolean(p.featured || p.is_featured),
+      gallery: Array.isArray(p.gallery) ? p.gallery : [],
+      gallery_images: Array.isArray(p.gallery_images) && p.gallery_images.length > 0 
+        ? p.gallery_images 
+        : (Array.isArray(p.gallery) ? p.gallery.map((g: any) => typeof g === 'string' ? g : g.src) : []),
     }))
     return NextResponse.json({ success: true, projects })
   } catch (error) {
@@ -33,42 +67,76 @@ export async function POST(req: Request) {
     const body = await req.json()
     const db = readDb()
 
-    const rawName = body.name || body.title || 'New Architectural Project'
-    const rawCover = body.cover || body.coverImage || body.image || '/images/hero-villa.png'
-    const rawCategory = body.type || body.category || 'Architecture'
+    const rawName = body.name || body.title || body.title_en || 'New Architectural Project'
+    const rawNameAr = body.nameAr || body.title_ar || body.titleAr || rawName
+    const rawCover = body.cover || body.cover_image || body.coverImage || '/images/hero-villa.png'
+    const rawCategory = body.type || body.category || body.sector_en || 'Architecture'
     const generatedSlug = (body.slug || rawName)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '') || `project-${Date.now()}`
 
     const newProject: any = {
+      id: body.id || `prj-${Date.now()}`,
+      code: body.code || `PRJ-${String(db.projects.length + 1).padStart(2, '0')}`,
       slug: generatedSlug,
       index: body.index || String(db.projects.length + 1).padStart(2, '0'),
       name: rawName,
       title: rawName,
-      location: body.location || 'Cairo',
-      country: body.country || 'Egypt',
-      year: String(body.year || new Date().getFullYear()),
+      title_en: rawName,
+      nameAr: rawNameAr,
+      title_ar: rawNameAr,
+      titleAr: rawNameAr,
+      location: body.location || body.location_en || 'Cairo',
+      location_en: body.location_en || body.location || 'Cairo',
+      location_ar: body.location_ar || body.locationAr || 'القاهرة',
+      country: body.country || body.country_en || 'Egypt',
+      country_en: body.country_en || body.country || 'Egypt',
+      country_ar: body.country_ar || 'مصر',
+      year: body.year || new Date().getFullYear(),
       type: rawCategory,
       category: rawCategory,
+      sector_en: body.sector_en || rawCategory,
+      sector_ar: body.sector_ar || 'سكني',
       disciplines: Array.isArray(body.disciplines) && body.disciplines.length > 0 
         ? body.disciplines 
         : [rawCategory],
+      services_en: Array.isArray(body.services_en) && body.services_en.length > 0 ? body.services_en : [rawCategory],
+      services_ar: Array.isArray(body.services_ar) && body.services_ar.length > 0 ? body.services_ar : ['الاستشارات المعمارية'],
       scope: Array.isArray(body.scope) ? body.scope : (typeof body.scope === 'string' ? body.scope.split(',').map((s: string) => s.trim()) : ['Concept Design', 'BIM Coordination']),
-      tagline: body.tagline || 'A bespoke spatial composition.',
+      tagline: body.tagline || body.subtitle_en || 'A bespoke spatial composition.',
+      subtitle_en: body.subtitle_en || body.tagline || 'A bespoke spatial composition.',
+      subtitle_ar: body.subtitle_ar || body.taglineAr || '',
       heading: body.heading || 'Elevating everyday spatial experience.',
-      description: body.description || '',
-      philosophy: body.philosophy || 'Architecture shaped by light and proportion.',
+      headingAr: body.headingAr || '',
+      description: body.description || body.details_en || '',
+      descriptionAr: body.descriptionAr || body.details_ar || '',
+      details_en: body.details_en || body.description || '',
+      details_ar: body.details_ar || body.descriptionAr || '',
+      philosophy: body.philosophy || body.vision_en || 'Architecture shaped by light and proportion.',
+      vision_en: body.vision_en || body.philosophy || 'Architecture shaped by light and proportion.',
+      vision_ar: body.vision_ar || body.philosophyAr || '',
       cover: rawCover,
+      cover_image: rawCover,
       coverImage: rawCover,
       interior: body.interior || body.interiorImage || '/images/interior-living-marble.jpg',
       cinematic: body.cinematic || rawCover,
       gallery: Array.isArray(body.gallery) ? body.gallery : [],
-      featured: Boolean(body.featured),
+      gallery_images: Array.isArray(body.gallery_images) ? body.gallery_images : (Array.isArray(body.gallery) ? body.gallery.map((g: any) => typeof g === 'string' ? g : g.src) : []),
+      featured: Boolean(body.featured || body.is_featured || body.publish_status === 'Featured'),
+      is_featured: Boolean(body.featured || body.is_featured || body.publish_status === 'Featured'),
+      status: body.status || 'completed',
+      publish_status: body.publish_status || (body.featured || body.is_featured ? 'Featured' : 'Published'),
+      client_en: body.client_en || 'Private Client',
+      client_ar: body.client_ar || 'عميل خاص',
+      area_sqm: body.area_sqm || '1,000 m²',
+      lat: Number(body.lat) || 30.0444,
+      lng: Number(body.lng) || 31.2357,
+      display_order: Number(body.display_order) || db.projects.length + 1,
+      lifecycle_stage: body.lifecycle_stage || 'handover',
     }
 
-    // Check if slug already exists; if so, make unique
-    if (db.projects.some(p => p.slug === newProject.slug)) {
+    if (db.projects.some((p: any) => p.slug === newProject.slug)) {
       newProject.slug = `${newProject.slug}-${Date.now().toString().slice(-4)}`
     }
 
@@ -93,26 +161,59 @@ export async function PUT(req: Request) {
     }
 
     const db = readDb()
-    const idx = db.projects.findIndex((p) => p.slug === slug || (p as any).id === slug)
+    const idx = db.projects.findIndex((p: any) => p.slug === slug || p.id === slug)
     if (idx === -1) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
-    // Sanitize updates
-    const current = db.projects[idx]
-    const updatedCover = updates.cover || updates.coverImage || updates.image || current.cover
-    const updatedName = updates.name || updates.title || current.name
-    const updatedCategory = updates.type || updates.category || current.type
+    const current: any = db.projects[idx]
+    const updatedCover = updates.cover || updates.cover_image || updates.coverImage || updates.image || current.cover
+    const updatedName = updates.name || updates.title || updates.title_en || current.name
+    const updatedNameAr = updates.nameAr || updates.title_ar || updates.titleAr || current.nameAr || updatedName
+    const updatedCategory = updates.type || updates.category || updates.sector_en || current.type
+    const isFeat = typeof updates.featured === 'boolean' 
+      ? updates.featured 
+      : (typeof updates.is_featured === 'boolean' 
+          ? updates.is_featured 
+          : (updates.publish_status === 'Featured' ? true : current.featured))
+
     db.projects[idx] = {
       ...current,
       ...updates,
       name: updatedName,
       title: updatedName,
+      title_en: updatedName,
+      nameAr: updatedNameAr,
+      title_ar: updatedNameAr,
+      titleAr: updatedNameAr,
       cover: updatedCover,
+      cover_image: updatedCover,
       coverImage: updatedCover,
+      interior: updates.interior || updates.interiorImage || current.interior,
+      cinematic: updates.cinematic || current.cinematic || updatedCover,
       type: updatedCategory,
       category: updatedCategory,
-      featured: typeof updates.featured === 'boolean' ? updates.featured : current.featured,
+      sector_en: updates.sector_en || updatedCategory,
+      sector_ar: updates.sector_ar || current.sector_ar || 'سكني',
+      tagline: updates.tagline || updates.subtitle_en || current.tagline,
+      subtitle_en: updates.subtitle_en || updates.tagline || current.subtitle_en,
+      subtitle_ar: updates.subtitle_ar || updates.taglineAr || current.subtitle_ar,
+      heading: updates.heading || current.heading,
+      headingAr: updates.headingAr || current.headingAr,
+      description: updates.description || updates.details_en || current.description,
+      descriptionAr: updates.descriptionAr || updates.details_ar || current.descriptionAr,
+      philosophy: updates.philosophy || updates.vision_en || current.philosophy,
+      vision_en: updates.vision_en || updates.philosophy || current.vision_en,
+      vision_ar: updates.vision_ar || updates.philosophyAr || current.vision_ar,
+      disciplines: Array.isArray(updates.disciplines) ? updates.disciplines : current.disciplines,
+      scope: Array.isArray(updates.scope) ? updates.scope : current.scope,
+      gallery: Array.isArray(updates.gallery) ? updates.gallery : current.gallery,
+      gallery_images: Array.isArray(updates.gallery_images) 
+        ? updates.gallery_images 
+        : (Array.isArray(updates.gallery) ? updates.gallery.map((g: any) => typeof g === 'string' ? g : g.src) : current.gallery_images),
+      featured: isFeat,
+      is_featured: isFeat,
+      publish_status: updates.publish_status || (isFeat ? 'Featured' : 'Published'),
     }
 
     writeDb(db)

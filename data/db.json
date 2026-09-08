@@ -1,17 +1,43 @@
 {
   "projects": [
     {
+      "id": "prj-private-residence-01",
+      "code": "PRJ-2026-01",
       "slug": "private-residence-01",
       "index": "01",
       "name": "Private Residence 01",
+      "nameAr": "إقامة خاصة 01",
+      "title": "Private Residence 01",
+      "title_en": "Private Residence 01",
+      "title_ar": "إقامة خاصة 01",
       "location": "New Cairo",
+      "location_en": "New Cairo, Egypt",
+      "location_ar": "القاهرة الجديدة، مصر",
       "country": "Egypt",
-      "year": "2026",
+      "country_en": "Egypt",
+      "country_ar": "مصر",
+      "client_en": "Private VIP Client",
+      "client_ar": "عميل خاص",
+      "year": 2026,
+      "area_sqm": "1,850 m²",
       "type": "Private Residence",
+      "category": "Private Residence",
+      "sector_en": "Residential",
+      "sector_ar": "القطاع السكني",
       "disciplines": [
         "Architecture",
         "Interior Design",
         "Landscape"
+      ],
+      "services_en": [
+        "Architecture",
+        "Interior Design",
+        "Landscape"
+      ],
+      "services_ar": [
+        "الاستشارات المعمارية",
+        "التصميم الداخلي",
+        "تصميم اللاندسكيب"
       ],
       "scope": [
         "Architecture Design",
@@ -21,13 +47,30 @@
         "Engineering Coordination"
       ],
       "tagline": "A home in harmony with its surroundings.",
+      "subtitle_en": "A home in harmony with its surroundings.",
+      "subtitle_ar": "منزل متناغم مع محيطه الطبيعي ويوفر ملاذاً هادئاً.",
       "heading": "A refined balance of architecture and nature.",
+      "headingAr": "توازن دقيق بين روعة العمارة وجمال الطبيعة.",
       "description": "This private residence was designed as a serene retreat where modern architecture meets a warm, timeless atmosphere. The design embraces open spaces, natural materials and a strong connection to the outdoors, creating a home that feels both elegant and personal. Travertine volumes are layered with vertical wood screens and expansive glazing, allowing the garden and pool to become part of daily life inside the house.",
+      "descriptionAr": "صُممت هذه الإقامة الخاصة كملاذ هادئ حيث تلتقي العمارة الحديثة بالأجواء الدافئة الخالدة. يتبنى التصميم الفراغات المفتوحة والمواد الطبيعية والاتصال القوي بالطبيعة الخارجية، مع كتل الترافيرتين وشاشات الخشب الرأسية والواجهات الزجاجية الممتدة.",
+      "details_en": "This private residence was designed as a serene retreat where modern architecture meets a warm, timeless atmosphere.",
+      "details_ar": "صُممت هذه الإقامة الخاصة كملاذ هادئ يجمع بين العمارة الحديثة والدفء الكلاسيكي.",
       "philosophy": "A dialogue between modern living and natural serenity, where every space is intentionally crafted to enhance the way people live.",
+      "vision_en": "A dialogue between modern living and natural serenity, where every space is intentionally crafted to enhance the way people live.",
+      "vision_ar": "حوار هندسي بين متطلبات المعيشة العصرية والسكينة الطبيعية، حيث تم تصميم كل فراغ بعناية لتعزيز جودة الحياة اليومية.",
       "cover": "/images/project-private-residence.png",
+      "cover_image": "/images/project-private-residence.png",
+      "coverImage": "/images/project-private-residence.png",
       "interior": "/images/interior-living-marble.jpg",
       "cinematic": "/images/hero-villa.png",
       "featured": true,
+      "is_featured": true,
+      "status": "completed",
+      "publish_status": "Featured",
+      "lat": 30.0131,
+      "lng": 31.4913,
+      "display_order": 1,
+      "lifecycle_stage": "handover",
       "gallery": [
         {
           "src": "/images/project-private-residence.png",
@@ -59,19 +102,51 @@
           "caption": "Travertine Detail",
           "category": "Details"
         }
+      ],
+      "gallery_images": [
+        "/images/project-private-residence.png",
+        "/images/interior-living-marble.jpg",
+        "/images/interior-dining.png",
+        "/images/interior-bedroom.png",
+        "/images/detail-courtyard.png",
+        "/images/material-stone.png"
       ]
     },
     {
+      "id": "prj-lake-house",
+      "code": "PRJ-2025-02",
       "slug": "lake-house",
       "index": "02",
       "name": "Lake House",
+      "nameAr": "منزل البحيرة",
+      "title": "Lake House",
+      "title_en": "Lake House",
+      "title_ar": "منزل البحيرة",
       "location": "Ain Sokhna",
+      "location_en": "Ain Sokhna, Egypt",
+      "location_ar": "العين السخنة، مصر",
       "country": "Egypt",
-      "year": "2025",
+      "country_en": "Egypt",
+      "country_ar": "مصر",
+      "client_en": "Private Owner",
+      "client_ar": "مالك خاص",
+      "year": 2025,
+      "area_sqm": "1,200 m²",
       "type": "Private Residence",
+      "category": "Private Residence",
+      "sector_en": "Residential",
+      "sector_ar": "القطاع السكني",
       "disciplines": [
         "Architecture",
         "Landscape"
+      ],
+      "services_en": [
+        "Architecture",
+        "Landscape"
+      ],
+      "services_ar": [
+        "الاستشارات المعمارية",
+        "تصميم اللاندسكيب"
       ],
       "scope": [
         "Architecture Design",
@@ -79,12 +154,30 @@
         "Technical Documentation"
       ],
       "tagline": "Rooted in the landscape. Designed for a slower, richer life.",
+      "subtitle_en": "Rooted in the landscape. Designed for a slower, richer life.",
+      "subtitle_ar": "متجذر في تضاريس الموقع، ومصمم لحياة أكثر عمقاً وهدوءاً.",
       "heading": "A quiet structure resting on water.",
+      "headingAr": "كتلة معمارية هادئة تستقر فوق سطح الماء.",
       "description": "The Lake House is a low, horizontal composition that extends over calm water on a timber deck. A cantilevered roof shelters the living spaces while travertine walls anchor the house to its site. Reeds, olive trees and native planting soften the edge between architecture and landscape, so the building appears to have always belonged there.",
+      "descriptionAr": "تكوين أفقي منخفض يمتد فوق سطح الماء الهادئ عبر منصات خشبية متدرجة وسقف كابولي يحمي المساحات المعيشية وجدران الترافيرتين الراسية.",
+      "details_en": "The Lake House is a low, horizontal composition that extends over calm water on a timber deck.",
+      "details_ar": "تكوين أفقي منخفض يمتد فوق سطح الماء عبر منصات خشبية متدرجة.",
       "philosophy": "Architecture lives longer when it belongs.",
+      "vision_en": "Architecture lives longer when it belongs.",
+      "vision_ar": "تدوم العمارة طويلاً حين تنتمي بتناغم تام إلى بيئتها وطبيعتها.",
       "cover": "/images/project-lake-house.png",
+      "cover_image": "/images/project-lake-house.png",
+      "coverImage": "/images/project-lake-house.png",
       "interior": "/images/interior-living-fireplace.jpg",
       "cinematic": "/images/project-lake-house.png",
+      "featured": false,
+      "is_featured": false,
+      "status": "completed",
+      "publish_status": "Published",
+      "lat": 29.6,
+      "lng": 32.3167,
+      "display_order": 2,
+      "lifecycle_stage": "handover",
       "gallery": [
         {
           "src": "/images/project-lake-house.png",
@@ -106,18 +199,46 @@
           "caption": "Timber Cladding",
           "category": "Details"
         }
+      ],
+      "gallery_images": [
+        "/images/project-lake-house.png",
+        "/images/interior-living-fireplace.jpg",
+        "/images/project-hillside-villa.png",
+        "/images/material-wood.png"
       ]
     },
     {
+      "id": "prj-the-urban-retreat",
+      "code": "PRJ-2025-03",
       "slug": "the-urban-retreat",
       "index": "03",
       "name": "The Urban Retreat",
+      "nameAr": "الملاذ الحضري",
+      "title": "The Urban Retreat",
+      "title_en": "The Urban Retreat",
+      "title_ar": "الملاذ الحضري",
       "location": "Cairo",
+      "location_en": "Cairo, Egypt",
+      "location_ar": "القاهرة، مصر",
       "country": "Egypt",
-      "year": "2025",
+      "country_en": "Egypt",
+      "country_ar": "مصر",
+      "client_en": "Private Collector",
+      "client_ar": "عميل خاص",
+      "year": 2025,
+      "area_sqm": "650 m²",
       "type": "Apartment",
+      "category": "Apartment",
+      "sector_en": "Interior Architecture",
+      "sector_ar": "العمارة الداخلية",
       "disciplines": [
         "Interior Design"
+      ],
+      "services_en": [
+        "Interior Design"
+      ],
+      "services_ar": [
+        "التصميم الداخلي والديكور"
       ],
       "scope": [
         "Interior Design",
@@ -126,12 +247,30 @@
         "Styling"
       ],
       "tagline": "A refined urban sanctuary that balances warmth, materiality and modern living.",
+      "subtitle_en": "A refined urban sanctuary that balances warmth, materiality and modern living.",
+      "subtitle_ar": "ملاذ حضري فاخر يوازن بين الدفء والمواد النبيلة والحياة العصرية.",
       "heading": "Calm, material and deeply personal.",
+      "headingAr": "هدوء وأناقة ومواد تعبر عن الخصوصية العميقة.",
       "description": "A complete interior transformation of a city apartment into a warm, layered retreat. Dark walnut panelling, travertine surfaces and a linear fireplace create a sense of stillness, while carefully controlled lighting shapes the mood from morning to night. Every piece of furniture and every finish was selected to feel timeless rather than fashionable.",
+      "descriptionAr": "تحول داخلي شامل لشقة في قلب المدينة إلى ملاذ دافئ من خشب الجوز والترافيرتين الطبيعي والمدفأة الخطية مع إضاءة مدروسة بعناية.",
+      "details_en": "A complete interior transformation of a city apartment into a warm, layered retreat.",
+      "details_ar": "تحول داخلي شامل لشقة في قلب المدينة إلى ملاذ دافئ وهادئ.",
       "philosophy": "Spaces shaped by purpose, character and detail.",
+      "vision_en": "Spaces shaped by purpose, character and detail.",
+      "vision_ar": "فراغات معمارية تشكلها الغاية والخصوصية والدقة في أدق التفاصيل.",
       "cover": "/images/interior-living-fireplace.jpg",
+      "cover_image": "/images/interior-living-fireplace.jpg",
+      "coverImage": "/images/interior-living-fireplace.jpg",
       "interior": "/images/interior-dining.png",
       "cinematic": "/images/interior-living-fireplace.jpg",
+      "featured": false,
+      "is_featured": false,
+      "status": "completed",
+      "publish_status": "Published",
+      "lat": 30.0444,
+      "lng": 31.2357,
+      "display_order": 3,
+      "lifecycle_stage": "handover",
       "gallery": [
         {
           "src": "/images/interior-living-fireplace.jpg",
@@ -158,20 +297,53 @@
           "caption": "Bronze & Stone",
           "category": "Details"
         }
+      ],
+      "gallery_images": [
+        "/images/interior-living-fireplace.jpg",
+        "/images/interior-dining.png",
+        "/images/interior-bedroom.png",
+        "/images/material-fabric.png",
+        "/images/material-metal.png"
       ]
     },
     {
+      "id": "prj-hillside-villa",
+      "code": "PRJ-2026-04",
       "slug": "hillside-villa",
       "index": "04",
       "name": "Hillside Villa",
+      "nameAr": "فيلا المنحدر الجبلي",
+      "title": "Hillside Villa",
+      "title_en": "Hillside Villa",
+      "title_ar": "فيلا المنحدر الجبلي",
       "location": "Ain Sokhna",
+      "location_en": "Ain Sokhna, Egypt",
+      "location_ar": "العين السخنة، مصر",
       "country": "Egypt",
-      "year": "2026",
+      "country_en": "Egypt",
+      "country_ar": "مصر",
+      "client_en": "Real Estate Developer",
+      "client_ar": "مطور عقاري",
+      "year": 2026,
+      "area_sqm": "2,400 m²",
       "type": "Private Villa",
+      "category": "Private Villa",
+      "sector_en": "Residential",
+      "sector_ar": "القطاع السكني",
       "disciplines": [
         "Architecture",
         "Landscape",
         "Engineering"
+      ],
+      "services_en": [
+        "Architecture",
+        "Landscape",
+        "Engineering"
+      ],
+      "services_ar": [
+        "الاستشارات المعمارية",
+        "تصميم اللاندسكيب",
+        "الهندسة الإنشائية والتنسيق"
       ],
       "scope": [
         "Architecture Design",
@@ -180,12 +352,30 @@
         "BIM"
       ],
       "tagline": "Rooted in the landscape.",
+      "subtitle_en": "Rooted in the landscape.",
+      "subtitle_ar": "منحوتة في تضاريس الموقع ومطلة على زرقة البحر.",
       "heading": "Built into the slope, open to the sea.",
+      "headingAr": "منحوتة في تضاريس الجبل، ومفتوحة على زرقة البحر.",
       "description": "Set into a steep coastal site, the villa steps down the hillside in a series of stone terraces. Wide external stairs move through native planting toward the sea, and each level opens onto its own shaded outdoor room. Structural and MEP coordination through BIM allowed the complex terracing to be resolved precisely before construction began.",
+      "descriptionAr": "فيلا مدرجة على منحدر ساحلي عبر مصاطب حجرية وأدراج واسعة وسط نباتات المنطقة نحو البحر، منسقة بدقة عبر نمذجة الـ BIM الهندسية.",
+      "details_en": "Set into a steep coastal site, the villa steps down the hillside in a series of stone terraces.",
+      "details_ar": "فيلا ساحلية متدرجة عبر مصاطب حجرية وأدراج واسعة.",
       "philosophy": "Nature. Architecture. People.",
+      "vision_en": "Nature. Architecture. People.",
+      "vision_ar": "الطبيعة. العمارة. الإنسان.",
       "cover": "/images/project-hillside-villa.png",
+      "cover_image": "/images/project-hillside-villa.png",
+      "coverImage": "/images/project-hillside-villa.png",
       "interior": "/images/interior-bedroom.png",
       "cinematic": "/images/project-hillside-villa.png",
+      "featured": false,
+      "is_featured": false,
+      "status": "ongoing",
+      "publish_status": "Published",
+      "lat": 29.58,
+      "lng": 32.33,
+      "display_order": 4,
+      "lifecycle_stage": "supervision",
       "gallery": [
         {
           "src": "/images/project-hillside-villa.png",
@@ -207,20 +397,52 @@
           "caption": "Stone Detail",
           "category": "Details"
         }
+      ],
+      "gallery_images": [
+        "/images/project-hillside-villa.png",
+        "/images/interior-bedroom.png",
+        "/images/detail-courtyard.png",
+        "/images/material-stone.png"
       ]
     },
     {
+      "id": "prj-commercial-project-03",
+      "code": "PRJ-2025-05",
       "slug": "commercial-project-03",
       "index": "05",
       "name": "Urban Commercial Hub",
+      "nameAr": "المركز التجاري الحضري",
+      "title": "Urban Commercial Hub",
+      "title_en": "Urban Commercial Hub",
+      "title_ar": "المركز التجاري الحضري",
       "location": "Riyadh",
+      "location_en": "Riyadh, KSA",
+      "location_ar": "الرياض، المملكة العربية السعودية",
       "country": "KSA",
-      "year": "2025",
+      "country_en": "KSA",
+      "country_ar": "السعودية",
+      "client_en": "Riyadh Holdings Group",
+      "client_ar": "مجموعة الرياض القابضة",
+      "year": 2025,
+      "area_sqm": "18,500 m²",
       "type": "Commercial",
+      "category": "Commercial",
+      "sector_en": "Commercial",
+      "sector_ar": "تجاري وإداري",
       "disciplines": [
         "Architecture",
         "Interior Design",
         "Engineering"
+      ],
+      "services_en": [
+        "Architecture",
+        "Interior Design",
+        "Engineering"
+      ],
+      "services_ar": [
+        "الاستشارات المعمارية",
+        "التصميم الداخلي",
+        "التنسيق الكهروميكانيكي"
       ],
       "scope": [
         "Architecture Design",
@@ -229,12 +451,30 @@
         "MEP Coordination"
       ],
       "tagline": "A civic presence in limestone and bronze.",
+      "subtitle_en": "A civic presence in limestone and bronze.",
+      "subtitle_ar": "حضور عمراني رائد بالحجر الجيري والبرونز في قلب الرياض.",
       "heading": "Precision at an urban scale.",
+      "headingAr": "دقة هندسية وصرح عمراني رائد.",
       "description": "A mixed-use commercial building on a prominent Riyadh plaza. Deep recessed windows and bronze vertical fins control the harsh desert light while giving the limestone façade rhythm and depth. Full technical documentation and MEP coordination were delivered alongside the design, ensuring a seamless transition from concept to construction.",
+      "descriptionAr": "مبنى تجاري متعدد الاستخدامات في ساحة بارزة بالرياض، يتميز بنوافذ عميقة وكواسر شمسية برونزية وتكسيات حجرية متطورة مع تنسيق MEP كامل.",
+      "details_en": "A mixed-use commercial building on a prominent Riyadh plaza.",
+      "details_ar": "مبنى تجاري متعدد الاستخدامات في ساحة بارزة بالرياض.",
       "philosophy": "Design is not decoration. It is how space works, feels and lasts.",
+      "vision_en": "Design is not decoration. It is how space works, feels and lasts.",
+      "vision_ar": "التصميم ليس مجرد زخرفة، بل هو كيف يعمل الفراغ، وكيف يبدو شعوره، وكيف يدوم للأجيال.",
       "cover": "/images/project-commercial-riyadh.png",
+      "cover_image": "/images/project-commercial-riyadh.png",
+      "coverImage": "/images/project-commercial-riyadh.png",
       "interior": "/images/project-executive-office.png",
       "cinematic": "/images/project-commercial-riyadh.png",
+      "featured": false,
+      "is_featured": false,
+      "status": "completed",
+      "publish_status": "Published",
+      "lat": 24.7136,
+      "lng": 46.6753,
+      "display_order": 5,
+      "lifecycle_stage": "handover",
       "gallery": [
         {
           "src": "/images/project-commercial-riyadh.png",
@@ -251,18 +491,45 @@
           "caption": "Bronze Fins",
           "category": "Details"
         }
+      ],
+      "gallery_images": [
+        "/images/project-commercial-riyadh.png",
+        "/images/project-executive-office.png",
+        "/images/material-metal.png"
       ]
     },
     {
+      "id": "prj-private-majlis",
+      "code": "PRJ-2024-06",
       "slug": "private-majlis",
       "index": "06",
       "name": "Private Majlis",
+      "nameAr": "المجلس الخاص",
+      "title": "Private Majlis",
+      "title_en": "Private Majlis",
+      "title_ar": "المجلس الخاص",
       "location": "Riyadh",
+      "location_en": "Riyadh, KSA",
+      "location_ar": "الرياض، المملكة العربية السعودية",
       "country": "KSA",
-      "year": "2024",
+      "country_en": "KSA",
+      "country_ar": "السعودية",
+      "client_en": "Royal Family Office",
+      "client_ar": "مكتب عائلي مرموق",
+      "year": 2024,
+      "area_sqm": "480 m²",
       "type": "Luxury Living",
+      "category": "Luxury Living",
+      "sector_en": "Hospitality & Heritage",
+      "sector_ar": "ضيافة وأصالة",
       "disciplines": [
         "Interior Design"
+      ],
+      "services_en": [
+        "Interior Design"
+      ],
+      "services_ar": [
+        "التصميم الداخلي الفاخر"
       ],
       "scope": [
         "Interior Design",
@@ -270,12 +537,30 @@
         "Lighting Design"
       ],
       "tagline": "Sophisticated spaces rooted in tradition, expressed with contemporary elegance.",
+      "subtitle_en": "Sophisticated spaces rooted in tradition, expressed with contemporary elegance.",
+      "subtitle_ar": "فضاءات راقية متجذرة في التراث ومعبر عنها بأناقة معاصرة.",
       "heading": "Tradition, reinterpreted.",
+      "headingAr": "أصالة التراث برؤية معمارية معاصرة.",
       "description": "A private majlis that honours the ritual of gathering. Backlit geometric screens in carved wood wrap the room, low seating follows the perimeter, and a single brass pendant marks the centre. Contemporary in its restraint, traditional in its generosity.",
+      "descriptionAr": "مجلس خاص يحتفي بتقاليد الضيافة الأصيلة، بقواطع خشبية هندسية مضيئة وجلسات محيطية وثريا نحاسية أيقونية.",
+      "details_en": "A private majlis that honours the ritual of gathering.",
+      "details_ar": "مجلس خاص يحتفي بتقاليد الضيافة الأصيلة.",
       "philosophy": "Every detail contributes to a more meaningful way of living.",
+      "vision_en": "Every detail contributes to a more meaningful way of living.",
+      "vision_ar": "كل تفصيلة معمارية تساهم في إثراء التجربة الإنسانية والعيش الراقي.",
       "cover": "/images/project-majlis.png",
+      "cover_image": "/images/project-majlis.png",
+      "coverImage": "/images/project-majlis.png",
       "interior": "/images/project-majlis.png",
       "cinematic": "/images/project-majlis.png",
+      "featured": false,
+      "is_featured": false,
+      "status": "completed",
+      "publish_status": "Published",
+      "lat": 24.7677,
+      "lng": 46.6384,
+      "display_order": 6,
+      "lifecycle_stage": "handover",
       "gallery": [
         {
           "src": "/images/project-majlis.png",
@@ -292,6 +577,11 @@
           "caption": "Upholstery",
           "category": "Details"
         }
+      ],
+      "gallery_images": [
+        "/images/project-majlis.png",
+        "/images/material-wood.png",
+        "/images/material-fabric.png"
       ]
     }
   ],
