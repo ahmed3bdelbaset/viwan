@@ -316,13 +316,13 @@ export default function AdminLoginPage() {
     // and the form column is always on the right, regardless of Arabic/English language toggle!
     <div
       dir="ltr"
-      className="min-h-screen w-full relative flex flex-col lg:flex-row overflow-x-hidden select-none bg-[#F7F4EC]"
+      className="min-h-screen w-full relative flex flex-col justify-between overflow-x-hidden select-none bg-[#F7F4EC]"
     >
       {/* ========================================================================= */}
-      {/* MOBILE SPLIT BACKGROUND (Visible on < lg screens) */}
+      {/* 50/50 SPLIT BACKGROUND (Universal across all screens: Desktop & Mobile) */}
       {/* Left 50% = Olive Tree Terrace Image | Right 50% = Warm Cream Stone */}
       {/* ========================================================================= */}
-      <div className="lg:hidden fixed inset-0 z-0 pointer-events-none flex">
+      <div className="fixed inset-0 z-0 pointer-events-none flex">
         {/* Left Half: Architectural Terrace Photo */}
         <div className="w-1/2 h-full relative overflow-hidden">
           <Image
@@ -334,7 +334,7 @@ export default function AdminLoginPage() {
             className="object-cover object-center"
           />
           {/* Subtle atmospheric vignette */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/45" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/15 to-black/50" />
         </div>
 
         {/* Right Half: Warm White/Cream Stone Background */}
@@ -342,26 +342,12 @@ export default function AdminLoginPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* DESKTOP LEFT COLUMN: ARCHITECTURAL EDITORIAL TERRACE (Visible on lg+) */}
+      {/* DESKTOP EDITORIAL SIDE PILLARS (Far Left Column outside the card) */}
       {/* ========================================================================= */}
-      <div className="hidden lg:flex lg:w-[44%] xl:w-[42%] relative min-h-screen flex-col justify-between p-12 xl:p-16 z-10 overflow-hidden shrink-0">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/admin-login-terrace.jpg"
-            alt="VIWAN Architectural Courtyard Terrace"
-            fill
-            priority
-            sizes="50vw"
-            className="object-cover object-center"
-          />
-          {/* Subtle vignette gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/35 pointer-events-none" />
-        </div>
-
+      <div className="hidden 2xl:flex fixed left-12 top-12 bottom-12 z-10 w-[240px] flex-col justify-between pointer-events-none">
         {/* Top-Left Brand Pillar Tagline */}
-        <div className="relative z-10 space-y-2">
-          <div className="text-[10px] xl:text-[11px] font-mono tracking-[0.3em] uppercase text-stone-200 font-light leading-relaxed">
+        <div className="space-y-2">
+          <div className="text-[10px] font-mono tracking-[0.3em] uppercase text-stone-200 font-light leading-relaxed">
             <div>SPACES</div>
             <div>PEOPLE</div>
             <div>POSSIBILITIES</div>
@@ -370,29 +356,16 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Bottom-Left Editorial Vision Narrative */}
-        <div className="relative z-10 space-y-4 max-w-sm">
-          <h2 className="font-cinzel text-3xl xl:text-4xl text-[#FAF6EE] font-normal leading-[1.12]">
+        <div className="space-y-3">
+          <h2 className="font-cinzel text-3xl text-[#FAF6EE] font-normal leading-[1.12]">
             Designing
             <br />
             a Better
             <br />
             Tomorrow
           </h2>
-
           <div className="w-8 h-[1.5px] bg-[#B08A5A]" />
-
-          <p
-            dir={isRtl ? 'rtl' : 'ltr'}
-            className={`text-xs xl:text-sm text-stone-200/90 font-light leading-relaxed ${
-              isRtl ? 'font-cairo' : 'font-sans'
-            }`}
-          >
-            {isRtl
-              ? 'في فيوان، نُحوّل الرؤى المعمارية إلى فراغات ذات معنى ملهم عبر التناغم الهندسي، نقاء الخامات، وصدق التفاصيل.'
-              : 'At VIWAN, we transform architectural visions into meaningful spaces through geometric harmony, pure materials, and honest detailing.'}
-          </p>
-
-          <div className="flex items-center gap-3 pt-2 text-[11px] font-mono tracking-widest text-[#B08A5A]">
+          <div className="flex items-center gap-3 pt-1 text-[11px] font-mono tracking-widest text-[#B08A5A]">
             <span>01</span>
             <span className="w-4 h-[1px] bg-[#B08A5A]" />
             <span>03</span>
@@ -401,9 +374,9 @@ export default function AdminLoginPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* RIGHT COLUMN: LOGIN & BREVO OTP RECOVERY (Always on the right) */}
+      {/* MAIN VIEWPORT WRAPPER (Top Header, Centered Floating Card, Bottom Footer) */}
       {/* ========================================================================= */}
-      <div className="flex-1 relative min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 z-10 overflow-y-auto">
+      <div className="relative z-20 min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-y-auto">
         {/* Top Header Bar: Consistent placement so switching language never jumps */}
         <div className="w-full flex items-center justify-between z-20">
           {/* Language Toggle Button */}
@@ -428,12 +401,11 @@ export default function AdminLoginPage() {
           </div>
         </div>
 
-        {/* Center Stage: The Luxury Floating Form Card */}
-        {/* Centered on mobile across the 50/50 split (half over image, half over white) */}
+        {/* Center Stage: The Luxury Floating Form Card Centered in the middle of the screen */}
         <div className="w-full flex items-center justify-center my-auto py-8">
           <div
             dir={isRtl ? 'rtl' : 'ltr'}
-            className={`w-full max-w-[460px] bg-gradient-to-r from-[#FAF6EE]/50 via-[#FAF6EE]/75 to-[#FAF6EE]/95 lg:from-[#FAF6EE] lg:to-[#FAF6EE] lg:bg-[#FAF6EE] backdrop-blur-xl lg:backdrop-blur-none rounded-[26px] p-7 sm:p-10 border border-white/50 lg:border-[#E7E1D4] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-6 transition-all duration-300 ${
+            className={`w-full max-w-[460px] bg-gradient-to-r from-[#FAF6EE]/50 via-[#FAF6EE]/75 to-[#FAF6EE]/95 backdrop-blur-xl rounded-[26px] p-7 sm:p-10 border border-white/60 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-6 transition-all duration-300 ${
               isRtl ? 'font-cairo' : 'font-sans'
             }`}
           >
@@ -943,18 +915,18 @@ export default function AdminLoginPage() {
 
         {/* Bottom Footer Row */}
         <div className="w-full flex items-center justify-between z-20 text-[10px] font-mono tracking-widest text-[#8C6D45] uppercase">
-          {/* Mobile Bottom Narrative Snippet */}
-          <div className="lg:hidden text-stone-300/90 text-left rtl:text-right space-y-1 font-serif">
-            <div className="text-sm font-cinzel">Designing a Better Tomorrow</div>
+          {/* Left Narrative Snippet (Over the Image) */}
+          <div className="text-stone-300/90 text-left space-y-1 font-serif">
+            <div className="text-xs sm:text-sm font-cinzel">Designing a Better Tomorrow</div>
             <div className="w-6 h-[1px] bg-[#B08A5A]" />
           </div>
 
-          <div className="hidden lg:block text-stone-400">
+          <div className="hidden sm:block text-stone-400">
             VIWAN STUDIO // OS 2026
           </div>
 
-          {/* Desktop Right Pillar Mark */}
-          <div className="hidden lg:flex items-center gap-2">
+          {/* Right Pillar Mark (Over the White/Cream) */}
+          <div className="flex items-center gap-2">
             <span>BUILT ON A VISION</span>
             <span className="w-4 h-[1px] bg-[#8C6D45]" />
           </div>
