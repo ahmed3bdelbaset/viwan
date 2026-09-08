@@ -1345,5 +1345,43 @@
       "labelEn": "Completed Masterpieces",
       "labelAr": "مشروعاً منجزاً"
     }
+  ],
+  "youtubeVideos": [
+    {
+      "id": "yt-1",
+      "titleEn": "Private Luxury Villa Architectural Walkthrough",
+      "titleAr": "جولة سينمائية متكاملة في فيلا سكنية فاخرة",
+      "youtubeUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      "videoId": "aqz-KE-bpKQ",
+      "categoryEn": "Architectural Tour",
+      "categoryAr": "جولة معمارية",
+      "thumbnailUrl": "https://img.youtube.com/vi/aqz-KE-bpKQ/maxresdefault.jpg",
+      "order": 1,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "yt-2",
+      "titleEn": "Contemporary Villa Interior & Ambient Lighting Design",
+      "titleAr": "التصميم الداخلي والإنارة المعمارية للقصور المعاصرة",
+      "youtubeUrl": "https://www.youtube.com/watch?v=7WT0nI-BwR4",
+      "videoId": "7WT0nI-BwR4",
+      "categoryEn": "Interior & Lighting",
+      "categoryAr": "التصميم الداخلي والإضاءة",
+      "thumbnailUrl": "https://img.youtube.com/vi/7WT0nI-BwR4/maxresdefault.jpg",
+      "order": 2,
+      "createdAt": "2026-01-02T00:00:00.000Z"
+    },
+    {
+      "id": "yt-3",
+      "titleEn": "Desert Modernism & Landscape Architecture Film",
+      "titleAr": "فيلم وثائقي معماري: عمارة وتنسيق المواقع المستدامة",
+      "youtubeUrl": "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+      "videoId": "kJQP7kiw5Fk",
+      "categoryEn": "Landscape & Masterplanning",
+      "categoryAr": "اللاندسكيب والتخطيط",
+      "thumbnailUrl": "https://img.youtube.com/vi/kJQP7kiw5Fk/maxresdefault.jpg",
+      "order": 3,
+      "createdAt": "2026-01-03T00:00:00.000Z"
+    }
   ]
 }

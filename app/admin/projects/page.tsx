@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { useViwanModal } from '@/components/ui/ViwanModalProvider';
+import { extractYouTubeId, getYouTubeThumbnail, getYouTubeEmbedUrl } from '@/lib/youtube';
 import {
   FolderKanban,
   Plus,
@@ -21,8 +23,25 @@ import {
   Calendar,
   Layers,
   Sparkles,
-  Eye
+  Eye,
+  Film,
+  ArrowUp,
+  ArrowDown,
+  Play
 } from 'lucide-react';
+
+export interface AdminYouTubeVideo {
+  id: string;
+  titleEn: string;
+  titleAr: string;
+  youtubeUrl: string;
+  videoId: string;
+  categoryEn?: string;
+  categoryAr?: string;
+  thumbnailUrl?: string;
+  order: number;
+  createdAt: string;
+}
 
 export interface AdminProjectItem {
   id: string;
@@ -114,6 +133,22 @@ export default function AdminProjectsPage() {
   const coverInputRef = useRef<HTMLInputElement | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
+  // YouTube Videos Management State
+  const [activeTab, setActiveTab] = useState<'projects' | 'videos'>('projects');
+  const [videos, setVideos] = useState<AdminYouTubeVideo[]>([]);
+  const [loadingVideos, setLoadingVideos] = useState(false);
+  const [videoForm, setVideoForm] = useState({
+    id: '',
+    titleEn: '',
+    titleAr: '',
+    youtubeUrl: '',
+    categoryEn: 'Architectural Tour',
+    categoryAr: 'جولة معمارية',
+  });
+  const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
+  const [savingVideo, setSavingVideo] = useState(false);
+  const [previewVideoModal, setPreviewVideoModal] = useState<AdminYouTubeVideo | null>(null);
+
   const fetchProjects = async () => {
     try {
       setLoading(true);
@@ -131,9 +166,176 @@ export default function AdminProjectsPage() {
     }
   };
 
+  const fetchVideos = async () => {
+    try {
+      setLoadingVideos(true);
+      const res = await fetch('/api/admin/videos');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.videos)) {
+          setVideos(data.videos);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch videos:', err);
+    } finally {
+      setLoadingVideos(false);
+    }
+  };
+
   useEffect(() => {
     fetchProjects();
+    fetchVideos();
   }, []);
+
+  const handleSaveVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!videoForm.youtubeUrl.trim()) {
+      showError(isRtl ? 'يرجى لصق رابط فيديو يوتيوب' : 'Please paste a YouTube URL', isRtl ? 'تنبيه' : 'Alert');
+      return;
+    }
+    const videoId = extractYouTubeId(videoForm.youtubeUrl);
+    if (!videoId) {
+      showError(isRtl ? 'الرابط غير صحيح. يرجى التأكد من أنه رابط يوتيوب صالح' : 'Invalid YouTube link. Please ensure it is a valid YouTube URL', isRtl ? 'تنبيه' : 'Alert');
+      return;
+    }
+
+    try {
+      setSavingVideo(true);
+      if (editingVideoId) {
+        const res = await fetch('/api/admin/videos', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingVideoId,
+            titleEn: videoForm.titleEn || videoForm.titleAr || 'Architectural Tour',
+            titleAr: videoForm.titleAr || videoForm.titleEn || 'جولة معمارية',
+            youtubeUrl: videoForm.youtubeUrl,
+            categoryEn: videoForm.categoryEn || 'Architectural Tour',
+            categoryAr: videoForm.categoryAr || 'جولة معمارية',
+          }),
+        });
+        if (res.ok) {
+          showNotification(isRtl ? 'تم تحديث بيانات الفيديو بنجاح' : 'Video updated successfully', isRtl ? 'تم الحفظ' : 'Saved');
+          setEditingVideoId(null);
+          setVideoForm({
+            id: '',
+            titleEn: '',
+            titleAr: '',
+            youtubeUrl: '',
+            categoryEn: 'Architectural Tour',
+            categoryAr: 'جولة معمارية',
+          });
+          fetchVideos();
+        } else {
+          showError(isRtl ? 'فشل حفظ التعديلات' : 'Failed to save changes');
+        }
+      } else {
+        const res = await fetch('/api/admin/videos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            titleEn: videoForm.titleEn || videoForm.titleAr || 'Architectural Tour',
+            titleAr: videoForm.titleAr || videoForm.titleEn || 'جولة معمارية',
+            youtubeUrl: videoForm.youtubeUrl,
+            categoryEn: videoForm.categoryEn || 'Architectural Tour',
+            categoryAr: videoForm.categoryAr || 'جولة معمارية',
+          }),
+        });
+        if (res.ok) {
+          showNotification(isRtl ? 'تمت إضافة الفيديو بنجاح وظهر في قسم المشاريع' : 'Video added successfully to projects showcase', isRtl ? 'تمت الإضافة' : 'Added');
+          setVideoForm({
+            id: '',
+            titleEn: '',
+            titleAr: '',
+            youtubeUrl: '',
+            categoryEn: 'Architectural Tour',
+            categoryAr: 'جولة معمارية',
+          });
+          fetchVideos();
+        } else {
+          showError(isRtl ? 'فشل إضافة الفيديو' : 'Failed to add video');
+        }
+      }
+    } catch (err) {
+      console.error('Error saving video:', err);
+      showError(isRtl ? 'حدث خطأ أثناء حفظ الفيديو' : 'An error occurred while saving the video');
+    } finally {
+      setSavingVideo(false);
+    }
+  };
+
+  const handleEditVideo = (video: AdminYouTubeVideo) => {
+    setEditingVideoId(video.id);
+    setVideoForm({
+      id: video.id,
+      titleEn: video.titleEn,
+      titleAr: video.titleAr,
+      youtubeUrl: video.youtubeUrl,
+      categoryEn: video.categoryEn || 'Architectural Tour',
+      categoryAr: video.categoryAr || 'جولة معمارية',
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEditVideo = () => {
+    setEditingVideoId(null);
+    setVideoForm({
+      id: '',
+      titleEn: '',
+      titleAr: '',
+      youtubeUrl: '',
+      categoryEn: 'Architectural Tour',
+      categoryAr: 'جولة معمارية',
+    });
+  };
+
+  const handleDeleteVideo = (video: AdminYouTubeVideo) => {
+    showConfirm(
+      isRtl ? 'هل أنت متأكد من حذف هذا الفيديو من معرض المشاريع؟' : 'Are you sure you want to remove this video from the showcase?',
+      async () => {
+        try {
+          const res = await fetch(`/api/admin/videos?id=${video.id}`, { method: 'DELETE' });
+          if (res.ok) {
+            setVideos((prev) => prev.filter((v) => v.id !== video.id));
+            showNotification(isRtl ? 'تم حذف الفيديو بنجاح' : 'Video deleted successfully', isRtl ? 'تم الحذف' : 'Deleted');
+            if (editingVideoId === video.id) {
+              handleCancelEditVideo();
+            }
+          }
+        } catch (err) {
+          console.error('Error deleting video:', err);
+          showError(isRtl ? 'فشل حذف الفيديو' : 'Failed to delete video');
+        }
+      },
+      isRtl ? 'تأكيد الحذف' : 'Confirm Delete',
+      isRtl ? 'حذف' : 'Delete'
+    );
+  };
+
+  const handleMoveVideo = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= videos.length) return;
+
+    const reordered = [...videos];
+    const temp = reordered[index];
+    reordered[index] = reordered[targetIndex];
+    reordered[targetIndex] = temp;
+
+    const payload = reordered.map((v, idx) => ({ id: v.id, order: idx + 1 }));
+    setVideos(reordered.map((v, idx) => ({ ...v, order: idx + 1 })));
+
+    try {
+      await fetch('/api/admin/videos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reorder: payload }),
+      });
+      showNotification(isRtl ? 'تم تحديث ترتيب الفيديوهات بنجاح' : 'Videos reordered', isRtl ? 'الترتيب' : 'Order');
+    } catch (err) {
+      console.error('Failed to save reordered videos:', err);
+    }
+  };
 
   const openCreateModal = () => {
     setEditingId(null);
@@ -377,25 +579,78 @@ export default function AdminProjectsPage() {
 
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
           <button
-            onClick={fetchProjects}
+            onClick={() => {
+              if (activeTab === 'projects') fetchProjects();
+              else fetchVideos();
+            }}
             className="p-2.5 border border-[#E7E2D8] bg-white hover:border-gold text-charcoal transition-colors shadow-xs"
-            title={isRtl ? 'تحديث المشاريع' : 'Refresh Projects'}
+            title={isRtl ? 'تحديث البيانات' : 'Refresh Data'}
           >
-            <RefreshCw className={`w-4 h-4 text-gold ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 text-gold ${(loading || loadingVideos) ? 'animate-spin' : ''}`} />
           </button>
 
-          <button
-            onClick={openCreateModal}
-            className="bg-charcoal hover:bg-gold text-white px-4 py-2.5 text-xs font-medium tracking-wider uppercase flex items-center space-x-2 rtl:space-x-reverse transition-colors shadow-sm"
-          >
-            <Plus className="w-4 h-4 text-gold group-hover:text-white" />
-            <span>{isRtl ? 'إضافة مشروع جديد' : 'ADD NEW PROJECT'}</span>
-          </button>
+          {activeTab === 'projects' ? (
+            <button
+              onClick={openCreateModal}
+              className="bg-charcoal hover:bg-gold text-white px-4 py-2.5 text-xs font-medium tracking-wider uppercase flex items-center space-x-2 rtl:space-x-reverse transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4 text-gold group-hover:text-white" />
+              <span>{isRtl ? 'إضافة مشروع جديد' : 'ADD NEW PROJECT'}</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                handleCancelEditVideo();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="bg-charcoal hover:bg-gold text-white px-4 py-2.5 text-xs font-medium tracking-wider uppercase flex items-center space-x-2 rtl:space-x-reverse transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4 text-gold group-hover:text-white" />
+              <span>{isRtl ? 'إضافة فيديو جديد' : 'ADD NEW VIDEO'}</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Filter Tabs & Search */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      {/* Primary Section Switcher (Tabs) */}
+      <div className="flex border-b border-[#E7E2D8] gap-3 sm:gap-6">
+        <button
+          type="button"
+          onClick={() => setActiveTab('projects')}
+          className={`pb-3.5 px-2 sm:px-4 text-xs font-cinzel tracking-wider uppercase transition-all relative flex items-center gap-2 cursor-pointer ${
+            activeTab === 'projects'
+              ? 'text-charcoal font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-gold'
+              : 'text-stone-500 hover:text-charcoal'
+          }`}
+        >
+          <FolderKanban className="w-4 h-4 text-gold" />
+          <span>{isRtl ? 'محفظة وتفاصيل المشاريع' : 'PROJECTS MONOGRAPH'}</span>
+          <span className="text-[10px] font-mono px-2 py-0.5 bg-stone-200/60 rounded-xs text-stone-700 font-semibold">
+            {projects.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('videos')}
+          className={`pb-3.5 px-2 sm:px-4 text-xs font-cinzel tracking-wider uppercase transition-all relative flex items-center gap-2 cursor-pointer ${
+            activeTab === 'videos'
+              ? 'text-charcoal font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-gold'
+              : 'text-stone-500 hover:text-charcoal'
+          }`}
+        >
+          <Film className="w-4 h-4 text-gold" />
+          <span>{isRtl ? 'جولات وفيديوهات اليوتيوب' : 'YOUTUBE SHOWCASE'}</span>
+          <span className="text-[10px] font-mono px-2 py-0.5 bg-gold/20 text-charcoal rounded-xs font-semibold">
+            {videos.length}
+          </span>
+        </button>
+      </div>
+
+      {activeTab === 'projects' ? (
+        <>
+          {/* Filter Tabs & Search */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Disciplines Filter */}
         <div className="flex flex-wrap items-center gap-1.5">
           <button
@@ -566,6 +821,437 @@ export default function AdminProjectsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+        </>
+      ) : (
+        /* ========================================================================= */
+        /* YOUTUBE VIDEOS SHOWCASE MANAGEMENT VIEW                                   */
+        /* ========================================================================= */
+        <div className="space-y-8">
+          {/* Top Info Banner */}
+          <div className="bg-[#FAF6EE] border border-[#E7E2D8] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-charcoal text-gold rounded-xs">
+                <Film className="size-4" />
+              </div>
+              <div>
+                <h2 className="font-cinzel text-xs sm:text-sm font-bold text-charcoal uppercase">
+                  {isRtl ? 'إدارة جولات وأفلام اليوتيوب (Zero Server Storage)' : 'YOUTUBE SHOWCASE MANAGEMENT (ZERO DISK STORAGE)'}
+                </h2>
+                <p className="text-[11px] text-stone-500">
+                  {isRtl
+                    ? 'أضف روابط يوتيوب فقط؛ يتم جلب الصور المصغرة والمشغل تلقائياً وعرضها في أسفل صفحة المشاريع العامة.'
+                    : 'Paste YouTube URLs; thumbnails & embed players are generated on the fly with zero storage load on your server.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link
+                href="/projects#architectural-cinematography"
+                target="_blank"
+                className="px-3 py-1.5 bg-white border border-[#E7E2D8] hover:border-gold text-charcoal text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
+              >
+                <span>{isRtl ? 'معاينة في صفحة المشاريع' : 'View on Public Page'}</span>
+                <ExternalLink className="size-3 text-gold" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Form Card: Add or Edit Video */}
+          <div className="bg-white border border-[#E7E2D8] p-6 shadow-xs rounded-xs">
+            <div className="flex items-center justify-between border-b border-[#E7E2D8] pb-4 mb-6">
+              <div className="flex items-center gap-2">
+                <Film className="w-4 h-4 text-gold" />
+                <h3 className="font-cinzel text-sm font-semibold text-charcoal tracking-wide uppercase">
+                  {editingVideoId
+                    ? (isRtl ? 'تعديل بيانات الفيديو' : 'EDIT YOUTUBE VIDEO')
+                    : (isRtl ? 'إضافة فيديو جديد من YouTube' : 'ADD NEW YOUTUBE VIDEO')}
+                </h3>
+              </div>
+              {editingVideoId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEditVideo}
+                  className="text-xs text-stone-500 hover:text-charcoal px-3 py-1 border border-[#E7E2D8] bg-stone-50 cursor-pointer"
+                >
+                  {isRtl ? 'إلغاء التعديل' : 'Cancel Edit'}
+                </button>
+              )}
+            </div>
+
+            <form onSubmit={handleSaveVideo} className="space-y-5">
+              {/* YouTube Link Field with Instant Live Preview */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                  {isRtl ? 'رابط الفيديو من يوتيوب (YouTube URL) *' : 'YOUTUBE VIDEO LINK (URL) *'}
+                </label>
+                <input
+                  type="url"
+                  required
+                  value={videoForm.youtubeUrl}
+                  onChange={(e) => setVideoForm((prev) => ({ ...prev, youtubeUrl: e.target.value }))}
+                  placeholder={
+                    isRtl
+                      ? 'الصق رابط الفيديو هنا، مثال: https://www.youtube.com/watch?v=aqz-KE-bpKQ أو https://youtu.be/...'
+                      : 'Paste YouTube URL here, e.g. https://www.youtube.com/watch?v=aqz-KE-bpKQ or https://youtu.be/...'
+                  }
+                  className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-3 text-xs text-charcoal focus:outline-none focus:border-gold font-mono"
+                />
+
+                {/* Instant Live Thumbnail Preview */}
+                {(() => {
+                  const detectedId = extractYouTubeId(videoForm.youtubeUrl);
+                  if (detectedId) {
+                    return (
+                      <div className="mt-3 p-3 bg-emerald-50/70 border border-emerald-200 rounded-xs flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div className="relative w-36 aspect-video bg-stone-900 shrink-0 rounded-xs overflow-hidden shadow-xs border border-emerald-300">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={`https://img.youtube.com/vi/${detectedId}/hqdefault.jpg`}
+                            alt="YouTube Thumbnail Preview"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                            <Play className="size-4 text-white fill-white" />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                            <span>✓ {isRtl ? 'تم التعرف على الفيديو والصورة المصغرة بنجاح' : 'YouTube Video Verified'}</span>
+                            <span className="font-mono text-[11px] bg-emerald-200/70 text-emerald-900 px-1.5 py-0.5 rounded-xs">
+                              {detectedId}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-stone-600">
+                            {isRtl
+                              ? 'سيتم استيراد الصورة المصغرة بأعلى دقة تلقائياً، ويعمل المشغل داخل المنصة فور نقر الزائر.'
+                              : 'Thumbnail will be rendered automatically in high resolution with inline modal playback.'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <p className="text-[11px] text-stone-500">
+                      {isRtl
+                        ? 'يمكنك لصق رابط يوتيوب عادي، أو رابط مختصر youtu.be، أو رابط Shorts، أو معرف الفيديو المكون من 11 رمزاً.'
+                        : 'Supports all YouTube links: standard watch URLs, short links (youtu.be), Shorts, or direct 11-char IDs.'}
+                    </p>
+                  );
+                })()}
+              </div>
+
+              {/* Title Fields: Arabic & English */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'عنوان الفيديو (باللغة العربية) *' : 'VIDEO TITLE (ARABIC) *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    dir="rtl"
+                    value={videoForm.titleAr}
+                    onChange={(e) => setVideoForm((prev) => ({ ...prev, titleAr: e.target.value }))}
+                    placeholder="مثال: جولة معمارية متكاملة في فيلا سكنية فاخرة"
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-cairo"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {isRtl ? 'عنوان الفيديو (باللغة الإنجليزية)' : 'VIDEO TITLE (ENGLISH)'}
+                  </label>
+                  <input
+                    type="text"
+                    value={videoForm.titleEn}
+                    onChange={(e) => setVideoForm((prev) => ({ ...prev, titleEn: e.target.value }))}
+                    placeholder="e.g. Private Luxury Villa Architectural Walkthrough"
+                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                  />
+                </div>
+              </div>
+
+              {/* Category / Scope */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                  {isRtl ? 'تصنيف الجولة / نوع الفيديو' : 'VIDEO CATEGORY / SCOPE'}
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { en: 'Architectural Tour', ar: 'جولة معمارية' },
+                    { en: 'Interior & Lighting', ar: 'التصميم الداخلي والإضاءة' },
+                    { en: 'Landscape & Masterplanning', ar: 'اللاندسكيب والتخطيط' },
+                    { en: 'Site Construction', ar: 'توثيق الموقع والإنشاءات' },
+                  ].map((cat) => {
+                    const isSelected =
+                      videoForm.categoryEn === cat.en || videoForm.categoryAr === cat.ar;
+                    return (
+                      <button
+                        key={cat.en}
+                        type="button"
+                        onClick={() =>
+                          setVideoForm((prev) => ({
+                            ...prev,
+                            categoryEn: cat.en,
+                            categoryAr: cat.ar,
+                          }))
+                        }
+                        className={`p-2 text-center text-xs font-medium border transition-colors cursor-pointer rounded-xs ${
+                          isSelected
+                            ? 'bg-charcoal text-gold border-gold font-bold shadow-xs'
+                            : 'bg-[#FAF6EE] border-[#E7E2D8] text-stone-600 hover:border-gold'
+                        }`}
+                      >
+                        {isRtl ? cat.ar : cat.en}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E7E2D8]">
+                {editingVideoId && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEditVideo}
+                    className="px-4 py-2 border border-[#E7E2D8] hover:border-stone-400 bg-white text-xs font-medium text-stone-600 transition-colors cursor-pointer"
+                  >
+                    {isRtl ? 'إلغاء' : 'Cancel'}
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={savingVideo}
+                  className="px-6 py-2.5 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <Film className="w-4 h-4 text-gold" />
+                  <span>
+                    {savingVideo
+                      ? (isRtl ? 'جاري الحفظ...' : 'SAVING...')
+                      : editingVideoId
+                      ? (isRtl ? 'حفظ تعديلات الفيديو' : 'UPDATE VIDEO')
+                      : (isRtl ? 'حفظ ونشر الفيديو في الموقع' : 'SAVE & PUBLISH VIDEO')}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Videos List */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-cinzel text-base text-charcoal font-medium uppercase tracking-wider flex items-center gap-2">
+                <span>{isRtl ? 'قائمة الفيديوهات المعروضة بالموقع' : 'PUBLISHED SHOWCASE VIDEOS'}</span>
+                <span className="bg-charcoal text-gold text-[11px] font-mono px-2 py-0.5">
+                  {videos.length}
+                </span>
+              </h3>
+
+              <button
+                type="button"
+                onClick={fetchVideos}
+                className="p-2 border border-[#E7E2D8] bg-white hover:border-gold text-charcoal transition-colors shadow-xs flex items-center gap-1.5 text-xs cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-gold ${loadingVideos ? 'animate-spin' : ''}`} />
+                <span>{isRtl ? 'تحديث' : 'Refresh'}</span>
+              </button>
+            </div>
+
+            {loadingVideos ? (
+              <div className="py-16 text-center text-xs text-stone-500 font-cinzel tracking-widest uppercase bg-white border border-[#E7E2D8]">
+                {isRtl ? 'جاري تحميل قائمة الفيديوهات...' : 'LOADING SHOWCASE VIDEOS...'}
+              </div>
+            ) : videos.length === 0 ? (
+              <div className="py-16 text-center bg-white border border-[#E7E2D8] p-8">
+                <Film className="w-10 h-10 text-stone-300 mx-auto mb-3" />
+                <p className="font-cinzel text-sm text-charcoal uppercase mb-1">
+                  {isRtl ? 'لا توجد فيديوهات منشورة حالياً' : 'NO VIDEOS PUBLISHED YET'}
+                </p>
+                <p className="text-xs text-stone-500">
+                  {isRtl
+                    ? 'استخدم النموذج أعلاه للصق أول رابط فيديو من يوتيوب ليظهر في قسم المشاريع.'
+                    : 'Use the form above to paste your first YouTube link to feature it in the portfolio.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {videos.map((vid, idx) => {
+                  return (
+                    <div
+                      key={vid.id}
+                      className="bg-white border border-[#E7E2D8] hover:border-gold/60 p-4 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs group"
+                    >
+                      {/* Left: Reordering buttons + Thumbnail + Info */}
+                      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                        {/* Order Controls */}
+                        <div className="flex flex-col items-center gap-1 shrink-0 bg-stone-50 p-1.5 border border-stone-200/80 rounded-xs">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => handleMoveVideo(idx, 'up')}
+                            className={`p-1 rounded-xs transition-colors ${
+                              idx === 0
+                                ? 'text-stone-300 cursor-not-allowed'
+                                : 'text-charcoal hover:bg-gold hover:text-white cursor-pointer'
+                            }`}
+                            title={isRtl ? 'نقل للأعلى' : 'Move Up'}
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+
+                          <span className="font-mono text-xs font-bold text-stone-700">
+                            #{idx + 1}
+                          </span>
+
+                          <button
+                            type="button"
+                            disabled={idx === videos.length - 1}
+                            onClick={() => handleMoveVideo(idx, 'down')}
+                            className={`p-1 rounded-xs transition-colors ${
+                              idx === videos.length - 1
+                                ? 'text-stone-300 cursor-not-allowed'
+                                : 'text-charcoal hover:bg-gold hover:text-white cursor-pointer'
+                            }`}
+                            title={isRtl ? 'نقل للأسفل' : 'Move Down'}
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Thumbnail with Quick Play Trigger */}
+                        <div
+                          onClick={() => setPreviewVideoModal(vid)}
+                          className="relative w-32 sm:w-40 aspect-video bg-stone-900 shrink-0 cursor-pointer overflow-hidden rounded-xs border border-stone-200 group/thumb shadow-xs"
+                          title={isRtl ? 'انقر للمعاينة' : 'Click to preview'}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={vid.thumbnailUrl || `https://img.youtube.com/vi/${vid.videoId}/hqdefault.jpg`}
+                            alt={vid.titleEn}
+                            className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-black/30 group-hover/thumb:bg-black/10 transition-colors flex items-center justify-center">
+                            <div className="size-8 rounded-full bg-charcoal/80 text-gold flex items-center justify-center group-hover/thumb:scale-110 transition-transform shadow-md">
+                              <Play className="size-3.5 fill-gold ms-0.5" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Info */}
+                        <div className="space-y-1 min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] font-mono px-2 py-0.5 bg-stone-100 text-stone-600 border border-stone-200 uppercase tracking-wider rounded-xs">
+                              {isRtl ? vid.categoryAr || vid.categoryEn : vid.categoryEn || vid.categoryAr}
+                            </span>
+                            <span className="text-[10px] font-mono text-stone-400">
+                              ID: {vid.videoId}
+                            </span>
+                          </div>
+
+                          <h4 className="font-serif text-sm sm:text-base font-semibold text-charcoal truncate">
+                            {isRtl ? vid.titleAr || vid.titleEn : vid.titleEn || vid.titleAr}
+                          </h4>
+
+                          {vid.titleAr && vid.titleEn && (
+                            <p className="text-xs text-stone-500 truncate font-light">
+                              {isRtl ? vid.titleEn : vid.titleAr}
+                            </p>
+                          )}
+
+                          <a
+                            href={vid.youtubeUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] text-stone-500 hover:text-gold transition-colors font-mono"
+                          >
+                            <ExternalLink className="size-3" />
+                            <span className="truncate max-w-xs">{vid.youtubeUrl}</span>
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* Right: Actions */}
+                      <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewVideoModal(vid)}
+                          className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-charcoal text-xs font-medium transition-colors flex items-center gap-1 rounded-xs cursor-pointer"
+                          title={isRtl ? 'تشغيل ومعاينة' : 'Preview video'}
+                        >
+                          <Play className="size-3 text-gold fill-gold" />
+                          <span>{isRtl ? 'معاينة' : 'Preview'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleEditVideo(vid)}
+                          className="px-3 py-1.5 border border-[#E7E2D8] hover:border-gold hover:text-gold bg-white text-xs font-medium text-charcoal transition-colors flex items-center gap-1 rounded-xs cursor-pointer"
+                          title={isRtl ? 'تعديل بيانات الفيديو' : 'Edit video'}
+                        >
+                          <Edit2 className="size-3" />
+                          <span>{isRtl ? 'تعديل' : 'Edit'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteVideo(vid)}
+                          className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors rounded-xs cursor-pointer"
+                          title={isRtl ? 'حذف الفيديو' : 'Delete video'}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Preview Lightbox Modal */}
+          {previewVideoModal && (
+            <div
+              className="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-4"
+              onClick={() => setPreviewVideoModal(null)}
+            >
+              <div
+                className="bg-[#11110F] border border-stone-700 max-w-4xl w-full rounded-xs overflow-hidden shadow-2xl animate-scale-in"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-[#161513]">
+                  <div className="flex items-center gap-2">
+                    <Film className="w-4 h-4 text-gold" />
+                    <h3 className="font-serif text-sm text-ivory truncate max-w-lg">
+                      {isRtl
+                        ? previewVideoModal.titleAr || previewVideoModal.titleEn
+                        : previewVideoModal.titleEn || previewVideoModal.titleAr}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewVideoModal(null)}
+                    className="p-1 text-ivory/60 hover:text-ivory cursor-pointer"
+                  >
+                    <X className="size-5" />
+                  </button>
+                </div>
+                <div className="relative aspect-video w-full bg-black">
+                  <iframe
+                    src={getYouTubeEmbedUrl(previewVideoModal.videoId, true)}
+                    title={previewVideoModal.titleEn}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

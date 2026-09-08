@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
-import { MapPin, ArrowUpRight } from 'lucide-react'
+import { MapPin, ArrowUpRight, Compass, Navigation } from 'lucide-react'
 import { SectionIndex, Display } from '@/components/site/primitives'
 import { Reveal } from '@/components/site/reveal'
 import { useLanguage } from '@/lib/i18n'
@@ -12,6 +12,7 @@ import {
   LTR_PINS,
   RTL_PINS,
 } from '@/lib/data/map-paths'
+import { resolveTerritoryInfo, TerritoryInfo, VIWAN_HUBS } from '@/lib/data/country-metadata'
 
 export interface CountryProjectData {
   id: 'egypt' | 'saudi' | 'syria'
@@ -20,6 +21,7 @@ export interface CountryProjectData {
   nameAr: string
   hubEn: string
   hubAr: string
+  coordinates: string
   projectsCount: number
   descriptionEn: string
   descriptionAr: string
@@ -34,6 +36,7 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
     nameAr: 'مصر',
     hubEn: 'Cairo & New Cairo · Main Headquarters',
     hubAr: 'القاهرة والقاهرة الجديدة · المقر الرئيسي',
+    coordinates: '30.0444° N, 31.2357° E',
     projectsCount: 28,
     descriptionEn:
       'Main headquarters delivering 28+ luxury residences, commercial headquarters, and integrated masterplans across New Cairo, Katameya, and the Red Sea.',
@@ -53,6 +56,7 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
     nameAr: 'المملكة العربية السعودية',
     hubEn: 'Riyadh & Diriyah · Regional Office',
     hubAr: 'الرياض والدرعية · المكتب الإقليمي',
+    coordinates: '24.7136° N, 46.6753° E',
     projectsCount: 14,
     descriptionEn:
       'Regional office delivering 14+ bespoke private palaces, villa compounds, and contemporary Najdi landscape masterplans across Riyadh.',
@@ -72,6 +76,7 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
     nameAr: 'سوريا',
     hubEn: 'Damascus & Latakia · Architectural Heritage',
     hubAr: 'دمشق واللاذقية · عمارة وتراث',
+    coordinates: '33.5138° N, 36.2765° E',
     projectsCount: 6,
     descriptionEn:
       'Delivering 6 landmark private estates, courtyard heritage restorations, and coastal luxury villas celebrating stone craftsmanship.',
@@ -89,6 +94,8 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
 export function RegionalMap() {
   const { lang } = useLanguage()
   const [selectedId, setSelectedId] = useState<'egypt' | 'saudi' | 'syria'>('egypt')
+  const [hoveredCountry, setHoveredCountry] = useState<TerritoryInfo | null>(null)
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
 
   const active = COUNTRIES_DATA.find((c) => c.id === selectedId) || COUNTRIES_DATA[0]
 
@@ -146,7 +153,16 @@ export function RegionalMap() {
             dy={isMobile ? 1.5 : 5}
             stdDeviation={isMobile ? 1.8 : 5}
             floodColor="#C5A880"
-            floodOpacity="0.4"
+            floodOpacity="0.45"
+          />
+        </filter>
+        <filter id={`hover-glow-${isMobile ? 'm' : 'd'}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow
+            dx="0"
+            dy={isMobile ? 1 : 3}
+            stdDeviation={isMobile ? 1.2 : 3}
+            floodColor="#181715"
+            floodOpacity="0.25"
           />
         </filter>
         <filter id={`pin-shadow-${isMobile ? 'm' : 'd'}`} x="-30%" y="-30%" width="160%" height="160%">
@@ -160,30 +176,50 @@ export function RegionalMap() {
         </filter>
       </defs>
 
+      {/* Cartographic Coordinate Reference Lat/Long Lines */}
+      {!isMobile && (
+        <g className="cartographic-reference opacity-15 pointer-events-none">
+          <line x1="0" y1="255" x2="800" y2="255" stroke="#C5A880" strokeWidth="0.6" strokeDasharray="3 4" />
+          <line x1="0" y1="330" x2="800" y2="330" stroke="#C5A880" strokeWidth="0.6" strokeDasharray="4 6" />
+          <line x1={lang === 'ar' ? '368' : '498'} y1="0" x2={lang === 'ar' ? '368' : '498'} y2="600" stroke="#C5A880" strokeWidth="0.6" strokeDasharray="3 4" />
+        </g>
+      )}
+
       {/* All Countries Polygons */}
       <g className="rsm-geographies">
         {countryPaths.map((country, idx) => {
-          const matched = COUNTRIES_DATA.find((c) => c.iso === country.id)
+          const info = resolveTerritoryInfo(country)
+          const matched = COUNTRIES_DATA.find((c) => c.iso === country.id || c.id === info.id)
           const isSelected = matched?.id === selectedId
           const isWorkedCountry = Boolean(matched)
+          const isHovered =
+            (hoveredCountry?.iso && hoveredCountry.iso === country.id) ||
+            (hoveredCountry?.nameEn && hoveredCountry.nameEn === country.name)
 
           let fill = '#E7DEC9'
           let stroke = '#D7CCA8'
           let strokeWidth = isMobile ? 0.25 : 0.45
-          let cursor = 'default'
+          let cursor = 'pointer'
           let filter = 'none'
 
           if (isSelected) {
             fill = '#C5A880'
             stroke = '#181715'
-            strokeWidth = isMobile ? 0.65 : 1.2
+            strokeWidth = isMobile ? 0.75 : 1.3
             cursor = 'pointer'
             filter = `url(#gold-glow-${isMobile ? 'm' : 'd'})`
           } else if (isWorkedCountry) {
-            fill = '#DFD3BF'
-            stroke = '#C5A88090'
-            strokeWidth = isMobile ? 0.45 : 0.8
+            fill = isHovered ? '#D8C3A5' : '#DFD3BF'
+            stroke = isHovered ? '#8C6D46' : '#C5A88090'
+            strokeWidth = isMobile ? 0.5 : 0.85
             cursor = 'pointer'
+            filter = isHovered ? `url(#hover-glow-${isMobile ? 'm' : 'd'})` : 'none'
+          } else if (isHovered) {
+            fill = '#D9CCA8'
+            stroke = '#8C7355'
+            strokeWidth = isMobile ? 0.45 : 0.75
+            cursor = 'pointer'
+            filter = `url(#hover-glow-${isMobile ? 'm' : 'd'})`
           }
 
           return (
@@ -194,6 +230,16 @@ export function RegionalMap() {
               stroke={stroke}
               strokeWidth={strokeWidth}
               filter={filter}
+              onMouseEnter={(e) => {
+                setHoveredCountry(info)
+                setMousePos({ x: e.clientX, y: e.clientY })
+              }}
+              onMouseMove={(e) => {
+                setMousePos({ x: e.clientX, y: e.clientY })
+              }}
+              onMouseLeave={() => {
+                setHoveredCountry((prev) => (prev?.nameEn === info.nameEn ? null : prev))
+              }}
               onClick={() => {
                 if (matched) {
                   setSelectedId(matched.id)
@@ -202,14 +248,11 @@ export function RegionalMap() {
               style={{
                 outline: 'none',
                 cursor,
-                transition:
-                  'fill 400ms cubic-bezier(0.16,1,0.3,1), stroke 400ms ease, transform 300ms ease',
+                transition: 'fill 300ms ease, stroke 300ms ease',
               }}
-              className={`transition-all duration-400 ${
-                isWorkedCountry ? 'hover:opacity-95 hover:brightness-105 active:scale-[0.995]' : ''
-              }`}
+              className="transition-all duration-300"
             >
-              <title>{country.name}</title>
+              <title>{`${info.nameAr} (${info.nameEn}) - ${info.coordinates}`}</title>
             </path>
           )
         })}
@@ -414,6 +457,10 @@ export function RegionalMap() {
                   <p className="text-[10px] eyebrow text-gold/90 uppercase tracking-wider mt-0.5">
                     {lang === 'ar' ? active.hubAr : active.hubEn}
                   </p>
+                  <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-gold/80 mt-1">
+                    <Navigation className="size-2.5 text-gold" />
+                    <span>{active.coordinates}</span>
+                  </div>
                 </div>
               </div>
 
@@ -490,7 +537,7 @@ export function RegionalMap() {
         />
 
         {/* Full-bleed background map container */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-auto">
           {renderMapSvg(false)}
         </div>
 
@@ -566,6 +613,10 @@ export function RegionalMap() {
                     <p className="text-[10px] eyebrow text-gold/90 uppercase tracking-wider mt-0.5 font-medium">
                       {lang === 'ar' ? active.hubAr : active.hubEn}
                     </p>
+                    <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-gold/80 mt-1">
+                      <Navigation className="size-2.5 text-gold" />
+                      <span>{active.coordinates}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -633,6 +684,74 @@ export function RegionalMap() {
           </div>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* INTERACTIVE FLOATING CARTOGRAPHIC TOOLTIP (Follows cursor over any region) */}
+      {/* ========================================================================= */}
+      {hoveredCountry && (
+        <div
+          style={{
+            position: 'fixed',
+            left: Math.min(mousePos.x + 14, typeof window !== 'undefined' ? window.innerWidth - 270 : mousePos.x),
+            top: Math.min(mousePos.y + 14, typeof window !== 'undefined' ? window.innerHeight - 150 : mousePos.y),
+            pointerEvents: 'none',
+            zIndex: 9999,
+          }}
+          className="bg-[#12110F]/95 text-ivory border border-gold/50 px-3.5 py-2.5 rounded-xs shadow-[0_16px_36px_rgba(0,0,0,0.5)] backdrop-blur-md animate-fade-in flex flex-col gap-1 min-w-[210px] max-w-[290px] select-none"
+        >
+          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <MapPin className="size-3 text-gold shrink-0" />
+              <span className="font-serif text-xs font-semibold text-white truncate">
+                {lang === 'ar' ? hoveredCountry.nameAr : hoveredCountry.nameEn}
+              </span>
+            </div>
+            {hoveredCountry.isViwanHub ? (
+              <span className="text-[9px] font-mono font-bold text-charcoal bg-gold px-1.5 py-0.5 rounded-2xs shrink-0">
+                {hoveredCountry.projectsCount}+ {lang === 'ar' ? 'مشروع' : 'Projects'}
+              </span>
+            ) : (
+              <span className="text-[8.5px] font-mono text-ivory/60 bg-white/10 px-1.5 py-0.5 rounded-2xs shrink-0">
+                TERRITORY
+              </span>
+            )}
+          </div>
+
+          {hoveredCountry.nameAr !== hoveredCountry.nameEn && (
+            <span className="text-[10.5px] text-ivory/70 font-light truncate">
+              {lang === 'ar' ? hoveredCountry.nameEn : hoveredCountry.nameAr}
+            </span>
+          )}
+
+          <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-gold/90 mt-0.5">
+            <span className="size-1 rounded-full bg-gold" />
+            <span>{hoveredCountry.coordinates}</span>
+          </div>
+
+          {hoveredCountry.isViwanHub ? (
+            <div className="mt-1 pt-1 border-t border-white/10 text-[9.5px] text-emerald-400 flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1">
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>
+                  {hoveredCountry.id === 'egypt'
+                    ? (lang === 'ar' ? 'المقر الرئيسي · القاهرة' : 'Main HQ · Cairo')
+                    : hoveredCountry.id === 'saudi'
+                    ? (lang === 'ar' ? 'المكتب الإقليمي · الرياض' : 'Regional Office · Riyadh')
+                    : (lang === 'ar' ? 'مشاريع التراث والقصور · دمشق' : 'Heritage & Craft · Damascus')}
+                </span>
+              </span>
+              <span className="text-[8.5px] text-gold/80 font-mono">
+                {lang === 'ar' ? 'انقر للتحديد' : 'Click to select'}
+              </span>
+            </div>
+          ) : (
+            <div className="mt-1 pt-1 border-t border-white/10 text-[9px] text-ivory/50 flex items-center justify-between">
+              <span>{lang === 'ar' ? 'نطاق التغطية والاستشارات' : 'Regional Reach'}</span>
+              <span className="text-[8px] font-mono text-ivory/40">VIWAN</span>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   )
 }

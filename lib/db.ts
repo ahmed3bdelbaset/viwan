@@ -119,6 +119,10 @@ export interface CounterMetric {
   subAr: string
 }
 
+export type { YouTubeVideo } from './youtube'
+export { DEFAULT_YOUTUBE_VIDEOS } from './youtube'
+import { YouTubeVideo, DEFAULT_YOUTUBE_VIDEOS } from './youtube'
+
 export interface SiteSettings {
   // Contact & Branches
   phone: string
@@ -181,6 +185,7 @@ export interface DatabaseSchema {
   admins?: AdminUser[]
   siteImages?: SiteImageItem[]
   counters?: CounterMetric[]
+  youtubeVideos?: YouTubeVideo[]
   adminAuth?: {
     password?: string
     updatedAt?: string
@@ -323,6 +328,7 @@ function getInitialData(): DatabaseSchema {
     admins: DEFAULT_ADMINS,
     siteImages: DEFAULT_SITE_IMAGES,
     counters: DEFAULT_COUNTERS,
+    youtubeVideos: DEFAULT_YOUTUBE_VIDEOS,
   }
 }
 
@@ -352,6 +358,10 @@ export function readDb(): DatabaseSchema {
     }
     if (!Array.isArray(data.counters) || data.counters.length === 0) {
       data.counters = DEFAULT_COUNTERS
+      changed = true
+    }
+    if (!Array.isArray(data.youtubeVideos) || data.youtubeVideos.length === 0) {
+      data.youtubeVideos = DEFAULT_YOUTUBE_VIDEOS
       changed = true
     }
 

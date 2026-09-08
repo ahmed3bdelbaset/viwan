@@ -15,6 +15,7 @@ import {
 import { Eyebrow, ButtonLink } from '@/components/site/primitives'
 import { useLanguage } from '@/lib/i18n'
 import { ProjectsFaqSection } from '@/components/projects/faq-section'
+import { ProjectsVideoShowcase } from '@/components/projects/video-showcase'
 
 interface ProjectItem {
   id: string
@@ -937,7 +938,12 @@ export default function ProjectsPage() {
       </section>
 
       {/* =========================================================================
-          5. LET'S BUILD TOGETHER (Bottom Dark Banner from Reference Image 2)
+          5. ARCHITECTURAL VIDEO SHOWCASE (YouTube Integration - Zero Disk Storage)
+         ========================================================================= */}
+      <ProjectsVideoShowcase />
+
+      {/* =========================================================================
+          6. LET'S BUILD TOGETHER (Bottom Dark Banner from Reference Image 2)
           - Left: LET'S BUILD TOGETHER / Start your next project.
           - Center: Share your vision and explore how we can bring it to life...
           - Right: 30 MINUTES FREE CONSULTATION -> button
