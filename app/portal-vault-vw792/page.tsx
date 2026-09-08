@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { ViwanMark } from '@/components/ui/Icons';
 import { AuthService } from '@/lib/auth';
 import { AdminLocale, adminTranslations } from '@/lib/i18n/adminTranslations';
+import { useLanguage } from '@/lib/i18n';
 import {
   Mail,
   Lock,
@@ -105,16 +106,17 @@ const SUCCESS_DICTIONARY: Record<string, { ar: string; en: string }> = {
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { setLang } = useLanguage();
   const [locale, setLocale] = useState<AdminLocale>('ar');
   const [mode, setMode] = useState<AuthMode>('login');
 
-  // Login credentials (Remember Me completely removed)
-  const [email, setEmail] = useState('admin@viwan.studio');
+  // Login credentials (clean and empty by default)
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   // Brevo OTP Forgot Password state
-  const [forgotEmail, setForgotEmail] = useState('admin@viwan.studio');
+  const [forgotEmail, setForgotEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -206,19 +208,30 @@ export default function AdminLoginPage() {
 
   // Load saved locale & check existing auth
   useEffect(() => {
-    const saved = localStorage.getItem('viwan_admin_locale') as AdminLocale;
+    const saved = (localStorage.getItem('viwan_admin_locale') || localStorage.getItem('viwan_lang') || 'ar') as AdminLocale;
     if (saved === 'en' || saved === 'ar') {
       setLocale(saved);
+      if (setLang) setLang(saved);
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = saved;
+        document.documentElement.dir = saved === 'ar' ? 'rtl' : 'ltr';
+      }
     }
     if (AuthService.isAuthenticated()) {
       router.push('/admin');
     }
-  }, [router]);
+  }, [router, setLang]);
 
   const toggleLanguage = () => {
     const next = locale === 'ar' ? 'en' : 'ar';
     setLocale(next);
     localStorage.setItem('viwan_admin_locale', next);
+    localStorage.setItem('viwan_lang', next);
+    if (setLang) setLang(next);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = next;
+      document.documentElement.dir = next === 'ar' ? 'rtl' : 'ltr';
+    }
   };
 
   const isRtl = locale === 'ar';
@@ -425,7 +438,7 @@ export default function AdminLoginPage() {
     // and the form column is always on the right, regardless of Arabic/English language toggle!
     <div
       dir="ltr"
-      className="min-h-screen w-full relative flex flex-col justify-between overflow-x-hidden select-none bg-[#F7F4EC]"
+      className="h-[100dvh] max-h-[100dvh] w-full relative flex flex-col justify-between overflow-hidden select-none bg-[#F7F4EC] overscroll-none"
     >
       {/* ========================================================================= */}
       {/* 50/50 SPLIT BACKGROUND (Universal across all screens: Desktop & Mobile) */}
@@ -485,19 +498,19 @@ export default function AdminLoginPage() {
       {/* ========================================================================= */}
       {/* MAIN VIEWPORT WRAPPER (Top Header, Centered Floating Card, Bottom Footer) */}
       {/* ========================================================================= */}
-      <div className="relative z-20 min-h-screen flex flex-col justify-between p-4 sm:p-10 lg:p-12 overflow-y-auto">
+      <div className="relative z-20 h-full max-h-[100dvh] flex flex-col justify-between p-3.5 sm:p-8 lg:p-12 overflow-hidden overscroll-none">
         {/* Top Header Bar: Consistent placement so switching language never jumps */}
-        <div className="w-full flex items-center justify-between z-20">
+        <div className="w-full flex items-center justify-between z-20 shrink-0">
           {/* Language Toggle Button */}
           <button
             type="button"
             onClick={toggleLanguage}
-            className="px-3.5 py-1.5 rounded-full border border-white/50 lg:border-[#E5DFD3] bg-white/80 lg:bg-white text-xs text-[#1C1B19] hover:text-[#8C6D45] hover:border-[#8C6D45] transition-all flex items-center gap-1.5 shadow-2xs backdrop-blur-md cursor-pointer active:scale-95 font-medium"
-            title={isRtl ? 'التبديل إلى الإنجليزية' : 'Switch to Arabic'}
+            className="px-3.5 py-1.5 rounded-full border border-white/50 lg:border-[#E5DFD3] bg-white/80 lg:bg-white text-xs text-[#1C1B19] hover:text-[#8C6D45] hover:border-[#8C6D45] transition-all flex items-center gap-1.5 shadow-2xs backdrop-blur-md cursor-pointer active:scale-95 font-medium z-30 select-none"
+            title={isRtl ? 'Switch to English' : 'التبديل إلى العربية'}
           >
             <Globe className="w-3.5 h-3.5 text-[#8C6D45]" />
-            <span className="font-semibold uppercase tracking-wider text-[11px]">
-              {locale === 'ar' ? 'AR' : 'EN'}
+            <span className="font-semibold tracking-wider text-[11px]">
+              {locale === 'ar' ? 'English' : 'العربية'}
             </span>
           </button>
 
@@ -511,7 +524,7 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Center Stage: The Luxury Floating Form Card Centered in the middle of the screen */}
-        <div className="w-full flex items-center justify-center my-auto py-3 sm:py-8">
+        <div className="w-full flex-1 flex items-center justify-center my-auto py-1 sm:py-6 overflow-y-auto sm:overflow-visible">
           <div
             dir={isRtl ? 'rtl' : 'ltr'}
             className={`w-[82%] sm:w-full max-w-[305px] sm:max-w-[440px] bg-gradient-to-r from-[#FAF6EE]/45 via-[#FAF6EE]/70 to-[#FAF6EE]/92 backdrop-blur-md rounded-[20px] sm:rounded-[26px] p-3.5 sm:p-8 border border-white/60 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-3 sm:space-y-5 transition-all duration-300 ${
@@ -577,7 +590,7 @@ export default function AdminLoginPage() {
                         dir="ltr"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="admin@viwan.studio"
+                        placeholder="example@email.com"
                         className="w-full bg-transparent p-2.5 sm:p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-sans font-medium"
                       />
                     </div>
@@ -615,7 +628,7 @@ export default function AdminLoginPage() {
                       type="button"
                       onClick={() => {
                         clearMessages();
-                        setForgotEmail(email || 'admin@viwan.studio');
+                        setForgotEmail(email || '');
                         setMode('forgot-1');
                       }}
                       className="text-[11px] sm:text-xs text-[#8C6D45] hover:text-[#111111] hover:underline transition-colors font-medium cursor-pointer"
@@ -748,7 +761,7 @@ export default function AdminLoginPage() {
                             dir="ltr"
                             value={forgotEmail}
                             onChange={(e) => setForgotEmail(e.target.value)}
-                            placeholder="admin@viwan.studio"
+                            placeholder="example@email.com"
                             className="w-full bg-transparent p-2.5 sm:p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-sans font-medium"
                           />
                         </div>
@@ -996,7 +1009,7 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Bottom Footer Row: Centered, Responsive, and styled in Luxury Bronze (#8C6D45) */}
-        <div className="w-full z-20 pt-4 pb-2 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase select-none">
+        <div className="w-full z-20 pt-2 pb-1 sm:pt-4 sm:pb-2 shrink-0 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase select-none">
           {/* Left Narrative Snippet (Desktop) */}
           <div className="hidden md:flex items-center gap-2 text-stone-300/80 font-serif">
             <span className="text-xs font-cinzel text-stone-200">Designing a Better Tomorrow</span>

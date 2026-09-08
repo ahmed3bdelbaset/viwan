@@ -16,9 +16,9 @@ export function ContactSection() {
   const [state, setState]   = useState<"idle"|"sending"|"sent"|"error">("idle")
 
   useEffect(() => {
-    fetch("/api/public/site-config")
+    fetch("/api/settings")
       .then(r => r.ok ? r.json() : null)
-      .then(d => d && setConfig(d))
+      .then(d => d && setConfig(d?.settings || d))
       .catch(() => {})
   }, [])
 

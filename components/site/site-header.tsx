@@ -121,7 +121,10 @@ export function SiteHeader() {
     return ''
   }
 
-  const isAdminOrGateway = pathname?.startsWith('/studio-gateway-vw') || pathname?.startsWith('/admin')
+  const isAdminOrGateway =
+    pathname?.startsWith('/studio-gateway-vw') ||
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/portal-vault')
 
   if (isAdminOrGateway) return null
 

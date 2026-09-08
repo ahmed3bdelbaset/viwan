@@ -154,12 +154,12 @@ export function proxy(request: NextRequest) {
   // Content Security Policy
   const cspHeader = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://va.vercel-scripts.com https://maps.googleapis.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://va.vercel-scripts.com https://maps.googleapis.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
     "frame-src 'self' https://www.google.com https://maps.google.com https://*.google.com https://www.youtube.com https://www.youtube-nocookie.com https://*.youtube.com",
-    "connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com",
+    "connect-src 'self' https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://*.googletagmanager.com https://www.googletagmanager.com https://*.googleapis.com https://*.google.com https://*.gstatic.com https://stats.g.doubleclick.net https://*.doubleclick.net",
     "frame-ancestors 'none'",
     "object-src 'none'",
     "base-uri 'self'",
