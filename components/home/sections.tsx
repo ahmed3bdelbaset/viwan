@@ -610,19 +610,19 @@ export function HomeImpactSection() {
   ]
 
   const clientLogos = [
-    { name: 'EMAAR', component: <EmaarLogo className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto" /> },
-    { name: 'SODIC', component: <SodicLogo className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto" /> },
-    { name: 'TMG', component: <TmgLogo className="h-9 sm:h-11 md:h-12 lg:h-14 w-auto" /> },
-    { name: 'ALMARASEM', component: <AlMarasemLogo className="h-10 sm:h-12 md:h-13 lg:h-15 w-auto" /> },
-    { name: 'HYDE PARK', component: <HydeParkLogo className="h-8 sm:h-10 md:h-11 lg:h-13 w-auto" /> },
-    { name: 'MISR ITALIA', component: <MisrItaliaLogo className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto" /> },
+    { name: 'EMAAR', component: <EmaarLogo className="h-5 sm:h-7 md:h-9 lg:h-11 w-auto max-w-[85%]" /> },
+    { name: 'SODIC', component: <SodicLogo className="h-5 sm:h-7 md:h-9 lg:h-11 w-auto max-w-[85%]" /> },
+    { name: 'TMG', component: <TmgLogo className="h-6 sm:h-8 md:h-10 lg:h-13 w-auto max-w-[85%]" /> },
+    { name: 'ALMARASEM', component: <AlMarasemLogo className="h-6 sm:h-8 md:h-11 lg:h-14 w-auto max-w-[85%]" /> },
+    { name: 'HYDE PARK', component: <HydeParkLogo className="h-5 sm:h-7 md:h-9 lg:h-12 w-auto max-w-[85%]" /> },
+    { name: 'MISR ITALIA', component: <MisrItaliaLogo className="h-5 sm:h-7 md:h-9 lg:h-11 w-auto max-w-[85%]" /> },
   ]
 
   return (
     <section
       ref={sectionRef}
       id="impact"
-      className="relative py-16 sm:py-24 md:py-32 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30 overflow-hidden select-none"
+      className="relative pt-28 pb-10 sm:pt-24 sm:pb-24 md:py-32 bg-[#FAF8F5] dark:bg-[#12110F] border-t border-stone/30 overflow-hidden select-none"
     >
       {/* Realistic Parallax Airplane Banner Background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 select-none">
@@ -649,28 +649,28 @@ export function HomeImpactSection() {
               alt="Realistic Airplane Towing VIWAN Architecture Banner Over Coastal Sea"
               fill
               sizes="100vw"
-              className="object-cover object-center"
+              className="object-cover object-[center_15%] sm:object-center"
               priority={false}
             />
           </div>
         </div>
 
         {/* Luxury Vignette & Soft Gradient Transition for Clean Architectural Integration */}
-        <div className="absolute inset-0 bg-[#FAF8F5]/30 dark:bg-black/50 pointer-events-none" />
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#FAF8F5] dark:from-[#12110F] via-[#FAF8F5]/60 dark:via-[#12110F]/60 to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FAF8F5] dark:from-[#12110F] via-[#FAF8F5]/60 dark:via-[#12110F]/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-[#FAF8F5]/20 dark:bg-black/40 pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-16 sm:h-28 bg-gradient-to-b from-[#FAF8F5]/80 dark:from-[#12110F]/80 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-20 sm:h-28 bg-gradient-to-t from-[#FAF8F5] dark:from-[#12110F] via-[#FAF8F5]/60 dark:via-[#12110F]/60 to-transparent pointer-events-none" />
       </div>
 
       <div className="container-viwan relative z-10">
-        {/* Main Architectural Unified Grid Box with Frosted Transparency */}
-        <div className="border border-[#E7E2D8] dark:border-stone-800 bg-white/94 dark:bg-[#161513]/94 backdrop-blur-md shadow-lg">
+        {/* Main Architectural Unified Grid Box with Frosted Luxury Glassmorphism */}
+        <div className="border border-white/60 dark:border-white/15 bg-white/50 dark:bg-[#12110F]/65 backdrop-blur-xl sm:backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.4)]">
           
           {/* ========================================================================= */}
-          {/* ROW 1: 06 / OUR IMPACT (Full Width, Big High-Impact Typography) */}
+          {/* ROW 1: 06 / OUR IMPACT (Full Width, Compact on Mobile, Big Typography)    */}
           {/* ========================================================================= */}
-          <div className="p-6 sm:p-10 md:p-14 lg:p-16 border-b border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-8 sm:gap-10">
+          <div className="p-3.5 sm:p-8 md:p-12 lg:p-14 border-b border-[#E7E2D8]/60 dark:border-white/10 flex flex-col justify-between gap-3 sm:gap-8">
             {/* Tag / Eyebrow */}
-            <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+            <div className="text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-1.5 sm:gap-2">
               <span className="text-gold font-bold">06</span>
               <span className="text-stone-300 dark:text-stone-700">/</span>
               <span className="font-semibold text-charcoal dark:text-ivory">
@@ -678,8 +678,8 @@ export function HomeImpactSection() {
               </span>
             </div>
 
-            {/* 4 Metric Columns with vertical dividers, generous spacing, and large prominent serif numbers */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 pt-2">
+            {/* 4 Metric Columns: 2x2 on Mobile (Ultra-Clean), 4 across on Desktop */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8]/60 dark:divide-white/10 pt-1">
               {metrics.map((m: any, idx: number) => {
                 const isArea = idx === 1 || m.value.includes('1M') || m.label?.toLowerCase().includes('design') || m.label?.includes('تصميم')
                 const rawNum = m.value.replace(' m²', '').replace('م²', '').trim()
@@ -687,15 +687,15 @@ export function HomeImpactSection() {
                 return (
                   <div
                     key={idx}
-                    className="py-6 sm:py-8 lg:py-2 px-4 sm:px-8 lg:px-12 first:ps-0 last:pe-0 flex flex-col justify-center"
+                    className="py-2.5 sm:py-6 lg:py-2 px-2 sm:px-6 lg:px-10 first:ps-0 last:pe-0 flex flex-col justify-center"
                   >
-                    <div className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light text-charcoal dark:text-ivory tracking-tight leading-none mb-3 sm:mb-4">
+                    <div className="font-serif text-2xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-light text-charcoal dark:text-ivory tracking-tight leading-none mb-1 sm:mb-2">
                       <CountUp value={rawNum} />
                     </div>
-                    <div className="text-xs sm:text-sm md:text-base text-stone-600 dark:text-stone-400 font-medium tracking-wide">
+                    <div className="text-[10px] sm:text-xs md:text-sm text-stone-600 dark:text-stone-300 font-medium tracking-wide">
                       {isArea ? (
                         <div className="flex flex-col">
-                          <span className="font-serif text-base sm:text-lg md:text-xl font-normal text-charcoal dark:text-ivory leading-tight">
+                          <span className="font-serif text-xs sm:text-base md:text-lg font-normal text-charcoal dark:text-ivory leading-tight">
                             {lang === 'ar' ? 'م²' : 'm²'}
                           </span>
                           <span className="mt-0.5">{m.label}</span>
@@ -711,11 +711,11 @@ export function HomeImpactSection() {
           </div>
 
           {/* ========================================================================= */}
-          {/* ROW 2: 07 / SELECTED CLIENTS (Full Width, 6 Logos Across The Entire Strip) */}
+          {/* ROW 2: 07 / SELECTED CLIENTS (3 Columns on Mobile, 6 on Desktop)         */}
           {/* ========================================================================= */}
-          <div className="p-6 sm:p-10 md:p-12 lg:p-14 border-b border-[#E7E2D8] dark:border-stone-800 flex flex-col justify-between gap-8 sm:gap-10">
+          <div className="p-3.5 sm:p-8 md:p-10 lg:p-12 border-b border-[#E7E2D8]/60 dark:border-white/10 flex flex-col justify-between gap-3 sm:gap-6">
             {/* Tag / Eyebrow */}
-            <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+            <div className="text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-1.5 sm:gap-2">
               <span className="text-gold font-bold">07</span>
               <span className="text-stone-300 dark:text-stone-700">/</span>
               <span className="font-semibold text-charcoal dark:text-ivory">
@@ -723,10 +723,10 @@ export function HomeImpactSection() {
               </span>
             </div>
 
-            {/* 6 Client Logos: Clean Cards on Mobile (Zero Overlap), Full-Width Spacious Architectural Divider Strip on Desktop */}
+            {/* 6 Client Logos: 3x2 on Mobile (compact), 6 Across on Desktop */}
             <div
               ref={clientsRef}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8] dark:divide-stone-800 items-center w-full"
+              className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-0 lg:divide-x rtl:lg:divide-x-reverse divide-[#E7E2D8]/60 dark:divide-white/10 items-center w-full"
             >
               {clientLogos.map((client, idx) => (
                 <div
@@ -734,7 +734,7 @@ export function HomeImpactSection() {
                   style={{
                     transitionDelay: `${idx * 80}ms`,
                   }}
-                  className={`bg-[#FAF8F5]/80 dark:bg-[#161513] lg:bg-transparent border border-[#E7E2D8] dark:border-stone-800/80 lg:border-none p-4 sm:p-6 lg:px-6 lg:py-8 flex items-center justify-center min-h-[92px] sm:min-h-[110px] lg:min-h-[140px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-all duration-700 ease-out group ${
+                  className={`bg-white/40 dark:bg-white/5 lg:bg-transparent border border-white/50 dark:border-white/10 lg:border-none p-2 sm:p-3 lg:px-6 lg:py-6 flex items-center justify-center min-h-[52px] sm:min-h-[70px] lg:min-h-[120px] text-charcoal/80 dark:text-ivory/80 hover:text-gold dark:hover:text-gold transition-all duration-700 ease-out group ${
                     logosVisible
                       ? 'opacity-100 translate-y-0 scale-100 filter-none'
                       : 'opacity-0 translate-y-6 scale-90 blur-[1px]'
@@ -751,10 +751,10 @@ export function HomeImpactSection() {
           {/* ========================================================================= */}
           {/* ROW 3: 08 / CLIENT FEEDBACK (Full Width, Underneath Section 07)           */}
           {/* ========================================================================= */}
-          <div className="p-6 sm:p-10 md:p-12 lg:p-14 bg-[#FAF8F5]/50 dark:bg-[#141311]/50 flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-12">
-            <div className="flex flex-col gap-3 max-w-3xl">
+          <div className="p-3.5 sm:p-8 md:p-10 lg:p-12 bg-white/25 dark:bg-black/25 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-12">
+            <div className="flex flex-col gap-2 sm:gap-3 max-w-3xl">
               {/* Tag / Eyebrow */}
-              <div className="text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-2">
+              <div className="text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-stone-500 flex items-center gap-1.5 sm:gap-2">
                 <span className="text-gold font-bold">08</span>
                 <span className="text-stone-300 dark:text-stone-700">/</span>
                 <span className="font-semibold text-charcoal dark:text-ivory">
@@ -763,9 +763,9 @@ export function HomeImpactSection() {
               </div>
 
               {/* Quote */}
-              <div className="flex items-start gap-3.5 pt-1">
-                <span className="text-3xl sm:text-4xl text-gold font-serif leading-none shrink-0 select-none">“</span>
-                <p className="font-serif text-sm sm:text-base md:text-lg text-stone-800 dark:text-stone-200 leading-relaxed font-light italic">
+              <div className="flex items-start gap-2 sm:gap-3.5 pt-0.5">
+                <span className="text-2xl sm:text-4xl text-gold font-serif leading-none shrink-0 select-none">“</span>
+                <p className="font-serif text-xs sm:text-base md:text-lg text-stone-800 dark:text-stone-200 leading-relaxed font-light italic">
                   {isRtl
                     ? '“فهمت VIWAN المشروع كتجربة معمارية متكاملة، وليس مجرد مجموعة من القرارات التصميمية المنفصلة.”'
                     : '“VIWAN understood the project as a complete experience, not a collection of separate design decisions.”'}
@@ -774,11 +774,11 @@ export function HomeImpactSection() {
             </div>
 
             {/* Attribution with fine hairline border on desktop */}
-            <div className="shrink-0 flex md:flex-col md:items-end justify-start gap-1 font-mono text-xs text-stone-500 border-t md:border-t-0 md:border-s rtl:md:border-s-0 rtl:md:border-e border-[#E7E2D8] dark:border-stone-800 pt-3 md:pt-0 md:ps-8 rtl:md:ps-0 rtl:md:pe-8">
+            <div className="shrink-0 flex md:flex-col md:items-end justify-start gap-1 font-mono text-[10px] sm:text-xs text-stone-500 border-t md:border-t-0 md:border-s rtl:md:border-s-0 rtl:md:border-e border-[#E7E2D8]/60 dark:border-white/10 pt-2.5 md:pt-0 md:ps-8 rtl:md:ps-0 rtl:md:pe-8">
               <span className="font-semibold text-charcoal dark:text-ivory tracking-wide">
                 {isRtl ? 'عميل إقامة خاصة' : 'Private Residence Client'}
               </span>
-              <span className="text-gold text-[10px] tracking-widest">
+              <span className="text-gold text-[9px] sm:text-[10px] tracking-widest">
                 {isRtl ? 'القاهرة الجديدة · مصر' : 'NEW CAIRO · EGYPT'}
               </span>
             </div>
