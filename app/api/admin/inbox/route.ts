@@ -1,8 +1,23 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { readDb, writeDb } from '@/lib/db'
+import { verifySecureAdminToken } from '@/lib/security'
 
-export async function GET() {
+async function checkAdminAuth(req: Request): Promise<boolean> {
+  const cookieStore = await cookies()
+  const token =
+    cookieStore.get('viwan_admin_token')?.value ||
+    req.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
+
+  return verifySecureAdminToken(token).valid
+}
+
+export async function GET(req: Request) {
   try {
+    if (!(await checkAdminAuth(req))) {
+      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+    }
+
     const db = readDb()
     return NextResponse.json({
       success: true,
@@ -16,6 +31,10 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    if (!(await checkAdminAuth(req))) {
+      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+    }
+
     const { id, type, status } = await req.json()
     const db = readDb()
 
@@ -40,6 +59,10 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    if (!(await checkAdminAuth(req))) {
+      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(req.url)
     const id = searchParams.get('id')
     const type = searchParams.get('type')

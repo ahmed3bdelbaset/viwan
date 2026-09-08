@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import crypto from 'crypto';
 import { isAuthorizedAdminEmail, getAdminPassword } from '@/lib/admin-auth';
 import { INITIAL_ADMIN_USERS } from '@/lib/data/seed';
+import { createSecureAdminToken } from '@/lib/security';
 
 export async function POST(req: Request) {
   try {
@@ -24,16 +26,23 @@ export async function POST(req: Request) {
     }
 
     const currentPassword = getAdminPassword(email);
-    const isMasterPassword = password === 'admin123' || password === 'viwan_admin_2026' || password === currentPassword;
+    let isPasswordCorrect = false;
+    try {
+      const bufA = Buffer.from(password);
+      const bufB = Buffer.from(currentPassword);
+      if (bufA.length === bufB.length) {
+        isPasswordCorrect = crypto.timingSafeEqual(bufA, bufB);
+      }
+    } catch {}
 
     // Check against authorized emails or initial users
     const matchedSeedUser = INITIAL_ADMIN_USERS.find(
       (u) => u.email.toLowerCase() === email
     );
 
-    const isAuthorized = isAuthorizedAdminEmail(email) || !!matchedSeedUser || email.includes('admin') || email.includes('viwan');
+    const isAuthorized = isAuthorizedAdminEmail(email) || !!matchedSeedUser;
 
-    if (!isAuthorized || !isMasterPassword) {
+    if (!isAuthorized || !isPasswordCorrect) {
       return NextResponse.json(
         {
           success: false,
@@ -59,7 +68,7 @@ export async function POST(req: Request) {
       createdAt: '2024-01-15',
     };
 
-    const token = Buffer.from(`${email}:${Date.now()}:viwan_secret`).toString('base64');
+    const token = createSecureAdminToken(email);
 
     const cookieStore = await cookies();
     cookieStore.set('viwan_admin_token', token, {

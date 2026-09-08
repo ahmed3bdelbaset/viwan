@@ -30,34 +30,6 @@ export const AuthService = {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        // Graceful fallback for local development or demo credentials
-        if (
-          pass === 'admin123' ||
-          pass === 'viwan_admin_2026' ||
-          email.toLowerCase().includes('admin') ||
-          email.toLowerCase().includes('viwan') ||
-          email.toLowerCase().includes('@')
-        ) {
-          const fallbackUser: AdminUser = {
-            id: 'usr-1',
-            name: 'Tarek Mansour',
-            name_ar: 'طارق منصور',
-            email: email,
-            role: 'Super Admin',
-            role_ar: 'المدير العام وكبير المعماريين',
-            phone: '+20 100 234 5678',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop',
-            status: 'Active',
-            createdAt: '2024-01-15'
-          };
-          inMemoryAccessToken = 'client-token';
-          inMemoryCurrentUser = fallbackUser;
-          if (typeof window !== 'undefined') {
-            sessionStorage.setItem('viwan_active_session', JSON.stringify({ user: fallbackUser, expiresAt: Date.now() + 86400000 }));
-          }
-          return { success: true, token: 'client-token', user: fallbackUser };
-        }
-
         return {
           success: false,
           code: data.code || 'INVALID_CREDENTIALS',
@@ -83,31 +55,6 @@ export const AuthService = {
         user: data.user,
       };
     } catch (err: any) {
-      if (
-        pass === 'admin123' ||
-        pass === 'viwan_admin_2026' ||
-        email.toLowerCase().includes('admin') ||
-        email.toLowerCase().includes('viwan')
-      ) {
-        const fallbackUser: AdminUser = {
-          id: 'usr-1',
-          name: 'Tarek Mansour',
-          name_ar: 'طارق منصور',
-          email: email,
-          role: 'Super Admin',
-          role_ar: 'المدير العام وكبير المعماريين',
-          phone: '+20 100 234 5678',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop',
-          status: 'Active',
-          createdAt: '2024-01-15'
-        };
-        inMemoryAccessToken = 'client-token';
-        inMemoryCurrentUser = fallbackUser;
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('viwan_active_session', JSON.stringify({ user: fallbackUser, expiresAt: Date.now() + 86400000 }));
-        }
-        return { success: true, token: 'client-token', user: fallbackUser };
-      }
       return {
         success: false,
         error: 'Network or server error during authentication.',

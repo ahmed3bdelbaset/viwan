@@ -57,6 +57,8 @@ export default function ContactPage() {
   })
   const [isCustomLocation, setIsCustomLocation] = useState(false)
   const [customLocationText, setCustomLocationText] = useState('')
+  const [honeypot, setHoneypot] = useState('')
+  const [formLoadedAt] = useState(() => Date.now())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -75,6 +77,8 @@ export default function ContactPage() {
         body: JSON.stringify({
           ...form,
           projectLocation: finalLocation,
+          _gotcha_company_title: honeypot,
+          _formLoadedAt: formLoadedAt,
         }),
       })
       const data = await res.json()
@@ -219,6 +223,20 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                {/* Invisible Honeypot Trap for Bot Detection */}
+                <div style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }} aria-hidden="true">
+                  <label htmlFor="inquiry-company-title-hp">Do not fill this</label>
+                  <input
+                    id="inquiry-company-title-hp"
+                    type="text"
+                    name="_gotcha_company_title"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
+
                 {error && (
                   <div
                     role="alert"

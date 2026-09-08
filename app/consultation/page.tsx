@@ -23,6 +23,8 @@ export default function ConsultationPage() {
     preferredTime: 'Morning (10:00 – 12:00)',
     notes: '',
   })
+  const [honeypot, setHoneypot] = useState('')
+  const [formLoadedAt] = useState(() => Date.now())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +35,11 @@ export default function ConsultationPage() {
       const res = await fetch('/api/consultation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          _gotcha_project_scope: honeypot,
+          _formLoadedAt: formLoadedAt,
+        }),
       })
       const data = await res.json()
 
@@ -191,6 +197,20 @@ export default function ConsultationPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                {/* Invisible Honeypot Trap for Bot Detection */}
+                <div style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }} aria-hidden="true">
+                  <label htmlFor="consult-scope-hp">Do not fill this</label>
+                  <input
+                    id="consult-scope-hp"
+                    type="text"
+                    name="_gotcha_project_scope"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
+
                 {error && (
                   <div role="alert" aria-live="polite" className="p-4 bg-red-950/10 border border-red-500/30 text-red-600 text-xs eyebrow">
                     {error}
