@@ -18,13 +18,13 @@ export const AuthService = {
   login: async (
     email: string,
     pass: string,
-    remember: boolean = false
-  ): Promise<{ success: boolean; token?: string; user?: AdminUser; error?: string; retryAfter?: number }> => {
+    locale?: string
+  ): Promise<{ success: boolean; token?: string; user?: AdminUser; error?: string; code?: string; retryAfter?: number }> => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: pass, remember }),
+        body: JSON.stringify({ email, password: pass, locale }),
       });
 
       const data = await res.json();
@@ -60,6 +60,7 @@ export const AuthService = {
 
         return {
           success: false,
+          code: data.code || 'INVALID_CREDENTIALS',
           error: data.error || 'Authentication failed',
           retryAfter: data.retryAfter,
         };

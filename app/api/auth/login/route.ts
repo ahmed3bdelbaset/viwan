@@ -9,8 +9,18 @@ export async function POST(req: Request) {
     const email = (body.email || '').trim().toLowerCase();
     const password = body.password || '';
 
+    const locale = body.locale || 'ar';
+    const isEn = locale === 'en';
+
     if (!email || !password) {
-      return NextResponse.json({ success: false, error: 'Email and password are required' }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'REQUIRED_FIELDS',
+          error: isEn ? 'Email and password are required' : 'يرجى إدخال البريد الإلكتروني وكلمة المرور',
+        },
+        { status: 400 }
+      );
     }
 
     const currentPassword = getAdminPassword(email);
@@ -25,7 +35,13 @@ export async function POST(req: Request) {
 
     if (!isAuthorized || !isMasterPassword) {
       return NextResponse.json(
-        { success: false, error: 'بيانات الدخول غير صحيحة، يرجى التحقق من البريد وكلمة المرور' },
+        {
+          success: false,
+          code: 'INVALID_CREDENTIALS',
+          error: isEn
+            ? 'Invalid credentials, please check your email and password.'
+            : 'بيانات الدخول غير صحيحة، يرجى التحقق من البريد وكلمة المرور',
+        },
         { status: 401 }
       );
     }

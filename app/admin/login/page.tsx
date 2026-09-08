@@ -25,16 +25,93 @@ import {
 
 type AuthMode = 'login' | 'forgot-1' | 'forgot-2' | 'forgot-3' | 'forgot-success';
 
+const ERROR_DICTIONARY: Record<string, { ar: string; en: string }> = {
+  ACCOUNT_NOT_FOUND: {
+    ar: 'هذا الحساب غير مسجل لدينا في سجلات الإدارة',
+    en: 'This account is not registered in our system.',
+  },
+  INVALID_CREDENTIALS: {
+    ar: 'بيانات الدخول غير صحيحة، يرجى التحقق من البريد وكلمة المرور',
+    en: 'Invalid credentials. Please check your email and password.',
+  },
+  REQUIRED_FIELDS: {
+    ar: 'يرجى إدخال البريد الإلكتروني وكلمة المرور',
+    en: 'Please enter your email and password.',
+  },
+  INVALID_EMAIL: {
+    ar: 'يرجى إدخال بريد إلكتروني صالح',
+    en: 'Please enter a valid email address.',
+  },
+  SEND_FAILED: {
+    ar: 'تعذر إرسال كود التحقق عبر Brevo. يرجى المحاولة لاحقاً.',
+    en: 'Failed to send verification code via Brevo. Please try again.',
+  },
+  INVALID_OTP: {
+    ar: 'كود التحقق غير صحيح أو انتهت صلاحيته',
+    en: 'Invalid or expired verification code.',
+  },
+  OTP_SHORT: {
+    ar: 'يرجى إدخال كود التحقق المكون من 6 أرقام',
+    en: 'Please enter the 6-digit verification code.',
+  },
+  EXPIRED_OTP: {
+    ar: 'انتهت صلاحية كود التحقق (10 دقائق). يرجى طلب كود جديد.',
+    en: 'Verification code expired (10 minutes). Please request a new code.',
+  },
+  EXPIRED_TOKEN: {
+    ar: 'انتهت صلاحية جلسة إعادة التعيين، يرجى طلب كود جديد.',
+    en: 'Reset session expired. Please request a new code.',
+  },
+  PASSWORD_TOO_SHORT: {
+    ar: 'يجب ألا تقل كلمة المرور عن 6 خانات',
+    en: 'Password must be at least 6 characters long.',
+  },
+  PASSWORD_MISMATCH: {
+    ar: 'كلمتا المرور غير متطابقتين',
+    en: 'Passwords do not match.',
+  },
+  SAVE_FAILED: {
+    ar: 'فشل تحديث كلمة المرور في قاعدة البيانات',
+    en: 'Failed to update password in database.',
+  },
+  SERVER_ERROR: {
+    ar: 'حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة لاحقاً',
+    en: 'A server connection error occurred. Please try again later.',
+  },
+  AUTH_FAILED: {
+    ar: 'فشل التحقق من بيانات الدخول',
+    en: 'Authentication failed. Please check your credentials.',
+  },
+};
+
+const SUCCESS_DICTIONARY: Record<string, { ar: string; en: string }> = {
+  OTP_SENT: {
+    ar: 'تم إرسال كود التحقق بنجاح عبر Brevo إلى بريدك المسجل.',
+    en: 'Verification code sent successfully via Brevo.',
+  },
+  OTP_RESENT: {
+    ar: 'تمت إعادة إرسال رمز التحقق عبر Brevo بنجاح.',
+    en: 'New verification code sent via Brevo successfully.',
+  },
+  OTP_VERIFIED: {
+    ar: 'تم التحقق من الرمز بنجاح.',
+    en: 'Code verified successfully.',
+  },
+  PASSWORD_RESET_SUCCESS: {
+    ar: 'تم تحديث كلمة المرور وتسجيل الدخول بنجاح!',
+    en: 'Password updated and authenticated successfully!',
+  },
+};
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [locale, setLocale] = useState<AdminLocale>('ar');
   const [mode, setMode] = useState<AuthMode>('login');
 
-  // Login credentials
+  // Login credentials (Remember Me completely removed)
   const [email, setEmail] = useState('admin@viwan.studio');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(true);
 
   // Brevo OTP Forgot Password state
   const [forgotEmail, setForgotEmail] = useState('admin@viwan.studio');
@@ -49,11 +126,40 @@ export default function AdminLoginPage() {
   const [resendCooldown, setResendCooldown] = useState(0);
   const [otpTimerSeconds, setOtpTimerSeconds] = useState(600); // 10 minutes
 
-  // Status & Feedback
+  // Status & Feedback with Reactive Bilingual Dictionaries
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [customError, setCustomError] = useState<{ ar: string; en: string } | null>(null);
+  const [successCode, setSuccessCode] = useState<string | null>(null);
+  const [customSuccess, setCustomSuccess] = useState<{ ar: string; en: string } | null>(null);
   const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
+
+  const clearMessages = () => {
+    setErrorCode(null);
+    setCustomError(null);
+    setSuccessCode(null);
+    setCustomSuccess(null);
+  };
+
+  const getErrorMessage = () => {
+    if (errorCode && ERROR_DICTIONARY[errorCode]) {
+      return ERROR_DICTIONARY[errorCode][locale];
+    }
+    if (customError) {
+      return customError[locale] || customError.ar || customError.en;
+    }
+    return null;
+  };
+
+  const getSuccessMessage = () => {
+    if (successCode && SUCCESS_DICTIONARY[successCode]) {
+      return SUCCESS_DICTIONARY[successCode][locale];
+    }
+    if (customSuccess) {
+      return customSuccess[locale] || customSuccess.ar || customSuccess.en;
+    }
+    return null;
+  };
 
   // Check URL params on mount (?mode=forgot)
   useEffect(() => {
@@ -128,22 +234,25 @@ export default function AdminLoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (retryCountdown) return;
-    setError('');
-    setSuccessMsg('');
+    clearMessages();
     setLoading(true);
 
     try {
-      const res = await AuthService.login(email, password, remember);
+      const res = await AuthService.login(email, password, locale);
       if (res.success) {
         router.push('/admin');
       } else {
         if (res.retryAfter) {
           setRetryCountdown(res.retryAfter);
         }
-        setError(res.error || (isRtl ? 'فشل التحقق من بيانات الدخول' : 'Authentication failed'));
+        if (res.code && ERROR_DICTIONARY[res.code]) {
+          setErrorCode(res.code);
+        } else {
+          setErrorCode('INVALID_CREDENTIALS');
+        }
       }
     } catch {
-      setError(isRtl ? 'حدث خطأ أثناء الاتصال بالخادم' : 'An error occurred during authentication');
+      setErrorCode('SERVER_ERROR');
     } finally {
       setLoading(false);
     }
@@ -152,13 +261,12 @@ export default function AdminLoginPage() {
   // ── 2. Brevo OTP: Step 1 - Request OTP ──────────────────────────────────────
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccessMsg('');
+    clearMessages();
     setLoading(true);
 
     const targetEmail = forgotEmail.trim().toLowerCase();
     if (!targetEmail) {
-      setError(isRtl ? 'يرجى إدخال البريد الإلكتروني' : 'Please enter your email');
+      setErrorCode('INVALID_EMAIL');
       setLoading(false);
       return;
     }
@@ -167,21 +275,21 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/admin/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'request-otp', email: targetEmail }),
+        body: JSON.stringify({ action: 'request-otp', email: targetEmail, locale }),
       });
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || (isRtl ? 'تعذر إرسال كود التحقق عبر Brevo.' : 'Failed to send OTP via Brevo.'));
+        setErrorCode(data.code || 'SEND_FAILED');
       } else {
-        setSuccessMsg(data.message || (isRtl ? 'تم إرسال كود التحقق بنجاح عبر Brevo.' : 'OTP sent successfully via Brevo.'));
+        setSuccessCode('OTP_SENT');
         setResendCooldown(60);
         setOtpTimerSeconds(600);
         setOtp('');
         setMode('forgot-2');
       }
     } catch {
-      setError(isRtl ? 'تعذر الاتصال بالخادم' : 'Server connection error');
+      setErrorCode('SERVER_ERROR');
     } finally {
       setLoading(false);
     }
@@ -190,17 +298,16 @@ export default function AdminLoginPage() {
   // ── 3. Brevo OTP: Step 2 - Verify OTP ───────────────────────────────────────
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccessMsg('');
+    clearMessages();
 
     const cleanOtp = otp.trim();
     if (cleanOtp.length < 6) {
-      setError(isRtl ? 'يرجى إدخال كود التحقق المكون من 6 أرقام' : 'Please enter the 6-digit OTP');
+      setErrorCode('OTP_SHORT');
       return;
     }
 
     if (otpTimerSeconds <= 0) {
-      setError(isRtl ? 'انتهت صلاحية كود التحقق (10 دقائق). يرجى طلب كود جديد.' : 'OTP expired. Please request a new code.');
+      setErrorCode('EXPIRED_OTP');
       return;
     }
 
@@ -214,19 +321,20 @@ export default function AdminLoginPage() {
           action: 'verify-otp',
           email: forgotEmail.trim().toLowerCase(),
           otp: cleanOtp,
+          locale,
         }),
       });
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || (isRtl ? 'كود التحقق غير صحيح' : 'Invalid OTP code'));
+        setErrorCode(data.code || 'INVALID_OTP');
       } else {
         setResetToken(data.resetToken || '');
-        setSuccessMsg('');
+        setSuccessCode('OTP_VERIFIED');
         setMode('forgot-3');
       }
     } catch {
-      setError(isRtl ? 'حدث خطأ أثناء التحقق' : 'Verification error');
+      setErrorCode('SERVER_ERROR');
     } finally {
       setLoading(false);
     }
@@ -235,16 +343,15 @@ export default function AdminLoginPage() {
   // ── 4. Brevo OTP: Step 3 - Set New Password ─────────────────────────────────
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccessMsg('');
+    clearMessages();
 
     if (newPassword.length < 6) {
-      setError(isRtl ? 'يجب ألا تقل كلمة المرور عن 6 خانات' : 'Password must be at least 6 characters');
+      setErrorCode('PASSWORD_TOO_SHORT');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError(isRtl ? 'كلمتا المرور غير متطابقتين' : 'Passwords do not match');
+      setErrorCode('PASSWORD_MISMATCH');
       return;
     }
 
@@ -259,20 +366,22 @@ export default function AdminLoginPage() {
           email: forgotEmail.trim().toLowerCase(),
           resetToken,
           newPassword,
+          locale,
         }),
       });
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || (isRtl ? 'فشل تحديث كلمة المرور' : 'Failed to update password'));
+        setErrorCode(data.code || 'SAVE_FAILED');
       } else {
+        setSuccessCode('PASSWORD_RESET_SUCCESS');
         setMode('forgot-success');
         setTimeout(() => {
           router.push('/admin');
         }, 1600);
       }
     } catch {
-      setError(isRtl ? 'حدث خطأ أثناء حفظ كلمة المرور' : 'Error updating password');
+      setErrorCode('SERVER_ERROR');
     } finally {
       setLoading(false);
     }
@@ -281,24 +390,24 @@ export default function AdminLoginPage() {
   // ── Resend OTP handler ──────────────────────────────────────────────────────
   const handleResendOtp = async () => {
     if (resendCooldown > 0 || loading) return;
-    setError('');
+    clearMessages();
     setLoading(true);
     try {
       const res = await fetch('/api/admin/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'request-otp', email: forgotEmail.trim().toLowerCase() }),
+        body: JSON.stringify({ action: 'request-otp', email: forgotEmail.trim().toLowerCase(), locale }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setSuccessMsg(isRtl ? 'تمت إعادة إرسال رمز التحقق عبر Brevo بنجاح.' : 'New OTP sent via Brevo.');
+        setSuccessCode('OTP_RESENT');
         setResendCooldown(60);
         setOtpTimerSeconds(600);
       } else {
-        setError(data.error || (isRtl ? 'تعذر إعادة إرسال الرمز' : 'Failed to resend OTP'));
+        setErrorCode(data.code || 'SEND_FAILED');
       }
     } catch {
-      setError(isRtl ? 'خطأ في الاتصال بالخادم' : 'Server error');
+      setErrorCode('SERVER_ERROR');
     } finally {
       setLoading(false);
     }
@@ -402,30 +511,30 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Center Stage: The Luxury Floating Form Card Centered in the middle of the screen */}
-        <div className="w-full flex items-center justify-center my-auto py-8">
+        <div className="w-full flex items-center justify-center my-auto py-4 sm:py-8">
           <div
             dir={isRtl ? 'rtl' : 'ltr'}
-            className={`w-full max-w-[460px] bg-gradient-to-r from-[#FAF6EE]/50 via-[#FAF6EE]/75 to-[#FAF6EE]/95 backdrop-blur-xl rounded-[26px] p-7 sm:p-10 border border-white/60 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-6 transition-all duration-300 ${
+            className={`w-[86%] sm:w-full max-w-[325px] sm:max-w-[440px] bg-gradient-to-r from-[#FAF6EE]/50 via-[#FAF6EE]/75 to-[#FAF6EE]/95 backdrop-blur-xl rounded-[20px] sm:rounded-[26px] p-4 sm:p-8 border border-white/60 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.4)] space-y-3.5 sm:space-y-5 transition-all duration-300 ${
               isRtl ? 'font-cairo' : 'font-sans'
             }`}
           >
             {/* 1. VIWAN Brand Header */}
-            <div className="text-center space-y-1.5 select-none">
-              <div className="flex justify-center mb-2">
-                <ViwanMark className="w-11 h-11" isDark={false} />
+            <div className="text-center space-y-1 select-none">
+              <div className="flex justify-center mb-1 sm:mb-2">
+                <ViwanMark className="w-8 h-8 sm:w-11 sm:h-11" isDark={false} />
               </div>
-              <h1 className="font-cinzel text-xl sm:text-2xl font-bold tracking-[0.3em] text-[#111111] uppercase">
+              <h1 className="font-cinzel text-lg sm:text-2xl font-bold tracking-[0.28em] text-[#111111] uppercase">
                 V I W A N
               </h1>
-              <p className="text-[8.5px] font-sans tracking-[0.28em] text-[#8C6D45] uppercase font-semibold">
+              <p className="text-[7.5px] sm:text-[8.5px] font-sans tracking-[0.25em] text-[#8C6D45] uppercase font-semibold">
                 ARCHITECTURE & DESIGN STUDIO
               </p>
             </div>
 
-            {/* Error Message Display */}
-            {error && (
-              <div className="p-3 bg-red-50/90 border border-red-200 text-xs text-red-700 rounded-lg space-y-1 animate-shake">
-                <p className="font-medium">{error}</p>
+            {/* Error Message Display (Dynamic reactive error switching on language change) */}
+            {getErrorMessage() && (
+              <div className="p-2.5 sm:p-3 bg-red-50/90 border border-red-200 text-xs text-red-700 rounded-lg space-y-1 animate-shake">
+                <p className="font-medium">{getErrorMessage()}</p>
                 {retryCountdown && (
                   <p className="font-mono text-amber-700 font-semibold text-[11px]">
                     {isRtl
@@ -437,10 +546,10 @@ export default function AdminLoginPage() {
             )}
 
             {/* Success Message Display */}
-            {successMsg && (
-              <div className="p-3 bg-emerald-50/90 border border-emerald-200 text-xs text-emerald-800 rounded-lg font-medium flex items-center gap-2">
+            {getSuccessMessage() && (
+              <div className="p-2.5 sm:p-3 bg-emerald-50/90 border border-emerald-200 text-xs text-emerald-800 rounded-lg font-medium flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{successMsg}</span>
+                <span>{getSuccessMessage()}</span>
               </div>
             )}
 
@@ -449,21 +558,18 @@ export default function AdminLoginPage() {
             {/* =============================================================== */}
             {mode === 'login' && (
               <>
-                <div className="text-center space-y-1 pt-1">
-                  <h2 className="text-lg sm:text-xl font-bold text-[#111111]">
-                    {t.title}
-                  </h2>
-                  <p className="text-xs text-stone-600 font-light">
+                <div className="text-center pt-0.5 select-none">
+                  <p className="text-[11px] sm:text-xs text-stone-600 font-light leading-relaxed">
                     {t.desc}
                   </p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-3 sm:space-y-4">
                   {/* Email Input */}
                   <div className="space-y-1">
                     <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
-                      <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
-                        <Mail className="w-4 h-4" />
+                      <div className="ps-3 sm:ps-3.5 text-stone-400 pointer-events-none shrink-0">
+                        <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
                       <input
                         type="email"
@@ -472,7 +578,7 @@ export default function AdminLoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="admin@viwan.studio"
-                        className="w-full bg-transparent p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-sans font-medium"
+                        className="w-full bg-transparent p-2.5 sm:p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-sans font-medium"
                       />
                     </div>
                   </div>
@@ -480,8 +586,8 @@ export default function AdminLoginPage() {
                   {/* Password Input */}
                   <div className="space-y-1">
                     <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
-                      <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
-                        <Lock className="w-4 h-4" />
+                      <div className="ps-3 sm:ps-3.5 text-stone-400 pointer-events-none shrink-0">
+                        <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
                       <input
                         type={showPassword ? 'text' : 'password'}
@@ -490,46 +596,25 @@ export default function AdminLoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        className="w-full bg-transparent p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-mono"
+                        className="w-full bg-transparent p-2.5 sm:p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-mono"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="pe-3.5 text-stone-400 hover:text-[#111111] transition-colors cursor-pointer"
+                        className="pe-3 sm:pe-3.5 text-stone-400 hover:text-[#111111] transition-colors cursor-pointer"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* Options Row: Remember Session & Forgot Password Button */}
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <label className="flex items-center gap-2 cursor-pointer select-none text-stone-600 font-medium">
-                      <button
-                        type="button"
-                        role="checkbox"
-                        aria-checked={remember}
-                        onClick={() => setRemember(!remember)}
-                        className={`w-4 h-4 rounded flex items-center justify-center transition-colors ${
-                          remember
-                            ? 'bg-[#8C6D45] border border-[#8C6D45] text-white'
-                            : 'bg-white border border-[#E5DFD3]'
-                        }`}
-                      >
-                        {remember && <Check className="w-3 h-3 stroke-[3]" />}
-                      </button>
-                      <span className="text-[11px] sm:text-xs text-stone-700">
-                        {isRtl ? 'تذكر الجلسة لمدة 30 يوماً' : 'Remember for 30 days'}
-                      </span>
-                    </label>
-
-                    {/* Forgot Password Trigger Button (Opens Brevo 3-Step Flow) */}
+                  {/* Options Row: Forgot Password Button (Remember Me completely removed) */}
+                  <div className="flex items-center justify-end text-xs pt-0.5">
                     <button
                       type="button"
                       onClick={() => {
-                        setError('');
-                        setSuccessMsg('');
+                        clearMessages();
                         setForgotEmail(email || 'admin@viwan.studio');
                         setMode('forgot-1');
                       }}
@@ -543,13 +628,13 @@ export default function AdminLoginPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-3.5 px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-2"
+                    className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-2.5 sm:py-3.5 px-5 sm:px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-1"
                   >
                     <span>{loading ? t.signingIn : (isRtl ? 'تسجيل الدخول إلى اللوحة' : 'Sign in to Dashboard')}</span>
                     {isRtl ? (
-                      <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
+                      <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:-translate-x-1 transition-transform" />
                     ) : (
-                      <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:translate-x-1 transition-transform" />
                     )}
                   </button>
                 </form>
@@ -651,11 +736,11 @@ export default function AdminLoginPage() {
                       </p>
                     </div>
 
-                    <form onSubmit={handleRequestOtp} className="space-y-4">
+                    <form onSubmit={handleRequestOtp} className="space-y-3 sm:space-y-4">
                       <div className="space-y-1">
                         <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
-                          <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
-                            <Mail className="w-4 h-4" />
+                          <div className="ps-3 sm:ps-3.5 text-stone-400 pointer-events-none shrink-0">
+                            <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </div>
                           <input
                             type="email"
@@ -664,7 +749,7 @@ export default function AdminLoginPage() {
                             value={forgotEmail}
                             onChange={(e) => setForgotEmail(e.target.value)}
                             placeholder="admin@viwan.studio"
-                            className="w-full bg-transparent p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-sans font-medium"
+                            className="w-full bg-transparent p-2.5 sm:p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-sans font-medium"
                           />
                         </div>
                       </div>
@@ -672,7 +757,7 @@ export default function AdminLoginPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-3.5 px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-1"
+                        className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-2.5 sm:py-3.5 px-5 sm:px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-1"
                       >
                         <span>
                           {loading
@@ -680,18 +765,17 @@ export default function AdminLoginPage() {
                             : (isRtl ? 'إرسال رمز التحقق (Brevo OTP)' : 'Send Verification OTP')}
                         </span>
                         {isRtl ? (
-                          <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
+                          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:-translate-x-1 transition-transform" />
                         ) : (
-                          <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:translate-x-1 transition-transform" />
                         )}
                       </button>
 
-                      <div className="text-center pt-1">
+                      <div className="text-center pt-0.5">
                         <button
                           type="button"
                           onClick={() => {
-                            setError('');
-                            setSuccessMsg('');
+                            clearMessages();
                             setMode('login');
                           }}
                           className="text-xs text-[#8C6D45] hover:text-[#111111] hover:underline font-medium transition-colors cursor-pointer"
@@ -707,24 +791,24 @@ export default function AdminLoginPage() {
                 {mode === 'forgot-2' && (
                   <>
                     <div className="text-center space-y-1">
-                      <h2 className="text-lg sm:text-xl font-bold text-[#111111]">
+                      <h2 className="text-base sm:text-xl font-bold text-[#111111]">
                         {isRtl ? 'تأكيد رمز التحقق' : 'Enter Security Code'}
                       </h2>
-                      <p className="text-xs text-stone-600 font-light leading-relaxed">
+                      <p className="text-[11px] sm:text-xs text-stone-600 font-light leading-relaxed">
                         {isRtl
                           ? 'تم إرسال كود سري من 6 أرقام عبر Brevo إلى:'
                           : 'A 6-digit security code was dispatched via Brevo to:'}
                       </p>
-                      <div className="inline-block mt-1 px-3 py-1 bg-[#8C6D45]/10 border border-[#8C6D45]/20 rounded-md text-xs font-mono text-[#8C6D45] font-semibold">
+                      <div className="inline-block mt-0.5 px-2.5 py-0.5 bg-[#8C6D45]/10 border border-[#8C6D45]/20 rounded-md text-xs font-mono text-[#8C6D45] font-semibold">
                         {forgotEmail}
                       </div>
                     </div>
 
-                    <form onSubmit={handleVerifyOtp} className="space-y-4">
-                      <div className="space-y-1.5">
+                    <form onSubmit={handleVerifyOtp} className="space-y-3 sm:space-y-4">
+                      <div className="space-y-1">
                         <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
-                          <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
-                            <KeyRound className="w-4 h-4" />
+                          <div className="ps-3 sm:ps-3.5 text-stone-400 pointer-events-none shrink-0">
+                            <KeyRound className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </div>
                           <input
                             type="text"
@@ -734,7 +818,7 @@ export default function AdminLoginPage() {
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                             placeholder="0 0 0 0 0 0"
-                            className="w-full bg-transparent p-3 text-base text-center tracking-[0.45em] font-mono font-bold text-[#111111] placeholder:text-stone-300 outline-none"
+                            className="w-full bg-transparent p-2.5 sm:p-3 text-base text-center tracking-[0.45em] font-mono font-bold text-[#111111] placeholder:text-stone-300 outline-none"
                           />
                         </div>
 
@@ -768,22 +852,21 @@ export default function AdminLoginPage() {
                       <button
                         type="submit"
                         disabled={loading || otp.length < 6}
-                        className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-3.5 px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-1"
+                        className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-2.5 sm:py-3.5 px-5 sm:px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-1"
                       >
                         <span>{loading ? (isRtl ? 'جاري التحقق...' : 'Verifying...') : (isRtl ? 'تأكيد ومتابعة' : 'Verify & Proceed')}</span>
                         {isRtl ? (
-                          <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
+                          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:-translate-x-1 transition-transform" />
                         ) : (
-                          <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:translate-x-1 transition-transform" />
                         )}
                       </button>
 
-                      <div className="flex items-center justify-between text-xs pt-1">
+                      <div className="flex items-center justify-between text-xs pt-0.5">
                         <button
                           type="button"
                           onClick={() => {
-                            setError('');
-                            setSuccessMsg('');
+                            clearMessages();
                             setMode('forgot-1');
                           }}
                           className="text-[#8C6D45] hover:text-[#111111] hover:underline font-medium transition-colors cursor-pointer"
@@ -794,8 +877,7 @@ export default function AdminLoginPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setError('');
-                            setSuccessMsg('');
+                            clearMessages();
                             setMode('login');
                           }}
                           className="text-stone-500 hover:text-[#111111] hover:underline font-medium transition-colors cursor-pointer"
@@ -811,22 +893,22 @@ export default function AdminLoginPage() {
                 {mode === 'forgot-3' && (
                   <>
                     <div className="text-center space-y-1">
-                      <h2 className="text-lg sm:text-xl font-bold text-[#111111]">
+                      <h2 className="text-base sm:text-xl font-bold text-[#111111]">
                         {isRtl ? 'تعيين كلمة المرور الجديدة' : 'Set New Password'}
                       </h2>
-                      <p className="text-xs text-stone-600 font-light leading-relaxed">
+                      <p className="text-[11px] sm:text-xs text-stone-600 font-light leading-relaxed">
                         {isRtl
                           ? 'أدخل كلمة المرور الجديدة لحساب المسؤول الرئيسي (6 خانات على الأقل).'
                           : 'Enter your new master administrator password (minimum 6 characters).'}
                       </p>
                     </div>
 
-                    <form onSubmit={handleResetPassword} className="space-y-4">
+                    <form onSubmit={handleResetPassword} className="space-y-3 sm:space-y-4">
                       {/* New Password */}
                       <div className="space-y-1">
                         <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
-                          <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
-                            <Lock className="w-4 h-4" />
+                          <div className="ps-3 sm:ps-3.5 text-stone-400 pointer-events-none shrink-0">
+                            <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </div>
                           <input
                             type={showNewPassword ? 'text' : 'password'}
@@ -835,14 +917,14 @@ export default function AdminLoginPage() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder={isRtl ? 'كلمة المرور الجديدة' : 'New Password'}
-                            className="w-full bg-transparent p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-mono"
+                            className="w-full bg-transparent p-2.5 sm:p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-mono"
                           />
                           <button
                             type="button"
                             onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="pe-3.5 text-stone-400 hover:text-[#111111] transition-colors cursor-pointer"
+                            className="pe-3 sm:pe-3.5 text-stone-400 hover:text-[#111111] transition-colors cursor-pointer"
                           >
-                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            {showNewPassword ? <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                           </button>
                         </div>
                       </div>
@@ -850,8 +932,8 @@ export default function AdminLoginPage() {
                       {/* Confirm Password */}
                       <div className="space-y-1">
                         <div className="relative flex items-center bg-gradient-to-r from-white/60 via-white/80 to-white/95 lg:bg-white border border-[#E5DFD3] rounded-lg focus-within:border-[#8C6D45] focus-within:ring-1 focus-within:ring-[#8C6D45]/30 focus-within:bg-white transition-all backdrop-blur-xs">
-                          <div className="ps-3.5 text-stone-400 pointer-events-none shrink-0">
-                            <Lock className="w-4 h-4" />
+                          <div className="ps-3 sm:ps-3.5 text-stone-400 pointer-events-none shrink-0">
+                            <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </div>
                           <input
                             type={showConfirmPassword ? 'text' : 'password'}
@@ -860,14 +942,14 @@ export default function AdminLoginPage() {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder={isRtl ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}
-                            className="w-full bg-transparent p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-mono"
+                            className="w-full bg-transparent p-2.5 sm:p-3 text-xs text-[#111111] placeholder:text-stone-400 outline-none font-mono"
                           />
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="pe-3.5 text-stone-400 hover:text-[#111111] transition-colors cursor-pointer"
+                            className="pe-3 sm:pe-3.5 text-stone-400 hover:text-[#111111] transition-colors cursor-pointer"
                           >
-                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                           </button>
                         </div>
                       </div>
@@ -875,7 +957,7 @@ export default function AdminLoginPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-3.5 px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-1"
+                        className="w-full bg-[#1C1B19] hover:bg-[#8C6D45] text-white py-2.5 sm:py-3.5 px-5 sm:px-6 rounded-lg text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer active:scale-[0.98] group mt-1"
                       >
                         <span>
                           {loading
@@ -883,9 +965,9 @@ export default function AdminLoginPage() {
                             : (isRtl ? 'حفظ كلمة المرور والدخول إلى اللوحة' : 'Save & Enter Dashboard')}
                         </span>
                         {isRtl ? (
-                          <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
+                          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:-translate-x-1 transition-transform" />
                         ) : (
-                          <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:translate-x-1 transition-transform" />
                         )}
                       </button>
                     </form>
@@ -894,14 +976,14 @@ export default function AdminLoginPage() {
 
                 {/* ── STEP SUCCESS: Completed & Redirecting ── */}
                 {mode === 'forgot-success' && (
-                  <div className="text-center py-6 space-y-3">
-                    <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto animate-bounce">
-                      <Sparkles className="w-6 h-6 text-emerald-600" />
+                  <div className="text-center py-5 space-y-2.5">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto animate-bounce">
+                      <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
                     </div>
-                    <h3 className="text-base font-bold text-emerald-900">
+                    <h3 className="text-sm sm:text-base font-bold text-emerald-900">
                       {isRtl ? 'تم تحديث كلمة المرور بنجاح!' : 'Password Updated Successfully!'}
                     </h3>
-                    <p className="text-xs text-stone-600">
+                    <p className="text-[11px] sm:text-xs text-stone-600">
                       {isRtl
                         ? 'تم تسجيل الدخول تلقائياً. جاري تحويلك إلى لوحة التحكم...'
                         : 'Authenticated successfully. Redirecting to your dashboard...'}
@@ -913,22 +995,25 @@ export default function AdminLoginPage() {
           </div>
         </div>
 
-        {/* Bottom Footer Row */}
-        <div className="w-full flex items-center justify-between z-20 text-[10px] font-mono tracking-widest text-[#8C6D45] uppercase">
-          {/* Left Narrative Snippet (Over the Image) */}
-          <div className="text-stone-300/90 text-left space-y-1 font-serif">
-            <div className="text-xs sm:text-sm font-cinzel">Designing a Better Tomorrow</div>
-            <div className="w-6 h-[1px] bg-[#B08A5A]" />
-          </div>
-
-          <div className="hidden sm:block text-stone-400">
-            VIWAN STUDIO // OS 2026
-          </div>
-
-          {/* Right Pillar Mark (Over the White/Cream) */}
-          <div className="flex items-center gap-2">
-            <span>BUILT ON A VISION</span>
+        {/* Bottom Footer Row: Centered, Responsive, and styled in Luxury Bronze (#8C6D45) */}
+        <div className="w-full z-20 pt-4 pb-2 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase select-none">
+          {/* Left Narrative Snippet (Desktop) */}
+          <div className="hidden md:flex items-center gap-2 text-stone-300/80 font-serif">
+            <span className="text-xs font-cinzel text-stone-200">Designing a Better Tomorrow</span>
             <span className="w-4 h-[1px] bg-[#8C6D45]" />
+          </div>
+
+          {/* Centered Brand OS - Prominently in center across all devices */}
+          <div className="mx-auto flex items-center justify-center gap-2 text-center text-[#8C6D45] font-semibold tracking-[0.25em]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8C6D45]/50 animate-pulse" />
+            <span>VIWAN STUDIO // OS 2026</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8C6D45]/50 animate-pulse" />
+          </div>
+
+          {/* Right Pillar Mark (Desktop) */}
+          <div className="hidden md:flex items-center gap-2 text-[#8C6D45]">
+            <span className="w-4 h-[1px] bg-[#8C6D45]" />
+            <span>BUILT ON A VISION</span>
           </div>
         </div>
       </div>
