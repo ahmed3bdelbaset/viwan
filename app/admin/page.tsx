@@ -2,224 +2,468 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { DataStore } from '@/lib/store';
 import { ViwanMark } from '@/components/ui/Icons';
 import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import {
-  TrendingUp,
-  FileText,
-  Eye,
+  FolderKanban,
+  Briefcase,
+  MessageSquare,
+  Users,
   ArrowRight,
-  PenTool,
-  Upload,
-  Plus,
-  Layers,
-  Compass
+  ExternalLink,
+  Images,
+  Building2,
+  Workflow,
+  Sparkles,
+  Calendar,
+  Mail,
+  Phone,
+  RefreshCw,
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
-import { SpatialMapWidget } from '@/components/ui/SpatialMapWidget';
+
+interface OverviewStats {
+  projectsCount: number;
+  servicesCount: number;
+  inquiriesCount: number;
+  adminsCount: number;
+  recentContacts: any[];
+  recentConsultations: any[];
+}
 
 export default function AdminDashboardOverviewPage() {
-  const [projectsCount, setProjectsCount] = useState(124);
-  const [insightsCount, setInsightsCount] = useState(38);
-  const { t, isRtl } = useAdminLang();
+  const { isRtl } = useAdminLang();
+
+  const [stats, setStats] = useState<OverviewStats>({
+    projectsCount: 0,
+    servicesCount: 8,
+    inquiriesCount: 0,
+    adminsCount: 0,
+    recentContacts: [],
+    recentConsultations: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  const fetchOverviewData = async () => {
+    try {
+      setLoading(true);
+      const [dataRes, adminsRes] = await Promise.all([
+        fetch('/api/admin/data'),
+        fetch('/api/admin/admins'),
+      ]);
+
+      let projectsCount = 0;
+      let inquiriesCount = 0;
+      let recentContacts: any[] = [];
+      let recentConsultations: any[] = [];
+      let adminsCount = 0;
+
+      if (dataRes.ok) {
+        const dbData = await dataRes.json();
+        const projects = Array.isArray(dbData.projects) ? dbData.projects : [];
+        const contacts = Array.isArray(dbData.contacts) ? dbData.contacts : [];
+        const consultations = Array.isArray(dbData.consultations) ? dbData.consultations : [];
+
+        projectsCount = projects.length;
+        inquiriesCount = contacts.length + consultations.length;
+        recentContacts = contacts.slice(-3).reverse();
+        recentConsultations = consultations.slice(-3).reverse();
+      }
+
+      if (adminsRes.ok) {
+        const adminsData = await adminsRes.json();
+        if (Array.isArray(adminsData.admins)) {
+          adminsCount = adminsData.admins.length;
+        }
+      }
+
+      setStats({
+        projectsCount,
+        servicesCount: 8,
+        inquiriesCount,
+        adminsCount: adminsCount || 3,
+        recentContacts,
+        recentConsultations,
+      });
+    } catch (err) {
+      console.error('Failed to load dashboard overview data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const list = DataStore.getProjects();
-    const insights = DataStore.getInsights();
-    if (list.length > 0) setProjectsCount(list.length);
-    if (insights.length > 0) setInsightsCount(insights.length);
+    fetchOverviewData();
   }, []);
+
+  // 7 Public Pages Portals
+  const publicPagesPortals = [
+    {
+      num: '01',
+      titleEn: 'Homepage',
+      titleAr: 'الصفحة الرئيسية',
+      route: '/',
+      descEn: 'Hero slider, architectural marquee, render-vs-reality, and impact stats.',
+      descAr: 'سلايدر الهيرو الرئيسي، شريط الماركي المعماري، الرندر والواقع، وإحصائيات الأثر.',
+      manageRoute: '/admin/media',
+      manageLabelEn: 'Manage Hero & Images',
+      manageLabelAr: 'إدارة صور وهيدر الصفحة',
+      icon: <Images className="w-5 h-5 text-gold" />,
+    },
+    {
+      num: '02',
+      titleEn: 'Selected Projects',
+      titleAr: 'المشاريع المعمارية',
+      route: '/projects',
+      descEn: 'Full cinematic hero, 5 architectural disciplines, case studies, and gallery assets.',
+      descAr: 'الهيرو السينمائي، التخصصات الخمسة، دراسات الحالة، ومعارض الصور الحية.',
+      manageRoute: '/admin/projects',
+      manageLabelEn: 'Manage Projects & Disciplines',
+      manageLabelAr: 'إدارة المشروعات والتخصصات',
+      icon: <FolderKanban className="w-5 h-5 text-gold" />,
+    },
+    {
+      num: '03',
+      titleEn: 'Services & Disciplines',
+      titleAr: 'الخدمات والتخصصات',
+      route: '/services',
+      descEn: '8 core engineering disciplines, BIM execution scopes, and deliverables.',
+      descAr: 'التخصصات الهندسية الثمانية، مخرجات مراحل الـ BIM، والمواصفات الفنية.',
+      manageRoute: '/admin/services',
+      manageLabelEn: 'Configure Services & BIM',
+      manageLabelAr: 'إدارة التخصصات ومواصفات الـ BIM',
+      icon: <Briefcase className="w-5 h-5 text-gold" />,
+    },
+    {
+      num: '04',
+      titleEn: 'Studio & Leadership',
+      titleAr: 'الاستوديو وهوية المكتب',
+      route: '/studio',
+      descEn: 'HQ Atelier, founding architects, material lab, Cairo & Riyadh presence.',
+      descAr: 'مقر الاستوديو، فلسفة وفريق القيادة، مختبر الخامات، ومكاتب القاهرة والرياض.',
+      manageRoute: '/admin/settings',
+      manageLabelEn: 'Edit Studio Profile & Branches',
+      manageLabelAr: 'تعديل بيانات وفروع الاستوديو',
+      icon: <Building2 className="w-5 h-5 text-gold" />,
+    },
+    {
+      num: '05',
+      titleEn: 'How We Work',
+      titleAr: 'منهجية ومراحل العمل',
+      route: '/how-we-work',
+      descEn: '6-stage international delivery framework (Discovery through Turnkey Execution).',
+      descAr: 'المراحل الست المعتمدة دولياً من الاستكشاف الأولي وحتى التسليم على المفتاح.',
+      manageRoute: '/admin/media',
+      manageLabelEn: 'Process Visuals & Blueprint Hero',
+      manageLabelAr: 'إدارة صور وبانر طاولة المخططات',
+      icon: <Workflow className="w-5 h-5 text-gold" />,
+    },
+    {
+      num: '06',
+      titleEn: 'Careers & Culture',
+      titleAr: 'الوظائف وفريق العمل',
+      route: '/careers',
+      descEn: 'Studio workspace hero, architectural openings, and talent applications.',
+      descAr: 'صورة بيئة العمل بالاستوديو، فرص التوظيف المفتوحة، وطلبات الانضمام.',
+      manageRoute: '/admin/media',
+      manageLabelEn: 'Manage Careers Hero & Gallery',
+      manageLabelAr: 'إدارة صور ومعرض بيئة العمل',
+      icon: <Sparkles className="w-5 h-5 text-gold" />,
+    },
+    {
+      num: '07',
+      titleEn: 'Contact & Consultations',
+      titleAr: 'تواصل معنا وحجز الاستشارة',
+      route: '/contact',
+      descEn: 'Direct inquiries, 30-minute consultation scheduler, studio map coordinates.',
+      descAr: 'استفسارات العملاء المباشرة، حجز جلسة استشارية 30 دقيقة، وإحداثيات الخريطة.',
+      manageRoute: '/admin/inbox',
+      manageLabelEn: 'View Inquiries & Bookings',
+      manageLabelAr: 'استعراض الرسائل والحجوزات',
+      icon: <MessageSquare className="w-5 h-5 text-gold" />,
+    },
+  ];
 
   return (
     <div className="space-y-10">
-      {/* ========================================================================= */}
-      {/* 1. THREE WHITE KPI CARDS (Matches admin_dashboard_overview.png) */}
-      {/* ========================================================================= */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* KPI 1: TOTAL PROJECTS */}
-        <div className="bg-white p-7 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[160px] shadow-sm">
-          {/* Decorative Watermark Icon */}
-          <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none`}>
-            <ViwanMark className="w-16 h-16" />
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E2D8] pb-6">
+        <div>
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            <h1 className="font-cinzel text-2xl font-normal text-charcoal tracking-wide uppercase">
+              {isRtl ? 'لوحة القيادة والمؤشرات الحقيقية' : 'STUDIO EXECUTIVE DASHBOARD'}
+            </h1>
           </div>
-
-          <div className="space-y-1 relative z-10">
-            <span className="text-[11px] font-semibold tracking-widest uppercase text-stone-dark">
-              {t.overview.totalProjects}
-            </span>
-            <div className="font-cinzel text-4xl sm:text-5xl text-charcoal font-normal">
-              {projectsCount}
-            </div>
-          </div>
-
-          <div className="text-xs text-stone-600 font-light flex items-center space-x-1.5 rtl:space-x-reverse pt-4 border-t border-[#F3EDE3] relative z-10">
-            <span className="text-stone-800 font-medium">{t.overview.totalProjectsSub}</span>
-          </div>
+          <p className="text-xs text-stone-600 font-light mt-1">
+            {isRtl
+              ? 'متابعة العمليات المعمارية وإدارة محتوى الصفحات السبع ومزامنتها اللحظية مع الموقع العام.'
+              : 'Direct architectural consultancy operations, persistent 7-page content hubs, and live public sync.'}
+          </p>
         </div>
 
-        {/* KPI 2: PORTFOLIO VIEWS */}
-        <div className="bg-white p-7 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[160px] shadow-sm">
-          {/* Decorative Watermark Eye */}
-          <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 text-[#E7E2D8] pointer-events-none`}>
-            <Eye className="w-16 h-16" strokeWidth={1} />
-          </div>
+        <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
+          <Link
+            href="/"
+            target="_blank"
+            className="inline-flex items-center space-x-1.5 rtl:space-x-reverse border border-[#E7E2D8] bg-white hover:border-gold px-3.5 py-2 text-xs text-charcoal transition-colors shadow-xs"
+          >
+            <span>{isRtl ? 'معاينة الموقع المباشر' : 'VISIT LIVE SITE'}</span>
+            <ExternalLink className="w-3.5 h-3.5 text-gold" />
+          </Link>
 
-          <div className="space-y-1 relative z-10">
-            <span className="text-[11px] font-semibold tracking-widest uppercase text-stone-dark">
-              {t.overview.caseStudyViews}
-            </span>
-            <div className="font-cinzel text-4xl sm:text-5xl text-charcoal font-normal">
-              45.2K
-            </div>
-          </div>
-
-          <div className="text-xs text-stone-600 font-light flex items-center space-x-1.5 rtl:space-x-reverse pt-4 border-t border-[#F3EDE3] relative z-10">
-            <TrendingUp className="w-3.5 h-3.5 text-stone-800" />
-            <span className="text-stone-800 font-medium">+12%</span>
-            <span>{t.overview.caseStudyViewsSub}</span>
-          </div>
-        </div>
-
-        {/* KPI 3: PUBLISHED INSIGHTS */}
-        <div className="bg-white p-7 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[160px] shadow-sm">
-          {/* Decorative Watermark Document */}
-          <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 text-[#E7E2D8] pointer-events-none`}>
-            <FileText className="w-16 h-16" strokeWidth={1} />
-          </div>
-
-          <div className="space-y-1 relative z-10">
-            <span className="text-[11px] font-semibold tracking-widest uppercase text-stone-dark">
-              {t.overview.publishedInsights}
-            </span>
-            <div className="font-cinzel text-4xl sm:text-5xl text-charcoal font-normal">
-              {insightsCount}
-            </div>
-          </div>
-
-          <div className="text-xs text-stone-600 font-light flex items-center space-x-1.5 rtl:space-x-reverse pt-4 border-t border-[#F3EDE3] relative z-10">
-            <FileText className="w-3.5 h-3.5 text-stone-500" />
-            <span>{t.overview.publishedInsightsSub}</span>
-          </div>
+          <button
+            onClick={fetchOverviewData}
+            className="p-2 border border-[#E7E2D8] bg-white hover:border-gold text-charcoal transition-colors shadow-xs"
+            title={isRtl ? 'تحديث البيانات' : 'Refresh Data'}
+          >
+            <RefreshCw className={`w-4 h-4 text-gold ${loading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. RECENT ACTIVITY & QUICK ACTIONS */}
+      {/* 1. FOUR GENUINE KPI SUMMARY CARDS */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Recent Activity Stream */}
-        <div className="lg:col-span-8 space-y-6">
-          <div className="flex items-center justify-between pb-3 border-b border-[#E7E2D8]">
-            <h2 className="font-cinzel text-lg tracking-wider uppercase text-charcoal font-medium">
-              {t.overview.recentActivity}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* KPI 1: TOTAL PROJECTS */}
+        <Link
+          href="/admin/projects"
+          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+        >
+          <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
+            <FolderKanban className="w-14 h-14 text-charcoal" />
+          </div>
+
+          <div className="space-y-1 relative z-10">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+              {isRtl ? 'المشاريع المعمارية' : 'TOTAL PROJECTS'}
+            </span>
+            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
+              {stats.projectsCount}
+            </div>
+          </div>
+
+          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+            <span>{isRtl ? 'عبر التخصصات الـ 5' : 'Across 5 Disciplines'}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        {/* KPI 2: CORE DISCIPLINES */}
+        <Link
+          href="/admin/services"
+          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+        >
+          <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
+            <Briefcase className="w-14 h-14 text-charcoal" />
+          </div>
+
+          <div className="space-y-1 relative z-10">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+              {isRtl ? 'التخصصات الهندسية' : 'CORE DISCIPLINES'}
+            </span>
+            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
+              {stats.servicesCount}
+            </div>
+          </div>
+
+          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+            <span>{isRtl ? 'خدمات معمارية متكاملة' : 'Integrated Services'}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        {/* KPI 3: CLIENT INQUIRIES & CONSULTATIONS */}
+        <Link
+          href="/admin/inbox"
+          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+        >
+          <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
+            <MessageSquare className="w-14 h-14 text-charcoal" />
+          </div>
+
+          <div className="space-y-1 relative z-10">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+              {isRtl ? 'الاستفسارات والاستشارات' : 'CLIENT INQUIRIES'}
+            </span>
+            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
+              {stats.inquiriesCount}
+            </div>
+          </div>
+
+          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+            <span>{isRtl ? 'رسائل الموقع وحجوزات 30 دقيقة' : 'Inquiries & 30-Min Bookings'}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        {/* KPI 4: ADMIN TEAM */}
+        <Link
+          href="/admin/users"
+          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+        >
+          <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
+            <Users className="w-14 h-14 text-charcoal" />
+          </div>
+
+          <div className="space-y-1 relative z-10">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+              {isRtl ? 'مسؤولو النظام' : 'ADMINISTRATORS'}
+            </span>
+            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
+              {stats.adminsCount}
+            </div>
+          </div>
+
+          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+            <span>{isRtl ? 'حسابات إدارة نشطة' : 'Active Admin Accounts'}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
+          </div>
+        </Link>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. SEVEN PUBLIC PAGES MANAGEMENT HUBS */}
+      {/* ========================================================================= */}
+      <div className="space-y-5">
+        <div className="flex items-center justify-between border-b border-[#E7E2D8] pb-3">
+          <div>
+            <h2 className="font-cinzel text-lg font-medium text-charcoal uppercase tracking-wider">
+              {isRtl ? 'بوابات إدارة الصفحات السبع' : 'THE 7 PUBLIC PAGES MANAGEMENT HUBS'}
             </h2>
-            <Link
-              href="/admin/projects"
-              className="text-xs text-stone-dark hover:text-gold tracking-widest uppercase font-medium"
+            <p className="text-xs text-stone-500 font-light">
+              {isRtl ? 'تحكم مباشر في نصوص، صور، وهيدرات كل صفحة من صفحات المنصة' : 'Direct control over texts, images, and heroes of each public page'}
+            </p>
+          </div>
+          <Link
+            href="/admin/media"
+            className="text-xs text-gold hover:text-charcoal font-mono tracking-wider uppercase transition-colors flex items-center gap-1"
+          >
+            <span>{isRtl ? 'مركز الوسائط الشامل ←' : 'ALL MEDIA ASSETS →'}</span>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {publicPagesPortals.map((portal) => (
+            <div
+              key={portal.num}
+              className="bg-white border border-[#E7E2D8] p-5 flex flex-col justify-between shadow-sm hover:border-gold/60 transition-colors"
             >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
+                    <span className="font-mono text-xs font-bold text-gold">{portal.num}</span>
+                    <h3 className="font-cinzel text-sm font-semibold text-charcoal">
+                      {isRtl ? portal.titleAr : portal.titleEn}
+                    </h3>
+                  </div>
+                  <Link
+                    href={portal.route}
+                    target="_blank"
+                    className="text-stone-400 hover:text-gold p-1"
+                    title={isRtl ? 'معاينة الصفحة الحية' : 'View live page'}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+
+                <p className="text-xs text-stone-600 font-light leading-relaxed">
+                  {isRtl ? portal.descAr : portal.descEn}
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-[#F3EDE3] mt-4">
+                <Link
+                  href={portal.manageRoute}
+                  className="w-full bg-[#FAF6EE] hover:bg-charcoal hover:text-white border border-[#E7E2D8] text-charcoal px-3 py-2 text-xs font-medium tracking-wider uppercase flex items-center justify-between transition-all group"
+                >
+                  <span className="text-[11px] font-sans">
+                    {isRtl ? portal.manageLabelAr : portal.manageLabelEn}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:text-white group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. RECENT INQUIRIES & LIVE SUBMISSIONS STREAM */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Left: Recent Contact Inquiries */}
+        <div className="bg-white border border-[#E7E2D8] p-6 space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-[#E7E2D8] pb-3">
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <Mail className="w-4 h-4 text-gold" />
+              <h3 className="font-cinzel text-sm font-semibold text-charcoal uppercase tracking-wider">
+                {isRtl ? 'أحدث استفسارات التواصل' : 'RECENT CONTACT INQUIRIES'}
+              </h3>
+            </div>
+            <Link href="/admin/inbox" className="text-xs text-gold hover:underline font-mono">
               {isRtl ? 'عرض الكل' : 'VIEW ALL'}
             </Link>
           </div>
 
-          <div className="space-y-4">
-            {/* Activity 1 */}
-            <div className="bg-white p-5 border border-[#E7E2D8] flex items-start space-x-4 rtl:space-x-reverse shadow-sm">
-              <div className="w-9 h-9 border border-[#E7E2D8] bg-[#FAF6EE] flex items-center justify-center shrink-0">
-                <PenTool className="w-4 h-4 text-charcoal" />
-              </div>
-              <div className="space-y-1 flex-grow">
-                <p className="text-xs text-charcoal leading-snug">
-                  <strong className="font-semibold">{isRtl ? 'تحديث مشروع:' : 'Project Updated:'}</strong> {isRtl ? 'اعتماد مخططات ورندرات المركز التجاري الحضري بالرياض (Urban Commercial Hub).' : 'Architectural drawings and renders approved for Urban Commercial Hub (Riyadh).'}
-                </p>
-                <div className="text-[10px] text-stone-500 font-mono tracking-wider uppercase">
-                  {isRtl ? 'اليوم، 09:45 ص • بواسطة كبير المعماريين طارق منصور' : 'TODAY, 09:45 AM • BY CHIEF ARCHITECT TAREK MANSOUR'}
-                </div>
-              </div>
+          {stats.recentContacts.length === 0 ? (
+            <div className="py-8 text-center text-xs text-stone-400">
+              {isRtl ? 'لا توجد استفسارات مسجلة حديثاً.' : 'No recent contact inquiries.'}
             </div>
-
-            {/* Activity 2 */}
-            <div className="bg-white p-5 border border-[#E7E2D8] flex items-start space-x-4 rtl:space-x-reverse shadow-sm">
-              <div className="w-9 h-9 border border-[#E7E2D8] bg-[#FAF6EE] flex items-center justify-center shrink-0">
-                <Upload className="w-4 h-4 text-charcoal" />
-              </div>
-              <div className="space-y-1 flex-grow">
-                <p className="text-xs text-charcoal leading-snug">
-                  <strong className="font-semibold">{isRtl ? 'معرض الصور:' : 'Gallery Update:'}</strong> {isRtl ? 'تحديث أصول المعرض واللقطات السينمائية لمنزل البحيرة (Lake House).' : 'Architectural gallery assets and cinematic shots updated for Lake House.'}
-                </p>
-                <div className="text-[10px] text-stone-500 font-mono tracking-wider uppercase">
-                  {isRtl ? 'أمس، 04:15 م • بواسطة الإدارة' : 'YESTERDAY, 04:15 PM • BY ADMIN'}
+          ) : (
+            <div className="space-y-3">
+              {stats.recentContacts.map((c) => (
+                <div key={c.id} className="p-3 bg-[#FAF6EE] border border-[#E7E2D8] text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-charcoal">{c.name}</span>
+                    <span className="text-[10px] text-stone-400 font-mono">
+                      {new Date(c.submittedAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
+                    </span>
+                  </div>
+                  <div className="text-stone-500 truncate">{c.email} • {c.phone}</div>
+                  <p className="text-stone-700 italic truncate">"{c.message || 'No message provided'}"</p>
                 </div>
-              </div>
+              ))}
             </div>
-
-            {/* Activity 3 */}
-            <div className="bg-white p-5 border border-[#E7E2D8] flex items-start space-x-4 rtl:space-x-reverse shadow-sm">
-              <div className="w-9 h-9 border border-[#E7E2D8] bg-[#FAF6EE] flex items-center justify-center shrink-0">
-                <Layers className="w-4 h-4 text-charcoal" />
-              </div>
-              <div className="space-y-1 flex-grow">
-                <p className="text-xs text-charcoal leading-snug">
-                  <strong className="font-semibold">{isRtl ? 'مشروع مميز:' : 'Featured Case Study:'}</strong> {isRtl ? 'تثبيت إقامة خاصة 01 بالقاهرة الجديدة كدراسة حالة مميزة على الموقع العام.' : 'Private Residence 01 pinned as featured architectural case study.'}
-                </p>
-                <div className="text-[10px] text-stone-500 font-mono tracking-wider uppercase">
-                  {isRtl ? 'منذ يومين • بواسطة فريق التصميم' : '2 DAYS AGO • BY DESIGN TEAM'}
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* Right Column: Quick Actions & Status */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="pb-3 border-b border-[#E7E2D8]">
-            <h2 className="font-cinzel text-lg tracking-wider uppercase text-charcoal font-medium">
-              {t.overview.quickActions}
-            </h2>
-          </div>
-
-          <div className="space-y-3">
-            {/* Primary Action Button */}
-            <Link
-              href="/admin/projects"
-              className="w-full bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase p-4 transition-all flex items-center justify-between group shadow-sm"
-            >
-              <span>{t.overview.addNewProject}</span>
-              <ArrowRight className="w-4 h-4 text-gold group-hover:text-white transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
-            </Link>
-
-            {/* Secondary Action Button */}
-            <Link
-              href="/admin/insights"
-              className="w-full bg-transparent hover:bg-charcoal hover:text-white border border-charcoal/40 text-charcoal text-xs font-semibold tracking-widest uppercase p-4 transition-all flex items-center justify-between group shadow-sm"
-            >
-              <span>{t.overview.writeArticle}</span>
-              <ArrowRight className="w-4 h-4 text-charcoal group-hover:text-white transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+        {/* Right: Recent Consultation Bookings */}
+        <div className="bg-white border border-[#E7E2D8] p-6 space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-[#E7E2D8] pb-3">
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <Calendar className="w-4 h-4 text-gold" />
+              <h3 className="font-cinzel text-sm font-semibold text-charcoal uppercase tracking-wider">
+                {isRtl ? 'أحدث حجوزات الاستشارات (30 دقيقة)' : 'RECENT 30-MIN CONSULTATIONS'}
+              </h3>
+            </div>
+            <Link href="/admin/inbox" className="text-xs text-gold hover:underline font-mono">
+              {isRtl ? 'عرض الكل' : 'VIEW ALL'}
             </Link>
           </div>
 
-          {/* System Status Widget */}
-          <div className="bg-[#F3EDE3] border border-[#E7E2D8] p-5 space-y-3">
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-dark block">
-              {t.overview.systemStatus}
-            </span>
-
-            <div className="flex items-center space-x-2 rtl:space-x-reverse text-xs text-charcoal font-medium">
-              <span className="w-2.5 h-2.5 bg-green-600 rounded-full" />
-              <span>{t.overview.storageEngine}</span>
+          {stats.recentConsultations.length === 0 ? (
+            <div className="py-8 text-center text-xs text-stone-400">
+              {isRtl ? 'لا توجد حجوزات استشارات جديدة.' : 'No recent consultation bookings.'}
             </div>
-
-            <div className="text-[11px] text-stone-600 font-light">
-              {t.overview.i18nSync}
+          ) : (
+            <div className="space-y-3">
+              {stats.recentConsultations.map((cb) => (
+                <div key={cb.id} className="p-3 bg-[#FAF6EE] border border-[#E7E2D8] text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-charcoal">{cb.name}</span>
+                    <span className="text-[10px] text-stone-400 font-mono">
+                      {cb.preferredDate || new Date(cb.submittedAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
+                    </span>
+                  </div>
+                  <div className="text-stone-500 truncate">{cb.projectType} • {cb.phone}</div>
+                  <p className="text-stone-700 italic truncate">"{cb.notes || 'No notes provided'}"</p>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 3. SPATIAL REGIONAL DISTRIBUTION & GFA TELEMETRY */}
-      {/* ========================================================================= */}
-      <div className="pt-2">
-        <SpatialMapWidget isRtl={isRtl} />
       </div>
     </div>
   );

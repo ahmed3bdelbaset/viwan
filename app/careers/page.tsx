@@ -24,6 +24,22 @@ import { JOBS, Job } from '@/lib/jobs'
 export default function CareersPage() {
   const { t, lang } = useLanguage()
   const isAr = lang === 'ar'
+  const [heroImgUrl, setHeroImgUrl] = useState('/images/careers-hero-viwan.jpg')
+
+  // Load dynamic hero image from site settings
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.siteImages && Array.isArray(data.siteImages)) {
+          const img = data.siteImages.find((i: any) => i.id === 'careers-hero')
+          if (img?.currentUrl) {
+            setHeroImgUrl(img.currentUrl)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const [expandedSlug, setExpandedSlug] = useState<string | null>(null)
   const [modalRole, setModalRole] = useState<string | null>(null)
@@ -141,7 +157,7 @@ export default function CareersPage() {
         {/* Cinematic Studio Photography */}
         <div className="absolute inset-0">
           <Image
-            src="/images/careers-hero-viwan.jpg"
+            src={heroImgUrl}
             alt="VIWAN Architecture and Design Studio open-plan workspace with illuminated 3D wall branding"
             fill
             priority

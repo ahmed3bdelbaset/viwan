@@ -25,7 +25,9 @@ import {
   ExternalLink,
   Globe,
   Users,
-  Command
+  Command,
+  Images,
+  MessageSquare
 } from 'lucide-react';
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
@@ -76,11 +78,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     { label: t.sidebar.dashboard, href: '/admin', icon: <LayoutDashboard className="w-4 h-4" /> },
     { label: t.sidebar.projects, href: '/admin/projects', icon: <FolderKanban className="w-4 h-4" /> },
     { label: t.sidebar.services, href: '/admin/services', icon: <Briefcase className="w-4 h-4" /> },
-    { label: t.sidebar.expertise, href: '/admin/expertise', icon: <Layers className="w-4 h-4" /> },
-    { label: t.sidebar.insights, href: '/admin/insights', icon: <FileText className="w-4 h-4" /> },
-    { label: t.sidebar.users, href: '/admin/users', icon: <Users className="w-4 h-4" /> },
+    { label: (t.sidebar as any).media || (isRtl ? 'إدارة صور وهيدرز الموقع' : 'SITE IMAGES & HEROES'), href: '/admin/media', icon: <Images className="w-4 h-4" /> },
+    { label: (t.sidebar as any).inbox || (isRtl ? 'الرسائل والاستشارات (07)' : 'INQUIRIES & BOOKINGS'), href: '/admin/inbox', icon: <MessageSquare className="w-4 h-4" /> },
     { label: t.sidebar.companyInfo, href: '/admin/settings', icon: <Building className="w-4 h-4" /> },
-    { label: t.sidebar.statistics, href: '/admin/statistics', icon: <BarChart3 className="w-4 h-4" /> },
+    { label: t.sidebar.users, href: '/admin/users', icon: <Users className="w-4 h-4" /> },
   ];
 
   const handleLogout = () => {
@@ -290,10 +291,17 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Global Command Palette */}
         <CommandPalette />
 
-        {/* Dynamic Page Canvas */}
-        <main className="flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto">
-          {children}
-        </main>
+        {/* Dynamic Page Canvas with Luxury V Watermark */}
+        <div className="relative flex-1 min-h-[calc(100vh-5rem)]">
+          {/* Subtle Architectural V Watermark */}
+          <div className="fixed inset-0 pointer-events-none select-none flex items-center justify-center overflow-hidden z-0">
+            <ViwanMark className="w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] text-charcoal opacity-[0.025] transform translate-y-12" />
+          </div>
+
+          <main className="relative z-10 flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );

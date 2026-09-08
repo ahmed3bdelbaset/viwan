@@ -1307,6 +1307,32 @@
       "description": "A sleek white aircraft towing an aerial banner with the VIWAN logo over clear blue sea.",
       "descriptionAr": "طائرة بيضاء أنيقة تحلق في سماء صافية فوق مياه البحر وتسحب شعار استوديو إيوان.",
       "aspectRatio": "16/9"
+    },
+    {
+      "id": "studio-hero",
+      "labelEn": "Studio Page Hero (HQ & Atelier)",
+      "labelAr": "هيدر صفحة الاستوديو (المقر الرئيسي والمعمل)",
+      "section": "Hero Banners",
+      "currentUrl": "/images/studio-firm-hero.jpg",
+      "year": "2024",
+      "location": "Cairo & Riyadh",
+      "locationAr": "القاهرة والرياض",
+      "description": "Architectural studio headquarters with warm ambient lighting and material showcase.",
+      "descriptionAr": "المقر الرئيسي لاستوديو إيوان مع إضاءة دافئة ومعرض للمواد المعمارية.",
+      "aspectRatio": "16/9"
+    },
+    {
+      "id": "project-commercial-tower",
+      "labelEn": "King Fahd Commercial Tower",
+      "labelAr": "برج طريق الملك فهد التجاري",
+      "section": "Featured Projects",
+      "currentUrl": "/images/project-commercial-tower.png",
+      "year": "2024",
+      "location": "King Fahd Rd, Riyadh, KSA",
+      "locationAr": "طريق الملك فهد، الرياض، السعودية",
+      "description": "Iconic commercial headquarters with bioclimatic facade louvers and glass curtain.",
+      "descriptionAr": "صرح تجاري مع كواسر شمسية ذكية وواجهات زجاجية مزدوجة متطورة.",
+      "aspectRatio": "16/10"
     }
   ],
   "counters": [

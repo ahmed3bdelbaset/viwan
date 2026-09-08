@@ -42,7 +42,7 @@ interface DisciplineCategory {
   taglineEn: string
   taglineAr: string
   featured: ProjectItem
-  subProjects: [ProjectItem, ProjectItem]
+  subProjects: ProjectItem[]
 }
 
 const DISCIPLINES_DATA: DisciplineCategory[] = [
@@ -482,40 +482,27 @@ export default function ProjectsPage() {
         slug: feat.slug || cat.featured.slug,
       }
 
-      const updatedSubProjects = [...cat.subProjects] as [ProjectItem, ProjectItem]
-      if (rest[0]) {
-        updatedSubProjects[0] = {
-          id: rest[0].id || cat.subProjects[0].id,
-          titleEn: rest[0].name || rest[0].title || cat.subProjects[0].titleEn,
-          titleAr: rest[0].nameAr || rest[0].titleAr || rest[0].title_ar || cat.subProjects[0].titleAr,
-          locationEn: rest[0].location || rest[0].location_en || cat.subProjects[0].locationEn,
-          locationAr: rest[0].locationAr || rest[0].location_ar || cat.subProjects[0].locationAr,
-          year: String(rest[0].year || cat.subProjects[0].year),
-          scopeEn: rest[0].scope ? `Scope of Work: ${Array.isArray(rest[0].scope) ? rest[0].scope.join(' + ') : rest[0].scope}` : cat.subProjects[0].scopeEn,
-          scopeAr: rest[0].scopeAr ? `نطاق العمل: ${Array.isArray(rest[0].scopeAr) ? rest[0].scopeAr.join(' + ') : rest[0].scopeAr}` : cat.subProjects[0].scopeAr,
-          image: rest[0].cover || rest[0].coverImage || rest[0].cover_image || cat.subProjects[0].image,
-          alt: rest[0].name || rest[0].title || cat.subProjects[0].alt,
-          descEn: rest[0].description || rest[0].details_en || cat.subProjects[0].descEn,
-          descAr: rest[0].descriptionAr || rest[0].details_ar || cat.subProjects[0].descAr,
-          slug: rest[0].slug || cat.subProjects[0].slug,
-        }
-      }
-      if (rest[1]) {
-        updatedSubProjects[1] = {
-          id: rest[1].id || cat.subProjects[1].id,
-          titleEn: rest[1].name || rest[1].title || cat.subProjects[1].titleEn,
-          titleAr: rest[1].nameAr || rest[1].titleAr || rest[1].title_ar || cat.subProjects[1].titleAr,
-          locationEn: rest[1].location || rest[1].location_en || cat.subProjects[1].locationEn,
-          locationAr: rest[1].locationAr || rest[1].location_ar || cat.subProjects[1].locationAr,
-          year: String(rest[1].year || cat.subProjects[1].year),
-          scopeEn: rest[1].scope ? `Scope of Work: ${Array.isArray(rest[1].scope) ? rest[1].scope.join(' + ') : rest[1].scope}` : cat.subProjects[1].scopeEn,
-          scopeAr: rest[1].scopeAr ? `نطاق العمل: ${Array.isArray(rest[1].scopeAr) ? rest[1].scopeAr.join(' + ') : rest[1].scopeAr}` : cat.subProjects[1].scopeAr,
-          image: rest[1].cover || rest[1].coverImage || rest[1].cover_image || cat.subProjects[1].image,
-          alt: rest[1].name || rest[1].title || cat.subProjects[1].alt,
-          descEn: rest[1].description || rest[1].details_en || cat.subProjects[1].descEn,
-          descAr: rest[1].descriptionAr || rest[1].details_ar || cat.subProjects[1].descAr,
-          slug: rest[1].slug || cat.subProjects[1].slug,
-        }
+      let updatedSubProjects: ProjectItem[] = []
+      if (rest.length > 0) {
+        updatedSubProjects = rest.map((p, rIdx) => ({
+          id: p.id || `sub-${p.slug || rIdx}`,
+          titleEn: p.name || p.title || p.title_en || 'Architectural Project',
+          titleAr: p.nameAr || p.titleAr || p.title_ar || p.name || 'مشروع معماري',
+          locationEn: p.location || p.location_en || 'Cairo, Egypt',
+          locationAr: p.locationAr || p.location_ar || 'القاهرة، مصر',
+          year: String(p.year || '2025'),
+          scopeEn: p.scope ? `Scope of Work: ${Array.isArray(p.scope) ? p.scope.join(' + ') : p.scope}` : 'Scope of Work: Architecture',
+          scopeAr: p.scopeAr ? `نطاق العمل: ${Array.isArray(p.scopeAr) ? p.scopeAr.join(' + ') : p.scopeAr}` : 'نطاق العمل: عمارة',
+          image: p.cover || p.coverImage || p.cover_image || '/images/project-private-residence.png',
+          alt: p.name || p.title || 'Project Detail',
+          descEn: p.description || p.details_en || '',
+          descAr: p.descriptionAr || p.details_ar || '',
+          scopeListEn: Array.isArray(p.scope) ? p.scope : [],
+          scopeListAr: Array.isArray(p.scopeAr) ? p.scopeAr : [],
+          slug: p.slug,
+        }))
+      } else {
+        updatedSubProjects = [...cat.subProjects]
       }
 
       return {
@@ -534,14 +521,14 @@ export default function ProjectsPage() {
         ...cat,
         subProjects: [...cat.subProjects].sort((a) =>
           a.locationEn.includes('Egypt') ? -1 : 1
-        ) as [ProjectItem, ProjectItem],
+        ),
       }))
     } else if (sortBy === 'ksa') {
       list = list.map((cat) => ({
         ...cat,
         subProjects: [...cat.subProjects].sort((a) =>
           a.locationEn.includes('Saudi') || a.locationEn.includes('Riyadh') || a.locationEn.includes('AlUla') ? -1 : 1
-        ) as [ProjectItem, ProjectItem],
+        ),
       }))
     }
 
@@ -551,20 +538,45 @@ export default function ProjectsPage() {
   return (
     <main className="min-h-screen bg-[#FAF9F6] text-charcoal selection:bg-gold selection:text-charcoal">
       {/* =========================================================================
-          1. EDITORIAL HERO SECTION (Matching Reference Image 2)
+          1. FULL-WIDTH CINEMATIC HERO SECTION
+          - Full-bleed cinematic architectural background covering the entire header
+          - Ambient dark directional gradients for crisp text readability
           - Left: OUR WORK / Selected Projects / Subtitle / Accent Line
-          - Right: High-resolution visual with vertical PEOPLE/PLACES/PURPOSE/ALWAYS
+          - Right: Vertical Editorial Typography (PEOPLE / PLACES / PURPOSE / ALWAYS)
          ========================================================================= */}
-      <section className="relative pt-28 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 bg-[#FAF9F6] border-b border-stone/30 overflow-hidden">
-        <div className="container-viwan">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Column: Heading & Monograph Brief */}
-            <div className="lg:col-span-6 flex flex-col justify-center">
-              <span className="eyebrow text-xs sm:text-sm text-gold tracking-[0.25em] font-semibold uppercase mb-3 block animate-fade-up">
+      <section className="relative min-h-[64vh] lg:min-h-[74vh] flex flex-col justify-end surface-dark overflow-hidden select-none">
+        {/* Full-bleed Architectural Image Background */}
+        <div className="absolute inset-0">
+          <Image
+            src={heroImage}
+            alt="Selected Projects architectural villa with pool overlooking horizon"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center scale-100"
+          />
+        </div>
+
+        {/* Ambient Dark Directional Gradients for Crisp Legibility & Architectural Glow */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/60 to-charcoal/30 pointer-events-none"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-charcoal/95 via-charcoal/65 to-transparent rtl:bg-gradient-to-l rtl:from-charcoal/95 rtl:via-charcoal/65 rtl:to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Hero Content Container */}
+        <div className="container-viwan relative z-10 w-full pt-36 md:pt-44 pb-16 md:pb-20">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+            {/* Left Text Block */}
+            <div className="flex flex-col gap-4 max-w-2xl">
+              <span className="eyebrow text-xs sm:text-sm text-gold tracking-[0.25em] font-semibold uppercase animate-fade-up">
                 {isAr ? 'أعمالنا المختارة' : 'OUR WORK'}
               </span>
 
-              <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl text-charcoal font-normal tracking-tight leading-[1.05] mb-6 animate-fade-up [animation-delay:120ms]">
+              <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl text-ivory font-light tracking-tight leading-[1.05] animate-fade-up [animation-delay:120ms]">
                 {isAr ? (
                   <>
                     مشاريع
@@ -580,14 +592,14 @@ export default function ProjectsPage() {
                 )}
               </h1>
 
-              <p className="text-sm sm:text-base text-charcoal/75 leading-relaxed max-w-lg mb-8 animate-fade-up [animation-delay:240ms]">
+              <p className="text-sm sm:text-base text-ivory/85 leading-relaxed max-w-xl animate-fade-up [animation-delay:240ms]">
                 {isAr
                   ? 'ملف أعمال منتقى عبر العمارة، التصميم الداخلي، اللاندسكيب، التخطيط العمراني، والهندسة المتكاملة — نوحد الإنسان والمكان والغاية.'
                   : 'A curated portfolio across Architecture, Interior Design, Landscape, Urban Design, and Engineering — unifying people, places and purpose.'}
               </p>
 
               {/* Accent Line & Motto */}
-              <div className="flex items-center gap-3 text-xs eyebrow text-charcoal/60 font-medium tracking-widest animate-fade-up [animation-delay:360ms]">
+              <div className="flex items-center gap-3 text-xs eyebrow text-gold/90 font-medium tracking-widest pt-2 animate-fade-up [animation-delay:360ms]">
                 <span className="w-10 h-px bg-gold inline-block" aria-hidden="true" />
                 <span>
                   {isAr ? 'مساحات لغدٍ أكثر إشراقاً' : 'SPACES FOR A BRIGHTER TOMORROW'}
@@ -595,29 +607,17 @@ export default function ProjectsPage() {
               </div>
             </div>
 
-            {/* Right Column: Hero Visual with Vertical Editorial Typography */}
-            <div className="lg:col-span-6 relative animate-fade-in [animation-delay:200ms]">
-              <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden bg-stone/20 shadow-md group">
-                <Image
-                  src={heroImage}
-                  alt="Selected Projects architectural villa with pool overlooking horizon"
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 via-transparent to-transparent pointer-events-none" />
-
-                {/* Right Edge Vertical Typography (PEOPLE / PLACES / PURPOSE / ALWAYS) */}
-                <div
-                  dir="ltr"
-                  className="absolute top-0 end-0 bottom-0 px-4 sm:px-6 py-6 flex flex-col justify-between items-center text-[10px] sm:text-xs font-mono tracking-[0.25em] text-ivory/90 uppercase select-none pointer-events-none bg-charcoal/30 backdrop-blur-[2px]"
-                >
-                  <span className="hover:text-gold transition-colors">PEOPLE</span>
-                  <span className="hover:text-gold transition-colors">PLACES</span>
-                  <span className="hover:text-gold transition-colors">PURPOSE</span>
-                  <span className="text-gold font-bold">ALWAYS</span>
-                </div>
+            {/* Right Brand Pillars (PEOPLE / PLACES / PURPOSE / ALWAYS) */}
+            <div
+              dir="ltr"
+              className="flex items-center gap-4 animate-fade-in [animation-delay:400ms] self-start lg:self-end"
+            >
+              <span className="h-16 w-px bg-gold/40 hidden sm:inline-block" aria-hidden="true" />
+              <div className="flex flex-col gap-1.5 eyebrow text-ivory/80 text-xs tracking-[0.25em] font-medium uppercase">
+                <span className="hover:text-gold transition-colors">PEOPLE</span>
+                <span className="hover:text-gold transition-colors">PLACES</span>
+                <span className="hover:text-gold transition-colors">PURPOSE</span>
+                <span className="text-gold font-bold">ALWAYS</span>
               </div>
             </div>
           </div>

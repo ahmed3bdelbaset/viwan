@@ -49,6 +49,20 @@ export default function AdminSettingsPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     DataStore.saveCompanyInfo(info);
+    fetch('/api/admin/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        settings: {
+          phoneCairo: info.phones?.[0]?.number,
+          phoneRiyadh: info.phones?.[1]?.number,
+          email: info.emails?.[0]?.email,
+          linkedin: info.social?.linkedin,
+          instagram: info.social?.instagram,
+          facebook: info.social?.facebook,
+        }
+      })
+    }).catch(() => {});
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };

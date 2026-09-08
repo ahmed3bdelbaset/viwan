@@ -19,7 +19,9 @@ import {
   Compass,
   Layers,
   BarChart3,
-  Check
+  Check,
+  Images,
+  MessageSquare
 } from 'lucide-react';
 import { DataStore } from '@/lib/store';
 import { Project, InsightArticle } from '@/lib/types';
@@ -173,15 +175,27 @@ export const CommandPalette: React.FC = () => {
       },
     },
     {
-      id: 'nav-expertise',
+      id: 'nav-media',
       category: 'NAVIGATION',
       categoryAr: 'التنقل',
-      title: isRtl ? 'مجالات التخصص والقطاعات' : 'Expertise & Typology Sectors',
-      subtitle: isRtl ? 'سكني، رعاية صحية، ضيافة، تخطيط مدن' : 'Residential, healthcare, hospitality, master planning',
-      icon: <Building className="w-4 h-4 text-stone-400" />,
+      title: isRtl ? 'إدارة صور وهيدرز الموقع' : 'Site Images & Hero Banners',
+      subtitle: isRtl ? 'تعديل ورفع صور الصفحات السبع والتخصصات' : 'Manage hero visual assets across all 7 pages',
+      icon: <Images className="w-4 h-4 text-stone-400" />,
       action: () => {
         setIsOpen(false);
-        router.push('/admin/expertise');
+        router.push('/admin/media');
+      },
+    },
+    {
+      id: 'nav-inbox',
+      category: 'NAVIGATION',
+      categoryAr: 'التنقل',
+      title: isRtl ? 'صندوق الوارد وحجوزات الاستشارات' : 'Inbox & Consultation Bookings',
+      subtitle: isRtl ? 'متابعة رسائل العملاء ومواعيد الـ 30 دقيقة' : 'Client inquiries and 30-min consultation bookings',
+      icon: <MessageSquare className="w-4 h-4 text-stone-400" />,
+      action: () => {
+        setIsOpen(false);
+        router.push('/admin/inbox');
       },
     },
     {

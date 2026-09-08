@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PageHero, Display, Eyebrow, SectionIndex, ButtonLink } from '@/components/site/primitives'
@@ -27,6 +27,22 @@ export default function StudioPage() {
   const { t, lang } = useLanguage()
   const impactSectionRef = useRef<HTMLElement>(null)
   const impactBgRef = useRef<HTMLDivElement>(null)
+  const [heroImgUrl, setHeroImgUrl] = useState('/images/studio-firm-hero.jpg')
+
+  // Load dynamic hero image from site settings
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.siteImages && Array.isArray(data.siteImages)) {
+          const img = data.siteImages.find((i: any) => i.id === 'studio-hero')
+          if (img?.currentUrl) {
+            setHeroImgUrl(img.currentUrl)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     let animId: number | null = null
@@ -96,7 +112,7 @@ export default function StudioPage() {
         {/* Cinematic Studio Interior Photo */}
         <div className="absolute inset-0">
           <Image
-            src="/images/studio-firm-hero.jpg"
+            src={heroImgUrl}
             alt="VIWAN Architecture & Design Studio — Integrated Engineering Consultancy Headquarters"
             fill
             priority

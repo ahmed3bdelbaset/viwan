@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server'
 import { readDb, writeDb } from '@/lib/db'
 
+export async function GET() {
+  try {
+    const db = readDb()
+    return NextResponse.json({
+      success: true,
+      contacts: Array.isArray(db.contacts) ? db.contacts : [],
+      consultations: Array.isArray(db.consultations) ? db.consultations : [],
+    })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to fetch inbox items' }, { status: 500 })
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const { id, type, status } = await req.json()
@@ -22,5 +35,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update inbox item' }, { status: 500 })
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+    const type = searchParams.get('type')
+
+    if (!id || !type) {
+      return NextResponse.json({ error: 'id and type are required' }, { status: 400 })
+    }
+
+    const db = readDb()
+    if (type === 'contact') {
+      db.contacts = (db.contacts || []).filter((c) => c.id !== id)
+    } else if (type === 'consultation') {
+      db.consultations = (db.consultations || []).filter((c) => c.id !== id)
+    }
+
+    writeDb(db)
+    return NextResponse.json({ success: true, message: 'Item deleted successfully' })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete inbox item' }, { status: 500 })
   }
 }

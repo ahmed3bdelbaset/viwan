@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PROCESS } from '@/lib/site'
@@ -57,6 +58,22 @@ const ARABIC_PROCESS = [
 
 export default function HowWeWorkPage() {
   const { t, lang } = useLanguage()
+  const [heroImgUrl, setHeroImgUrl] = useState('/images/how-we-work-hero.jpg')
+
+  // Load dynamic hero image from site settings
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.siteImages && Array.isArray(data.siteImages)) {
+          const img = data.siteImages.find((i: any) => i.id === 'how-we-work-hero')
+          if (img?.currentUrl) {
+            setHeroImgUrl(img.currentUrl)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const stages = lang === 'ar' ? ARABIC_PROCESS : PROCESS
 
@@ -67,7 +84,7 @@ export default function HowWeWorkPage() {
         {/* Real Architectural Blueprint & Process Desk Photo */}
         <div className="absolute inset-0">
           <Image
-            src="/images/how-we-work-hero.jpg"
+            src={heroImgUrl}
             alt="Architectural drafting desk with technical drawings, scale rulers, and project coordination schedules"
             fill
             priority

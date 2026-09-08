@@ -288,6 +288,22 @@ export default function ServicesPage() {
   const { t, lang } = useLanguage()
   const isAr = lang === 'ar'
   const [selectedService, setSelectedService] = useState<ServiceDetail | null>(null)
+  const [heroImgUrl, setHeroImgUrl] = useState('/images/services-hero-colonnade.jpg')
+
+  // Load dynamic hero image from site settings
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.siteImages && Array.isArray(data.siteImages)) {
+          const img = data.siteImages.find((i: any) => i.id === 'services-hero')
+          if (img?.currentUrl) {
+            setHeroImgUrl(img.currentUrl)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   // Close modal on Escape
   useEffect(() => {
@@ -305,7 +321,7 @@ export default function ServicesPage() {
         {/* Full-width Cinematic Travertine Colonnade Photo */}
         <div className="absolute inset-0">
           <Image
-            src="/images/services-hero-colonnade.jpg"
+            src={heroImgUrl}
             alt="Monolithic travertine and limestone colonnade overlooking reflective pool at golden hour"
             fill
             priority
