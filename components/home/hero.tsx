@@ -78,6 +78,8 @@ export function Hero() {
         className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-charcoal/80 to-transparent pointer-events-none"
         aria-hidden
       />
+      {/* Architectural Ultra-Fine Drafting Grid Overlay */}
+      <div className="pointer-events-none absolute inset-0 architectural-hairline-grid-dark opacity-35 z-[1]" />
 
       {/* Main Hero Content: pt-28 md:pt-36 ensures plenty of breathing room below fixed navbar (88px) */}
       <div className="relative container-viwan w-full h-full flex flex-col justify-end pt-28 md:pt-36 pb-20 md:pb-24">

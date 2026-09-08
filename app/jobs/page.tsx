@@ -294,7 +294,7 @@ export default function JobsPage() {
         </div>
 
         {/* Spontaneous Open Inquiries */}
-        <div className="mt-16 p-8 bg-[#11110F] text-ivory border border-stone/30 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-16 p-8 bg-[#11110F] architectural-hairline-grid-dark text-ivory border border-stone/30 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gold">
               <Sparkles className="size-4" />

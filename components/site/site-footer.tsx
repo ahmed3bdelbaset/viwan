@@ -34,7 +34,7 @@ export function SiteFooter() {
   ]
 
   return (
-    <footer className="surface-dark">
+    <footer className="surface-dark border-t border-white/10 architectural-hairline-grid-dark relative overflow-hidden">
       <div className="container-viwan py-16 md:py-20 flex flex-col gap-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
           <div className="md:col-span-4 flex flex-col gap-5">

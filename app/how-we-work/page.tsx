@@ -275,7 +275,7 @@ export default function HowWeWorkPage() {
       </section>
 
       {/* Collaboration Callout */}
-      <section className="section-gap surface-dark border-b border-border">
+      <section className="section-gap surface-dark border-b border-border architectural-hairline-grid-dark">
         <div className="container-viwan flex flex-col items-center text-center gap-8 max-w-3xl mx-auto">
           <Eyebrow gold className="tracking-[0.2em]">{t.howWeWorkPage.calloutEyebrow}</Eyebrow>
           <Display as="h2" size="lg" className="text-ivory whitespace-pre-line font-serif font-light">

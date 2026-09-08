@@ -270,7 +270,7 @@ export function ServicesPreview() {
   const { t } = useLanguage()
 
   return (
-    <section className="surface-dark section-gap">
+    <section className="surface-dark section-gap architectural-hairline-grid-dark relative overflow-hidden">
       <div className="container-viwan flex flex-col gap-16">
         <Reveal className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div className="flex flex-col gap-6">
@@ -289,7 +289,7 @@ export function ServicesPreview() {
             const itemT = t.servicesPreview.items[i] || s
 
             return (
-              <Reveal key={s.slug} as="li" delay={i * 100} className="bg-charcoal">
+              <Reveal key={s.slug} as="li" delay={i * 100} className="bg-charcoal/90 architectural-hairline-grid-dark">
                 <Link
                   href={`/services#${s.slug}`}
                   className="group flex flex-col gap-8 p-8 h-full transition-colors duration-500 hover:bg-secondary"
@@ -363,6 +363,8 @@ export function FeaturedProject({ initialProject }: { initialProject?: any }) {
         className="object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/30 to-charcoal/20" aria-hidden />
+      {/* Architectural Ultra-Fine Drafting Grid Overlay */}
+      <div className="pointer-events-none absolute inset-0 architectural-hairline-grid-dark opacity-40 z-[2]" />
 
       {/* Top Architectural Datum Bar */}
       <div className="absolute top-8 start-8 end-8 hidden sm:flex items-center justify-between z-10 text-[9px] font-mono uppercase tracking-widest text-ivory/60 select-none">
@@ -490,6 +492,8 @@ export function CinematicBreak() {
         className="object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent" aria-hidden />
+      {/* Architectural Ultra-Fine Drafting Grid Overlay */}
+      <div className="pointer-events-none absolute inset-0 architectural-hairline-grid-dark opacity-35 z-[2]" />
       <div className="relative container-viwan h-full flex items-end justify-between pb-10 eyebrow text-ivory/70">
         <span>
           {t.cinematicBreak.brand}

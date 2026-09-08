@@ -124,7 +124,7 @@ export function ProjectsFaqSection() {
   const faqs = t.projectsPage.faqs || []
 
   return (
-    <section id="projects-faq" className="surface-dark bg-[#0c0b0a] border-t border-stone/30 py-20 sm:py-28 md:py-36 relative overflow-hidden">
+    <section id="projects-faq" className="surface-dark bg-[#0c0b0a] architectural-hairline-grid-dark border-t border-stone/30 py-20 sm:py-28 md:py-36 relative overflow-hidden">
       {/* Subtle architectural ambient background glow */}
       <div className="pointer-events-none absolute top-0 start-1/4 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 end-10 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />

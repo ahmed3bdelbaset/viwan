@@ -224,6 +224,11 @@ a.group:has(span):active {
   --input: #3a372f;
   background-color: var(--charcoal);
   color: var(--ivory);
+  background-image:
+    linear-gradient(to right, rgba(197, 168, 128, 0.085) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 168, 128, 0.085) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center center;
 }
 
 /* Scroll reveal with bidirectional scroll dynamics */
@@ -501,9 +506,9 @@ html[data-scroll-dir="up"] .reveal:not(.is-visible) {
 .surface-dark .drafting-grid,
 .drafting-grid-dark {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 64px 64px;
+    linear-gradient(to right, rgba(197, 168, 128, 0.085) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 168, 128, 0.085) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 .drafting-grid-dense {
@@ -604,30 +609,41 @@ html[data-scroll-dir="up"] .reveal:not(.is-visible) {
    ============================================================================== */
 .architectural-hairline-grid {
   background-image:
-    linear-gradient(to right, rgba(177, 139, 88, 0.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(177, 139, 88, 0.055) 1px, transparent 1px);
+    linear-gradient(to right, rgba(177, 139, 88, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(177, 139, 88, 0.06) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: center center;
 }
 
 .architectural-hairline-grid-subtle {
   background-image:
-    linear-gradient(to right, rgba(177, 139, 88, 0.038) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(177, 139, 88, 0.038) 1px, transparent 1px);
+    linear-gradient(to right, rgba(177, 139, 88, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(177, 139, 88, 0.04) 1px, transparent 1px);
   background-size: 28px 28px;
   background-position: center center;
 }
 
+/* Dark surface ultra-fine grid (الشبكة المتناهية في الرفع للأسطح الداكنة والسوداء) */
+.surface-dark,
+.surface-dark-grid,
+.architectural-hairline-grid-dark,
+.surface-dark .architectural-hairline-grid,
+.surface-dark.architectural-hairline-grid,
 .dark .architectural-hairline-grid {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(197, 168, 128, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 168, 128, 0.09) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center center;
 }
 
-.dark .architectural-hairline-grid-subtle {
+.dark .architectural-hairline-grid-subtle,
+.surface-dark .architectural-hairline-grid-subtle {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(to right, rgba(197, 168, 128, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 168, 128, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center center;
 }
 
 
