@@ -43,8 +43,8 @@ const ERROR_DICTIONARY: Record<string, { ar: string; en: string }> = {
     en: 'Please enter a valid email address.',
   },
   SEND_FAILED: {
-    ar: 'تعذر إرسال كود التحقق عبر Brevo. يرجى المحاولة لاحقاً.',
-    en: 'Failed to send verification code via Brevo. Please try again.',
+    ar: 'تعذر إرسال كود التحقق. يرجى المحاولة لاحقاً.',
+    en: 'Failed to send verification code. Please try again.',
   },
   INVALID_OTP: {
     ar: 'كود التحقق غير صحيح أو انتهت صلاحيته',
@@ -86,12 +86,12 @@ const ERROR_DICTIONARY: Record<string, { ar: string; en: string }> = {
 
 const SUCCESS_DICTIONARY: Record<string, { ar: string; en: string }> = {
   OTP_SENT: {
-    ar: 'تم إرسال كود التحقق بنجاح عبر Brevo إلى بريدك المسجل.',
-    en: 'Verification code sent successfully via Brevo.',
+    ar: 'تم إرسال كود التحقق بنجاح إلى بريدك المسجل.',
+    en: 'Verification code sent successfully to your registered email.',
   },
   OTP_RESENT: {
-    ar: 'تمت إعادة إرسال رمز التحقق عبر Brevo بنجاح.',
-    en: 'New verification code sent via Brevo successfully.',
+    ar: 'تمت إعادة إرسال رمز التحقق بنجاح.',
+    en: 'New verification code sent successfully.',
   },
   OTP_VERIFIED: {
     ar: 'تم التحقق من الرمز بنجاح.',
@@ -731,8 +731,8 @@ export default function AdminLoginPage() {
                       </h2>
                       <p className="text-xs text-stone-600 font-light leading-relaxed">
                         {isRtl
-                          ? 'أدخل بريدك الإلكتروني المسجل وسنرسل لك كود التحقق السري (OTP) عبر Brevo.'
-                          : 'Enter your registered administrator email to receive a 6-digit OTP code via Brevo.'}
+                          ? 'أدخل بريدك الإلكتروني المسجل وسنرسل لك كود التحقق السري (OTP).'
+                          : 'Enter your registered administrator email to receive a 6-digit security code (OTP).'}
                       </p>
                     </div>
 
@@ -761,8 +761,8 @@ export default function AdminLoginPage() {
                       >
                         <span>
                           {loading
-                            ? (isRtl ? 'جاري الإرسال عبر Brevo...' : 'Sending via Brevo...')
-                            : (isRtl ? 'إرسال رمز التحقق (Brevo OTP)' : 'Send Verification OTP')}
+                            ? (isRtl ? 'جاري الإرسال...' : 'Sending...')
+                            : (isRtl ? 'إرسال رمز التحقق (OTP)' : 'Send Verification Code (OTP)')}
                         </span>
                         {isRtl ? (
                           <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:-translate-x-1 transition-transform" />
@@ -796,8 +796,8 @@ export default function AdminLoginPage() {
                       </h2>
                       <p className="text-[11px] sm:text-xs text-stone-600 font-light leading-relaxed">
                         {isRtl
-                          ? 'تم إرسال كود سري من 6 أرقام عبر Brevo إلى:'
-                          : 'A 6-digit security code was dispatched via Brevo to:'}
+                          ? 'تم إرسال كود سري من 6 أرقام إلى:'
+                          : 'A 6-digit security code was dispatched to:'}
                       </p>
                       <div className="inline-block mt-0.5 px-2.5 py-0.5 bg-[#8C6D45]/10 border border-[#8C6D45]/20 rounded-md text-xs font-mono text-[#8C6D45] font-semibold">
                         {forgotEmail}
@@ -843,7 +843,7 @@ export default function AdminLoginPage() {
                               className="text-[#8C6D45] hover:text-[#111111] font-medium flex items-center gap-1 hover:underline cursor-pointer disabled:opacity-50"
                             >
                               <RotateCcw className="w-3 h-3" />
-                              <span>{isRtl ? 'إعادة الإرسال عبر Brevo' : 'Resend Code via Brevo'}</span>
+                              <span>{isRtl ? 'إعادة إرسال الرمز' : 'Resend Code'}</span>
                             </button>
                           )}
                         </div>

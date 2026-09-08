@@ -162,6 +162,16 @@ export const DICTIONARY = {
       freeConsultationCta: '30 MINUTES FREE CONSULTATION',
       startProjectCta: 'START A PROJECT',
 
+      philosophyEyebrow: 'OUR PHILOSOPHY',
+      philosophyTitle: 'Better environments create brighter lives.',
+      philosophyQuote:
+        'We design across disciplines to create meaningful places — where people, nature and progress belong together.',
+      philosophyAccent: 'A MORE HUMAN TOMORROW',
+      letsBuildEyebrow: "LET'S BUILD TOGETHER",
+      letsBuildTitle: 'Start your next project.',
+      letsBuildSubtitle:
+        'Share your vision and explore how we can bring it to life — from concept to completion.',
+
       faqEyebrow: 'INQUIRIES & METHODOLOGY',
       faqTitle: 'Frequently Asked Questions',
       faqSubtitle:
@@ -662,6 +672,16 @@ export const DICTIONARY = {
       readyTitle: 'دعنا نحول رؤيتك المعمارية إلى واقع ملموس.',
       freeConsultationCta: 'استشارة مجانية لمدة 30 دقيقة',
       startProjectCta: 'ابدأ مشروعك الآن',
+
+      philosophyEyebrow: 'فلسفتنا المعمارية',
+      philosophyTitle: 'بيئات أرقى تصنع حياة أكثر إشراقاً.',
+      philosophyQuote:
+        'نصمم عبر تخصصات متكاملة لنبتكر فراغات ذات غاية حقيقية — حيث ينتمي الإنسان والطبيعة والارتقاء معاً.',
+      philosophyAccent: 'نحو غدٍ أكثر إنسانية',
+      letsBuildEyebrow: 'لنبنِ معاً',
+      letsBuildTitle: 'ابدأ مشروعك القادم.',
+      letsBuildSubtitle:
+        'شاركنا رؤيتك واستكشف كيف نحولها إلى واقع معماري ملهم — من الفكرة الأولية حتى التسليم النهائي.',
 
       faqEyebrow: 'استفسارات ومنهجية العمل',
       faqTitle: 'الأسئلة الشائعة',

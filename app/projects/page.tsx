@@ -3,21 +3,34 @@
 import { useState, useMemo, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, ChevronDown, X, MapPin, Calendar, CheckCircle2 } from 'lucide-react'
+import {
+  ArrowRight,
+  ArrowLeft,
+  ChevronDown,
+  X,
+  MapPin,
+  Calendar,
+  CheckCircle2,
+} from 'lucide-react'
 import { Eyebrow, ButtonLink } from '@/components/site/primitives'
 import { useLanguage } from '@/lib/i18n'
 import { ProjectsFaqSection } from '@/components/projects/faq-section'
 
-interface SubProject {
+interface ProjectItem {
+  id: string
   titleEn: string
   titleAr: string
   locationEn: string
   locationAr: string
+  year: string
+  scopeEn: string
+  scopeAr: string
   image: string
   alt: string
-  year?: string
   descEn?: string
   descAr?: string
+  scopeListEn?: string[]
+  scopeListAr?: string[]
   slug?: string
 }
 
@@ -26,64 +39,73 @@ interface DisciplineCategory {
   num: string
   titleEn: string
   titleAr: string
-  featured: {
-    titleEn: string
-    titleAr: string
-    locationEn: string
-    locationAr: string
-    year: string
-    image: string
-    alt: string
-    descEn: string
-    descAr: string
-    scopeEn: string[]
-    scopeAr: string[]
-    slug?: string
-  }
-  subProjects: [SubProject, SubProject]
+  taglineEn: string
+  taglineAr: string
+  featured: ProjectItem
+  subProjects: [ProjectItem, ProjectItem]
 }
 
-const PORTFOLIO_DATA: DisciplineCategory[] = [
+const DISCIPLINES_DATA: DisciplineCategory[] = [
   {
     id: 'architecture',
     num: '01',
     titleEn: 'Architecture',
     titleAr: 'الهندسة المعمارية',
+    taglineEn: 'Iconic buildings that balance beauty, function and enduring value.',
+    taglineAr: 'مبانٍ أيقونية توازن بين الجمال والوظيفة والقيمة الخالدة.',
     featured: {
-      titleEn: 'Modern Villa',
-      titleAr: 'فيلا عصرية فاخرة',
-      locationEn: 'New Cairo, Egypt',
-      locationAr: 'القاهرة الجديدة، مصر',
-      year: '2024',
+      id: 'arch-featured',
+      titleEn: 'THE COASTAL RESIDENCE',
+      titleAr: 'الإقامة الساحلية الفاخرة',
+      locationEn: 'Al Mouj, Muscat',
+      locationAr: 'الموج، مسقط',
+      year: '2023',
+      scopeEn: 'Scope of Work: Architecture + Interior Design',
+      scopeAr: 'نطاق العمل: عمارة + تصميم داخلي',
       image: '/images/service-architecture.jpg',
-      alt: 'Contemporary luxury travertine stone and glass villa at twilight',
+      alt: 'The Coastal Residence modern architectural villa at twilight with pool',
       descEn:
-        'A monolithic residential composition balancing travertine stone volumes, cantilevered roofs, and full-height glass walls opening directly to a reflective pool courtyard.',
+        'A monolithic seaside residential composition balancing natural travertine stone volumes, cantilevered roofs, and full-height glass walls opening directly to a reflective infinity pool.',
       descAr:
-        'كتل سكنية متوازنة من حجر الترافيرتين الطبيعي، وأسقف كابولية خرسانية، وواجهات زجاجية ممتدة بارتفاع كامل تطل على فناء مائي عاكس.',
-      scopeEn: ['Concept Design', 'Schematic Design', 'BIM Modeling', 'Façade Detailing'],
-      scopeAr: ['الفكرة التصميمية', 'المخططات المعمارية', 'نمذجة BIM', 'تفاصيل الواجهات'],
+        'تكوين سكني ساحلي متوازن من كتل حجر الترافيرتين الطبيعي، وأسقف كابولية خرسانية، وواجهات زجاجية ممتدة تطل مباشرة على مسبح إنفينيتي عاكس.',
+      scopeListEn: ['Concept Architecture', 'Schematic Design', 'BIM Modeling', 'Façade Detailing'],
+      scopeListAr: ['الفكرة المعمارية', 'المخططات التصميمية', 'نمذجة الـ BIM', 'تفاصيل الواجهات'],
+      slug: 'private-residence-01',
     },
     subProjects: [
       {
-        titleEn: 'Residential Compound',
-        titleAr: 'كمبوند سكني متكامل',
-        locationEn: 'Sheikh Zayed, Egypt',
-        locationAr: 'الشيخ زايد، مصر',
-        image: '/images/hero-villa.png',
-        alt: 'Contemporary luxury villa with infinity pool at dusk',
-        descEn: 'Private masterplanned gated villa enclave integrating modern Mediterranean architectural vernacular.',
-        descAr: 'مجمع فيلات سكنية فاخرة يدمج الهوية المعمارية المتوسطية العصرية مع الخصوصية.',
+        id: 'arch-sub-1',
+        titleEn: 'DESERT VILLA',
+        titleAr: 'فيلا العلا الصحراوية',
+        locationEn: 'AlUla, Saudi Arabia',
+        locationAr: 'العلا، المملكة العربية السعودية',
+        year: '2022',
+        scopeEn: 'Scope of Work: Architecture',
+        scopeAr: 'نطاق العمل: عمارة',
+        image: '/images/project-private-residence.png',
+        alt: 'Desert Villa integrated within AlUla canyon landscape',
+        descEn:
+          'Private sanctuary embedded into dramatic rock formations, celebrating local limestone textures and bioclimatic natural ventilation corridors.',
+        descAr:
+          'ملاذ سكني خاص منحوت في تضاريس العلا الصخرية، يحتفي بجماليات الحجر المحلي وتيارات التهوية الطبيعية المناخية.',
+        slug: 'hillside-villa',
       },
       {
-        titleEn: 'Mixed-Use Building',
-        titleAr: 'مبنى تجاري متعدد الاستخدام',
-        locationEn: 'Riyadh, KSA',
-        locationAr: 'الرياض، السعودية',
-        image: '/images/project-commercial-riyadh.png',
-        alt: 'Contemporary commercial building in Riyadh',
-        descEn: 'Corporate commercial landmark featuring bioclimatic solar shading louvers and stone cladding.',
-        descAr: 'صرح تجاري وإداري في الرياض يتميز بكواسر شمسية ذكية وتكسيات حجرية متطورة.',
+        id: 'arch-sub-2',
+        titleEn: 'CULTURAL CENTER',
+        titleAr: 'المركز الثقافي',
+        locationEn: 'Doha, Qatar',
+        locationAr: 'الدوحة، قطر',
+        year: '2021',
+        scopeEn: 'Scope of Work: Architecture',
+        scopeAr: 'نطاق العمل: عمارة',
+        image: '/images/hero-villa-3.jpg',
+        alt: 'Cultural Center geometric facade and reflecting water pool',
+        descEn:
+          'A civic landmark combining contemporary parametric lattice screens with grand limestone colonnades around a central public water court.',
+        descAr:
+          'صرح ثقافي ومدني يجمع بين الشاشات الهندسية المعاصرة والأروقة الحجرية المحيطة بفناء مائي عام.',
+        slug: 'commercial-project-03',
       },
     ],
   },
@@ -92,84 +114,124 @@ const PORTFOLIO_DATA: DisciplineCategory[] = [
     num: '02',
     titleEn: 'Interior Design',
     titleAr: 'التصميم الداخلي',
+    taglineEn: 'Refined interiors that elevate everyday living.',
+    taglineAr: 'تصاميم داخلية راقية ترتقي بتفاصيل الحياة اليومية.',
     featured: {
-      titleEn: 'Private Residence',
-      titleAr: 'إقامة خاصة فاخرة',
-      locationEn: 'Cairo, Egypt',
-      locationAr: 'القاهرة، مصر',
+      id: 'interior-featured',
+      titleEn: 'SERENITY APARTMENT',
+      titleAr: 'شقة سكنية هادئة',
+      locationEn: 'Dubai, UAE',
+      locationAr: 'دبي، الإمارات العربية المتحدة',
       year: '2024',
+      scopeEn: 'Scope of Work: Interior Design + FF&E',
+      scopeAr: 'نطاق العمل: تصميم داخلي + تأثيث وتجهيز',
       image: '/images/service-interior-design.jpg',
-      alt: 'Ultra-luxury modern interior living room with bespoke furniture and cove lighting',
+      alt: 'Serenity Apartment warm minimalist interior with bespoke sofa and ocean view',
       descEn:
-        'A warm minimalist interior where custom fluted walnut timber, backlit Calacatta marble fireplaces, and bespoke linen sectional furniture harmonize seamlessly.',
+        'A warm minimalist penthouse interior where custom fluted walnut timber, backlit Calacatta marble fireplaces, and bespoke linen sectionals harmonize seamlessly.',
       descAr:
-        'تصميم داخلي مينيمالي دافئ يجمع بين أخشاب الجوز المضلعة، ومواقد رخام الكلكتا بإضاءة خفية، وأثاث كتاني مصمم خصيصاً للمكان.',
-      scopeEn: ['Space Planning', 'Custom Joinery', 'Architectural Lighting', 'FF&E Selection'],
-      scopeAr: ['تخطيط الفراغات', 'النجارة الحصرية', 'الإضاءة المعمارية', 'انتقاء الأثاث والديكور'],
+        'تصميم داخلي مينيمالي دافئ لبنتهاوس يجمع بين أخشاب الجوز المضلعة، ومواقد رخام الكلكتا بإضاءة خفية، وأثاث كتاني مصمم خصيصاً للمكان.',
+      scopeListEn: ['Space Planning', 'Custom Millwork', 'Architectural Lighting', 'FF&E Procurement'],
+      scopeListAr: ['تخطيط الفراغات', 'النجارة الحصرية', 'الإضاءة المعمارية', 'توريد وتنسيق الأثاث'],
+      slug: 'the-urban-retreat',
     },
     subProjects: [
       {
-        titleEn: 'Luxury Apartment',
-        titleAr: 'شقة سكنية راقية',
-        locationEn: 'New Cairo, Egypt',
-        locationAr: 'القاهرة الجديدة، مصر',
+        id: 'interior-sub-1',
+        titleEn: 'THE RIVIERA HOTEL',
+        titleAr: 'فندق الريفييرا',
+        locationEn: 'Doha, Qatar',
+        locationAr: 'الدوحة، قطر',
+        year: '2023',
+        scopeEn: 'Scope of Work: Interior Design',
+        scopeAr: 'نطاق العمل: تصميم داخلي',
         image: '/images/interior-dining.png',
-        alt: 'Luxury dining room with marble table and sculptural light',
-        descEn: 'Penthouse dining and living sequence with custom bronze fixtures and travertine dining table.',
-        descAr: 'سلسلة فراغات معيشة واستقبال لبنتهاوس مع إكسسوارات برونزية وطاولة طعام حجرية.',
+        alt: 'The Riviera Hotel luxury interior lounge and dining hall',
+        descEn:
+          'Boutique coastal hospitality interiors celebrating natural raw materials, soft acoustic textures, and ambient golden cove lighting.',
+        descAr:
+          'تصميم داخلي لفندق ساحلي بوتيك يحتفي بالمواد الطبيعية الخام والمعالجات الصوتية والأجواء الدافئة.',
+        slug: 'private-majlis',
       },
       {
-        titleEn: 'Office Headquarters',
-        titleAr: 'مقر إداري رئيسي',
-        locationEn: 'Cairo, Egypt',
-        locationAr: 'القاهرة، مصر',
-        image: '/images/project-executive-office.png',
-        alt: 'Executive board office with timber cladding',
-        descEn: 'Executive corporate suite balancing acoustic comfort, natural wood paneling, and discreet technology.',
-        descAr: 'أجنحة إدارية تنفيذية توازن بين العزل الصوتي الفائق، والتجاليد الخشبية الطبيعية، والتقنيات الذكية.',
+        id: 'interior-sub-2',
+        titleEn: 'OLIVE RESTAURANT',
+        titleAr: 'مطعم أوليف الفاخر',
+        locationEn: 'Riyadh, Saudi Arabia',
+        locationAr: 'الرياض، المملكة العربية السعودية',
+        year: '2022',
+        scopeEn: 'Scope of Work: Interior Design',
+        scopeAr: 'نطاق العمل: تصميم داخلي',
+        image: '/images/interior-bedroom.png',
+        alt: 'Olive Restaurant arched vaulted dining room with bronze fixtures',
+        descEn:
+          'Fine dining restaurant featuring majestic stone arches, hand-plastered walls, and bespoke brass architectural luminaires.',
+        descAr:
+          'مطعم فاخر يتميز بأقواس حجرية مهيبة وجدران مكسوة يدوياً بإتقان ووحدات إضاءة نحاسية حصرية.',
+        slug: 'the-urban-retreat',
       },
     ],
   },
   {
-    id: 'landscape-design',
+    id: 'landscape',
     num: '03',
-    titleEn: 'Landscape Design',
-    titleAr: 'عمارة البيئة واللاندسكيب',
+    titleEn: 'Landscape',
+    titleAr: 'اللاندسكيب وتنسيق المواقع',
+    taglineEn: 'Living landscapes that connect people with nature and place.',
+    taglineAr: 'مناظر طبيعية حية تربط الإنسان بالطبيعة والمكان.',
     featured: {
-      titleEn: 'Private Garden',
-      titleAr: 'حديقة فيلا خاصة',
-      locationEn: 'New Cairo, Egypt',
-      locationAr: 'القاهرة الجديدة، مصر',
+      id: 'landscape-featured',
+      titleEn: 'THE GARDEN PAVILION',
+      titleAr: 'جناح الحديقة المائي',
+      locationEn: 'Abu Dhabi, UAE',
+      locationAr: 'أبوظبي، الإمارات العربية المتحدة',
       year: '2024',
+      scopeEn: 'Scope of Work: Landscape Design',
+      scopeAr: 'نطاق العمل: تصميم لاندسكيب',
       image: '/images/service-landscape-design.jpg',
-      alt: 'Luxury private villa landscape garden at sunset with pool and pergola',
+      alt: 'The Garden Pavilion reflecting infinity pool and manicured botanical grounds',
       descEn:
-        'A curated landscape design blending an infinity swimming pool, floating stone steps, custom timber pergolas, and climate-resilient olive trees and subtropical flora.',
+        'A lush botanical sanctuary integrating shaded timber pergolas, floating granite stepping stones, climate-resilient olive trees, and reflective water basins.',
       descAr:
-        'عمارة بيئية متكاملة تجمع بين مسبح إنفينيتي عاكس، ومسارات حجرية عائمة، ومظلات خشبية، وأشجار زيتون معمرة ونباتات متوافقة بيئياً.',
-      scopeEn: ['Masterplanning', 'Hardscape & Decks', 'Softscape Curation', 'Smart Irrigation'],
-      scopeAr: ['المخطط العام للحديقة', 'العناصر الصلبة والمظلات', 'انتقاء النباتات', 'شبكات الري الذكية'],
+        'ملاذ نباتي فاخر يدمج البرجولات الخشبية المظللة والمسارات الجرانيتية العائمة وأشجار الزيتون المعمرة والمسطحات المائية العاكسة.',
+      scopeListEn: ['Master Landscape Plan', 'Hardscape & Decks', 'Planting Palette', 'Smart Irrigation'],
+      scopeListAr: ['المخطط العام للحديقة', 'العناصر الصلبة والمظلات', 'انتقاء النباتات', 'شبكات الري الذكية'],
+      slug: 'lake-house',
     },
     subProjects: [
       {
-        titleEn: 'Residential Landscape',
-        titleAr: 'لاندسكيب سكني خاص',
-        locationEn: 'Sheikh Zayed, Egypt',
-        locationAr: 'الشيخ زايد، مصر',
+        id: 'landscape-sub-1',
+        titleEn: 'OASIS GARDENS',
+        titleAr: 'حدائق الواحة',
+        locationEn: 'Riyadh, Saudi Arabia',
+        locationAr: 'الرياض، المملكة العربية السعودية',
+        year: '2023',
+        scopeEn: 'Scope of Work: Landscape Design',
+        scopeAr: 'نطاق العمل: تصميم لاندسكيب',
         image: '/images/detail-courtyard.png',
-        alt: 'Minimalist courtyard with olive tree and stone fountain',
-        descEn: 'A contemplative inner courtyard centered around an ancient olive tree and linear water feature.',
-        descAr: 'فناء داخلي للتأمل يتمحور حول شجرة زيتون عتيقة ونافورة مائية هادئة.',
+        alt: 'Oasis Gardens courtyard with palm grove and tranquil water channel',
+        descEn:
+          'An urban oasis courtyard designed with endemic palms, stone fountains, and gentle evaporative water channels providing microclimate cooling.',
+        descAr:
+          'فناء واحة حضري مصمم بأشجار النخيل الأصيلة ونوافير حجرية وقنوات مائية تلطف درجات الحرارة طبيعياً.',
+        slug: 'hillside-villa',
       },
       {
-        titleEn: 'Hospitality Resort',
-        titleAr: 'منتجع ساحلي فاخر',
-        locationEn: 'Red Sea, Egypt',
-        locationAr: 'البحر الأحمر، مصر',
-        image: '/images/project-lake-house.png',
-        alt: 'Resort villa on water edge with natural planting',
-        descEn: 'Coastal resort masterplan integrating private beach terraces, native desert planting, and sea breeze corridors.',
-        descAr: 'مخطط لمنتجع ساحلي يدمج مصاطب شاطئية خاصة مع الغطاء النباتي الصحراوي وتيارات الهواء الطبيعية.',
+        id: 'landscape-sub-2',
+        titleEn: 'WADI RETREAT',
+        titleAr: 'منتجع الوادي الصحراوي',
+        locationEn: 'AlUla, Saudi Arabia',
+        locationAr: 'العلا، المملكة العربية السعودية',
+        year: '2021',
+        scopeEn: 'Scope of Work: Landscape Design',
+        scopeAr: 'نطاق العمل: تصميم لاندسكيب',
+        image: '/images/hero-villa-2.jpg',
+        alt: 'Wadi Retreat desert landscape with xeriscape planting and sand trails',
+        descEn:
+          'Ecological xeriscape landscape respecting the natural desert topography, using native stone boulders and arid-adapted desert flora.',
+        descAr:
+          'لاندسكيب بيئي يحترم طبيعة الوادي الصحراوي، معتمداً على الصخور الطبيعية والنباتات الصحراوية المتوافقة مع شح المياه.',
+        slug: 'lake-house',
       },
     ],
   },
@@ -178,41 +240,61 @@ const PORTFOLIO_DATA: DisciplineCategory[] = [
     num: '04',
     titleEn: 'Urban Design',
     titleAr: 'التصميم والتخطيط العمراني',
+    taglineEn: 'People-centric districts that shape vibrant and resilient cities.',
+    taglineAr: 'أحياء تركز على الإنسان وتصنع مدناً نابضة بالحياة ومرنة.',
     featured: {
-      titleEn: 'Mixed-Use Masterplan',
-      titleAr: 'مخطط عام متعدد الاستخدام',
-      locationEn: 'Riyadh, KSA',
-      locationAr: 'الرياض، السعودية',
+      id: 'urban-featured',
+      titleEn: 'MARINA DISTRICT',
+      titleAr: 'حي المارينا والواجهة البحرية',
+      locationEn: 'Jeddah, Saudi Arabia',
+      locationAr: 'جدة، المملكة العربية السعودية',
       year: '2024',
+      scopeEn: 'Scope of Work: Urban Design + Masterplanning',
+      scopeAr: 'نطاق العمل: تصميم عمراني + تخطيط عام',
       image: '/images/service-urban-design.jpg',
-      alt: 'Aerial architectural drone view of contemporary masterplanned community',
+      alt: 'Marina District masterplanned coastal waterfront with towers and promenade',
       descEn:
-        'A pedestrian-oriented sustainable urban masterplan featuring tree-canopied boulevards, water canals, mixed-use low-rise quarters, and walkable plazas.',
+        'A comprehensive mixed-use waterfront masterplan featuring pedestrian promenades, shaded public plazas, residential towers, and civic cultural anchors.',
       descAr:
-        'مخطط حضري مستدام يركز على المشاة، يضم جادات عريضة مظللة بالأشجار، وقنوات مائية، ومجمعات سكنية وتجارية منخفضة الارتفاع.',
-      scopeEn: ['Urban Density Strategy', 'Circulation & Walkability', 'Public Realm', '3D Visual Simulation'],
-      scopeAr: ['استراتيجية الكثافة العمرانية', 'حركة المشاة والسيارات', 'الفضاء العام', 'المحاكاة ثلاثية الأبعاد'],
+        'مخطط عام متكامل للواجهة البحرية يضم ممشى للمشاة، وساحات عامة مظللة، وأبراجاً سكنية، ومراكز ثقافية واجتماعية رائدة.',
+      scopeListEn: ['Masterplanning', 'Urban Density Strategy', 'Walkability & Mobility', 'Public Realm'],
+      scopeListAr: ['المخطط العام', 'استراتيجية الكثافة العمرانية', 'مسارات المشاة والتنقل', 'الفضاءات العامة'],
+      slug: 'commercial-project-03',
     },
     subProjects: [
       {
-        titleEn: 'Urban District',
-        titleAr: 'حي عمراني مستدام',
-        locationEn: 'New Capital, Egypt',
-        locationAr: 'العاصمة الإدارية، مصر',
-        image: '/images/project-hillside-villa.png',
-        alt: 'Terraced contemporary residential buildings',
-        descEn: 'Terraced urban residential community designed for natural daylight access and communal green gardens.',
-        descAr: 'مجتمع سكني حضري متدرج مصمم لتعظيم الاستفادة من الإضاءة الطبيعية والحدائق المشتركة.',
+        id: 'urban-sub-1',
+        titleEn: 'THE HORIZON MASTERPLAN',
+        titleAr: 'مخطط الأفق العمراني',
+        locationEn: 'Ras Al Khaimah, UAE',
+        locationAr: 'رأس الخيمة، الإمارات',
+        year: '2023',
+        scopeEn: 'Scope of Work: Urban Design + Infrastructure',
+        scopeAr: 'نطاق العمل: تصميم عمراني + بنية تحتية',
+        image: '/images/project-commercial-riyadh.png',
+        alt: 'The Horizon Masterplan aerial coastal district layout',
+        descEn:
+          'Sustainable coastal district masterplan balancing ecological mangrove conservation with vibrant mixed-use residential quarters.',
+        descAr:
+          'مخطط حضري ساحلي مستدام يوازن بين حماية أشجار القرم البيئية وتطوير أحياء سكنية متعددة الاستخدام.',
+        slug: 'hillside-villa',
       },
       {
-        titleEn: 'City Expansion Study',
-        titleAr: 'دراسة توسع وتطوير حضري',
-        locationEn: 'AlUla, KSA',
-        locationAr: 'العلا، السعودية',
-        image: '/images/hero-villa-2.jpg',
-        alt: 'Desert architectural volumes integrated with landscape',
-        descEn: 'Ecological masterplanning framework integrating vernacular stone architecture with natural canyon topography.',
-        descAr: 'إطار تخطيط بيئي يدمج العمارة الحجرية المحلية مع تضاريس الأودية والجبال الطبيعية.',
+        id: 'urban-sub-2',
+        titleEn: 'CITY CENTRAL',
+        titleAr: 'سنترال سيتي المتكامل',
+        locationEn: 'Muscat, Oman',
+        locationAr: 'مسقط، سلطنة عُمان',
+        year: '2021',
+        scopeEn: 'Scope of Work: Urban Design',
+        scopeAr: 'نطاق العمل: تصميم عمراني',
+        image: '/images/project-hillside-villa.png',
+        alt: 'City Central walkable mixed-use streetscape with colonnades',
+        descEn:
+          'Human-scale urban infill quarter designed with traditional shaded alleyways (sikkas), active ground-floor retail, and green pocket parks.',
+        descAr:
+          'حي عمراني إنساني النطاق مصمم بأزقة مظللة (سكك) وواجهات تجارية حيوية وحدائق جيب خضراء.',
+        slug: 'commercial-project-03',
       },
     ],
   },
@@ -220,171 +302,62 @@ const PORTFOLIO_DATA: DisciplineCategory[] = [
     id: 'engineering',
     num: '05',
     titleEn: 'Engineering',
-    titleAr: 'التنسيق الهندسي الشامل',
+    titleAr: 'الهندسة المتكاملة',
+    taglineEn: 'Integrated engineering for smarter, more resilient futures.',
+    taglineAr: 'هندسة متكاملة لمستقبل أكثر ذكاءً واستدامة.',
     featured: {
-      titleEn: 'Industrial Facility',
-      titleAr: 'منشأة صناعية متطورة',
-      locationEn: '10th of Ramadan, Egypt',
-      locationAr: 'العاشر من رمضان، مصر',
+      id: 'eng-featured',
+      titleEn: 'INTERNATIONAL TERMINAL',
+      titleAr: 'المحطة الدولية للمسافرين',
+      locationEn: 'Muscat, Oman',
+      locationAr: 'مسقط، سلطنة عُمان',
       year: '2024',
+      scopeEn: 'Scope of Work: Structural + MEP Engineering + Façade Design',
+      scopeAr: 'نطاق العمل: إنشائي + كهروميكانيكي + هندسة واجهات',
       image: '/images/service-engineering.jpg',
-      alt: 'Contemporary architectural engineering office building with precise structural grid',
+      alt: 'International Terminal canopy engineering structure with sculptural columns',
       descEn:
-        'A high-performance commercial and industrial facility engineered with long-span structural grids, advanced energy-efficient envelope, and seamless MEP integration.',
+        'A cutting-edge airport terminal featuring long-span sculptural steel tree-columns, aerodynamic roof canopies, and high-efficiency smart MEP systems.',
       descAr:
-        'منشأة صناعية وتجارية متطورة مصممة بهياكل إنشائية واسعة البحور، وغلاف مبنى موفر للطاقة، وتنسيق كهروميكانيكي محكم.',
-      scopeEn: ['Structural Engineering', 'MEP Infrastructure', 'BIM Clash Detection', 'Value Engineering'],
-      scopeAr: ['الهندسة الإنشائية', 'البنية التحتية الكهروميكانيكية', 'فحص التعارضات عبر BIM', 'الهندسة القيمية'],
+        'صالة ركاب دولية متطورة تتميز بأعمدة فولاذية شجرية واسعة البحور وأسقف إيروديناميكية وأنظمة كهروميكانيكية فائقة الكفاءة.',
+      scopeListEn: ['Long-Span Structural Engineering', 'MEP Infrastructure', 'BIM Clash Detection', 'Façade Engineering'],
+      scopeListAr: ['الهندسة الإنشائية واسعة البحور', 'البنية التحتية الكهروميكانيكية', 'فحص التعارضات عبر BIM', 'هندسة الواجهات'],
+      slug: 'commercial-project-03',
     },
     subProjects: [
       {
-        titleEn: 'Infrastructure Design',
-        titleAr: 'تصميم البنية التحتية والشبكات',
-        locationEn: 'Egypt',
-        locationAr: 'مصر',
-        image: '/images/material-stone.png',
-        alt: 'Engineered stone and civil infrastructure foundation',
-        descEn: 'Civil coordination, drainage grading, and underground utilities network modeling for private compounds.',
-        descAr: 'التنسيق المدني، وشبكات تصريف الأمطار، ونمذجة البنية التحتية للمجمعات السكنية الخاصة.',
+        id: 'eng-sub-1',
+        titleEn: 'INNOVATION CENTER',
+        titleAr: 'مركز الابتكار والتكنولوجيا',
+        locationEn: 'King Abdullah Economic City, KSA',
+        locationAr: 'مدينة الملك عبد الله الاقتصادية، السعودية',
+        year: '2023',
+        scopeEn: 'Scope of Work: MEP + Structural Engineering',
+        scopeAr: 'نطاق العمل: هندسة إنشائية وكهروميكانيكية',
+        image: '/images/service-construction-supervision.jpg',
+        alt: 'Innovation Center cubic glass and concrete engineered facade',
+        descEn:
+          'High-performance R&D engineering complex integrating seismic-resistant concrete frames and intelligent solar roof arrays.',
+        descAr:
+          'مجمع أبحاث هندسي متطور يدمج الهياكل الخرسانية المقاومة للزلازل مع ألواح طاقة شمسية ذكية.',
+        slug: 'hillside-villa',
       },
       {
-        titleEn: 'MEP Coordination',
-        titleAr: 'التنسيق الكهروميكانيكي المتقدم',
-        locationEn: 'Cairo, Egypt',
-        locationAr: 'القاهرة، مصر',
-        image: '/images/service-project-management.jpg',
-        alt: 'Engineering workspace with blueprints and laptop',
-        descEn: 'Fully coordinated Revit MEP model resolving hundreds of ceiling duct and pipe clashes prior to site execution.',
-        descAr: 'نموذج ريفيت كهروميكانيكي منسق بالكامل يحل كافة تعارضات التكييف والمواسير قبل التنفيذ بالموقع.',
-      },
-    ],
-  },
-  {
-    id: 'project-management',
-    num: '06',
-    titleEn: 'Project Management',
-    titleAr: 'إدارة المشاريع',
-    featured: {
-      titleEn: 'Residential Compound',
-      titleAr: 'مجمع سكني متكامل',
-      locationEn: 'Sheikh Zayed, Egypt',
-      locationAr: 'الشيخ زايد، مصر',
-      year: '2024',
-      image: '/images/hero-villa-3.jpg',
-      alt: 'Limestone private villa estate with illuminated pool terrace at sunset',
-      descEn:
-        'Comprehensive project management overseeing procurement, cost tracking, milestone scheduling, and quality audit across 18 luxury estate villas.',
-      descAr:
-        'إدارة شاملة للمشروع تشمل المشتريات، وضبط التكاليف، والجدولة الزمنية، وتدقيق الجودة عبر 18 فيلا سكنية فاخرة.',
-      scopeEn: ['Schedule Governance', 'Budget Administration', 'Contract Management', 'Quality Assurance'],
-      scopeAr: ['حوكمة الجدول الزمني', 'إدارة الميزانية', 'إدارة العقود والمستخلصات', 'توكيد ومراقبة الجودة'],
-    },
-    subProjects: [
-      {
-        titleEn: 'Commercial Complex',
-        titleAr: 'مجمع تجاري وإداري',
-        locationEn: 'Cairo, Egypt',
-        locationAr: 'القاهرة، مصر',
-        image: '/images/project-majlis.png',
-        alt: 'Contemporary commercial atrium architecture',
-        descEn: 'Milestone management and contractor supervision for a 12,000 sqm commercial lifestyle center.',
-        descAr: 'إدارة المهل الزمنية والإشراف على المقاولين لمركز تجاري وترفيهي بمساحة 12,000 متر مربع.',
-      },
-      {
-        titleEn: 'Hospitality Project',
-        titleAr: 'مشروع فندقي ساحلي',
-        locationEn: 'Red Sea, Egypt',
-        locationAr: 'البحر الأحمر، مصر',
-        image: '/images/consultation-architects.jpg',
-        alt: 'Architects reviewing blueprints at project meeting',
-        descEn: 'Turnkey schedule management and consultant coordination for a beachfront luxury boutique hotel.',
-        descAr: 'إدارة متكاملة للتسليم على المفتاح وتنسيق الاستشاريين لفندق بوتيك شاطئي فاخر.',
-      },
-    ],
-  },
-  {
-    id: 'finishing-fit-out',
-    num: '07',
-    titleEn: 'Finishing & Fit-Out',
-    titleAr: 'التشطيبات والتجهيز الداخلي',
-    featured: {
-      titleEn: 'Hotel Interiors',
-      titleAr: 'تشطيبات فندقية فاخرة',
-      locationEn: 'Cairo, Egypt',
-      locationAr: 'القاهرة، مصر',
-      year: '2024',
-      image: '/images/service-fitout-marble.jpg',
-      alt: 'Architectural bookmatched marble wall adjacent to fluted wood paneling',
-      descEn:
-        'Bespoke architectural execution including full-height bookmatched Italian Calacatta marble wall cladding, acoustic timber ribs, and concealed lighting profiles.',
-      descAr:
-        'تنفيذ معماري دقيق يشمل تجاليد رخام كلكتا إيطالي ممتد للأسقف، وتجاليد خشبية عازلة للصوت، ومسارات إضاءة مخفية.',
-      scopeEn: ['Marble Installation', 'Architectural Millwork', 'Custom Metalwork', 'Acoustic Finishes'],
-      scopeAr: ['تركيب الرخام الفاخر', 'الأعمال الخشبية الدقيقة', 'التشطيبات المعدنية', 'المعالجات الصوتية'],
-    },
-    subProjects: [
-      {
-        titleEn: 'Residential Finishing',
-        titleAr: 'تشطيبات سكنية حصرية',
-        locationEn: 'New Cairo, Egypt',
-        locationAr: 'القاهرة الجديدة، مصر',
-        image: '/images/interior-living-marble.jpg',
-        alt: 'Luxury living room with fine marble and wood',
-        descEn: 'Turnkey interior finishing featuring seamless micro-cement flooring and fluted timber wall accents.',
-        descAr: 'تشطيبات سكنية متكاملة بأرضيات مايكروسمنت انسيابية وتجاليد خشبية أنيقة.',
-      },
-      {
-        titleEn: 'Office Fit-Out',
-        titleAr: 'تجهيز مكاتب تنفيذية',
-        locationEn: 'Cairo, Egypt',
-        locationAr: 'القاهرة، مصر',
-        image: '/images/interior-bedroom.png',
-        alt: 'Luxury interior bedroom suite with fine joinery',
-        descEn: 'High-end fit-out of executive boardroom suites with custom acoustic paneling and bronze hardware.',
-        descAr: 'تجهيز رفيع المستوى لقاعات الاجتماعات التنفيذية بتكسيات صوتية ومقابض برونزية خاصة.',
-      },
-    ],
-  },
-  {
-    id: 'construction-supervision',
-    num: '08',
-    titleEn: 'Construction Supervision',
-    titleAr: 'الإشراف على التنفيذ',
-    featured: {
-      titleEn: 'Office Building',
-      titleAr: 'مبنى إداري ذكي',
-      locationEn: 'New Administrative Capital, Egypt',
-      locationAr: 'العاصمة الإدارية، مصر',
-      year: '2024',
-      image: '/images/service-construction-supervision.jpg',
-      alt: 'Site engineer in hardhat and safety vest inspecting building under construction',
-      descEn:
-        'Daily on-site engineering supervision, material compliance testing, structural concrete inspection, and facade installation quality control.',
-      descAr:
-        'إشراف هندسي ميداني يومي بالموقع، واختبارات مطابقة المواد، وفحص صب الخرسانات، ومراقبة جودة تركيب الواجهات.',
-      scopeEn: ['Daily Site Inspection', 'Specification Compliance', 'Concrete & Steel Testing', 'Snagging & Handover'],
-      scopeAr: ['التفتيش الميداني اليومي', 'مطابقة المواصفات القياسية', 'فحص الخرسانة والحديد', 'الفحص النهائي والتسليم'],
-    },
-    subProjects: [
-      {
-        titleEn: 'Residential Villas',
-        titleAr: 'فيلات سكنية فاخرة',
-        locationEn: 'New Cairo, Egypt',
-        locationAr: 'القاهرة الجديدة، مصر',
-        image: '/images/project-private-residence.png',
-        alt: 'Luxury villa private residence under finished supervision',
-        descEn: 'Full structural and architectural supervision ensuring complete fidelity to architectural drawings.',
-        descAr: 'إشراف إنشائي ومعماري متكامل يضمن مطابقة ما يُنفذ على الأرض للمخططات بنسبة 100%.',
-      },
-      {
-        titleEn: 'Commercial Project',
-        titleAr: 'مشروع تجاري متكامل',
-        locationEn: 'Cairo, Egypt',
-        locationAr: 'القاهرة، مصر',
-        image: '/images/studio-space.png',
-        alt: 'Architectural studio and commercial construction space',
-        descEn: 'Rigorous engineering oversight during MEP installation, glass curtain wall testing, and life safety approvals.',
-        descAr: 'إشراف هندسي صارم أثناء تمديدات الأنظمة الكهروميكانيكية وفحص الواجهات الزجاجية واعتمادات السلامة.',
+        id: 'eng-sub-2',
+        titleEn: 'COASTAL BRIDGE',
+        titleAr: 'الجسر الساحلي المعلق',
+        locationEn: 'Abu Dhabi, UAE',
+        locationAr: 'أبوظبي، الإمارات العربية المتحدة',
+        year: '2021',
+        scopeEn: 'Scope of Work: Civil + Structural Engineering',
+        scopeAr: 'نطاق العمل: هندسة مدنية وإنشائية',
+        image: '/images/project-executive-office.png',
+        alt: 'Coastal Bridge suspension cables spanning across bay waters at sunset',
+        descEn:
+          'A landmark civil infrastructure bridge engineered for coastal marine durability, harmonic wind resistance, and sculptural illumination.',
+        descAr:
+          'جسر بنية تحتية أيقوني مصمم لمقاومة البيئة البحرية والتوافقيات الهوائية مع إضاءة معمارية منحوتة.',
+        slug: 'lake-house',
       },
     ],
   },
@@ -394,12 +367,9 @@ const TAB_FILTERS = [
   { id: 'all', labelEn: 'ALL', labelAr: 'الكل' },
   { id: 'architecture', labelEn: 'ARCHITECTURE', labelAr: 'الهندسة المعمارية' },
   { id: 'interior-design', labelEn: 'INTERIOR DESIGN', labelAr: 'التصميم الداخلي' },
-  { id: 'landscape-design', labelEn: 'LANDSCAPE DESIGN', labelAr: 'عمارة البيئة' },
+  { id: 'landscape', labelEn: 'LANDSCAPE', labelAr: 'اللاندسكيب' },
   { id: 'urban-design', labelEn: 'URBAN DESIGN', labelAr: 'التخطيط العمراني' },
-  { id: 'engineering', labelEn: 'ENGINEERING', labelAr: 'التنسيق الهندسي' },
-  { id: 'project-management', labelEn: 'PROJECT MANAGEMENT', labelAr: 'إدارة المشاريع' },
-  { id: 'finishing-fit-out', labelEn: 'FINISHING & FIT-OUT', labelAr: 'التشطيبات والتجهيز' },
-  { id: 'construction-supervision', labelEn: 'CONSTRUCTION SUPERVISION', labelAr: 'الإشراف على التنفيذ' },
+  { id: 'engineering', labelEn: 'ENGINEERING', labelAr: 'الهندسة المتكاملة' },
 ]
 
 export default function ProjectsPage() {
@@ -415,6 +385,7 @@ export default function ProjectsPage() {
     image: string
     alt: string
     desc: string
+    scopeText?: string
     scope?: string[]
     slug?: string
   } | null>(null)
@@ -422,7 +393,7 @@ export default function ProjectsPage() {
   const [dbProjects, setDbProjects] = useState<any[]>([])
   const [heroImage, setHeroImage] = useState<string>('/images/projects-hero-villa.jpg')
 
-  // Load dynamic projects and site settings
+  // Fetch dynamic projects from API
   useEffect(() => {
     let isMounted = true
     fetch('/api/public/projects')
@@ -458,10 +429,10 @@ export default function ProjectsPage() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Filter and sort portfolio data, merging dynamic admin additions
-  const displayedCategories = useMemo(() => {
-    let result = PORTFOLIO_DATA.map((cat) => {
-      // Find dynamic projects matching this category/discipline
+  // Filter and sort disciplines, merging any dynamic DB project additions
+  const displayedDisciplines = useMemo(() => {
+    let list = DISCIPLINES_DATA.map((cat) => {
+      // Check if dbProjects has items for this category
       const matched = dbProjects.filter((p) => {
         const catNorm = cat.id.toLowerCase().replace(/[^a-z0-9]/g, '')
         const titleNorm = cat.titleEn.toLowerCase().replace(/[^a-z0-9]/g, '')
@@ -473,10 +444,6 @@ export default function ProjectsPage() {
         if (p.category && typeof p.category === 'string') {
           const cNorm = p.category.toLowerCase().replace(/[^a-z0-9]/g, '')
           if (cNorm === catNorm || cNorm === titleNorm || cNorm.includes(catNorm)) return true
-        }
-        if (p.type && typeof p.type === 'string') {
-          const tNorm = p.type.toLowerCase().replace(/[^a-z0-9]/g, '')
-          if (tNorm.includes(catNorm) || catNorm.includes(tNorm)) return true
         }
         if (Array.isArray(p.disciplines)) {
           return p.disciplines.some((d: string) => {
@@ -491,53 +458,63 @@ export default function ProjectsPage() {
         }
         return false
       })
+
       if (!matched.length) return cat
 
       const feat = matched.find((p) => p.featured || p.is_featured) || matched[0]
       const rest = matched.filter((p) => p.id !== feat.id && p.slug !== feat.slug)
 
-      const updatedFeatured = {
+      const updatedFeatured: ProjectItem = {
+        id: feat.id || cat.featured.id,
         titleEn: feat.name || feat.title || cat.featured.titleEn,
         titleAr: feat.nameAr || feat.titleAr || feat.title_ar || cat.featured.titleAr,
         locationEn: feat.location || feat.location_en || cat.featured.locationEn,
         locationAr: feat.locationAr || feat.location_ar || cat.featured.locationAr,
         year: String(feat.year || cat.featured.year),
+        scopeEn: feat.scope ? `Scope of Work: ${Array.isArray(feat.scope) ? feat.scope.join(' + ') : feat.scope}` : cat.featured.scopeEn,
+        scopeAr: feat.scopeAr ? `نطاق العمل: ${Array.isArray(feat.scopeAr) ? feat.scopeAr.join(' + ') : feat.scopeAr}` : cat.featured.scopeAr,
         image: feat.cover || feat.coverImage || feat.cover_image || cat.featured.image,
         alt: feat.name || feat.title || cat.featured.alt,
         descEn: feat.description || feat.details_en || cat.featured.descEn,
         descAr: feat.descriptionAr || feat.details_ar || cat.featured.descAr,
-        scopeEn: Array.isArray(feat.scope) && feat.scope.length ? feat.scope : cat.featured.scopeEn,
-        scopeAr: Array.isArray(feat.scopeAr) && feat.scopeAr.length ? feat.scopeAr : cat.featured.scopeAr,
-        slug: feat.slug,
+        scopeListEn: Array.isArray(feat.scope) && feat.scope.length ? feat.scope : cat.featured.scopeListEn,
+        scopeListAr: Array.isArray(feat.scopeAr) && feat.scopeAr.length ? feat.scopeAr : cat.featured.scopeListAr,
+        slug: feat.slug || cat.featured.slug,
       }
 
-      const updatedSubProjects = [...cat.subProjects] as [SubProject, SubProject]
+      const updatedSubProjects = [...cat.subProjects] as [ProjectItem, ProjectItem]
       if (rest[0]) {
         updatedSubProjects[0] = {
+          id: rest[0].id || cat.subProjects[0].id,
           titleEn: rest[0].name || rest[0].title || cat.subProjects[0].titleEn,
           titleAr: rest[0].nameAr || rest[0].titleAr || rest[0].title_ar || cat.subProjects[0].titleAr,
           locationEn: rest[0].location || rest[0].location_en || cat.subProjects[0].locationEn,
           locationAr: rest[0].locationAr || rest[0].location_ar || cat.subProjects[0].locationAr,
+          year: String(rest[0].year || cat.subProjects[0].year),
+          scopeEn: rest[0].scope ? `Scope of Work: ${Array.isArray(rest[0].scope) ? rest[0].scope.join(' + ') : rest[0].scope}` : cat.subProjects[0].scopeEn,
+          scopeAr: rest[0].scopeAr ? `نطاق العمل: ${Array.isArray(rest[0].scopeAr) ? rest[0].scopeAr.join(' + ') : rest[0].scopeAr}` : cat.subProjects[0].scopeAr,
           image: rest[0].cover || rest[0].coverImage || rest[0].cover_image || cat.subProjects[0].image,
           alt: rest[0].name || rest[0].title || cat.subProjects[0].alt,
-          year: String(rest[0].year || cat.subProjects[0].year || '2025'),
           descEn: rest[0].description || rest[0].details_en || cat.subProjects[0].descEn,
           descAr: rest[0].descriptionAr || rest[0].details_ar || cat.subProjects[0].descAr,
-          slug: rest[0].slug,
+          slug: rest[0].slug || cat.subProjects[0].slug,
         }
       }
       if (rest[1]) {
         updatedSubProjects[1] = {
+          id: rest[1].id || cat.subProjects[1].id,
           titleEn: rest[1].name || rest[1].title || cat.subProjects[1].titleEn,
           titleAr: rest[1].nameAr || rest[1].titleAr || rest[1].title_ar || cat.subProjects[1].titleAr,
           locationEn: rest[1].location || rest[1].location_en || cat.subProjects[1].locationEn,
           locationAr: rest[1].locationAr || rest[1].location_ar || cat.subProjects[1].locationAr,
+          year: String(rest[1].year || cat.subProjects[1].year),
+          scopeEn: rest[1].scope ? `Scope of Work: ${Array.isArray(rest[1].scope) ? rest[1].scope.join(' + ') : rest[1].scope}` : cat.subProjects[1].scopeEn,
+          scopeAr: rest[1].scopeAr ? `نطاق العمل: ${Array.isArray(rest[1].scopeAr) ? rest[1].scopeAr.join(' + ') : rest[1].scopeAr}` : cat.subProjects[1].scopeAr,
           image: rest[1].cover || rest[1].coverImage || rest[1].cover_image || cat.subProjects[1].image,
           alt: rest[1].name || rest[1].title || cat.subProjects[1].alt,
-          year: String(rest[1].year || cat.subProjects[1].year || '2025'),
           descEn: rest[1].description || rest[1].details_en || cat.subProjects[1].descEn,
           descAr: rest[1].descriptionAr || rest[1].details_ar || cat.subProjects[1].descAr,
-          slug: rest[1].slug,
+          slug: rest[1].slug || cat.subProjects[1].slug,
         }
       }
 
@@ -549,84 +526,109 @@ export default function ProjectsPage() {
     })
 
     if (activeTab !== 'all') {
-      result = result.filter((cat) => cat.id === activeTab)
+      list = list.filter((cat) => cat.id === activeTab)
     }
+
     if (sortBy === 'egypt') {
-      result = result.map((cat) => ({
+      list = list.map((cat) => ({
         ...cat,
         subProjects: [...cat.subProjects].sort((a) =>
           a.locationEn.includes('Egypt') ? -1 : 1
-        ) as [SubProject, SubProject],
+        ) as [ProjectItem, ProjectItem],
       }))
     } else if (sortBy === 'ksa') {
-      result = result.map((cat) => ({
+      list = list.map((cat) => ({
         ...cat,
         subProjects: [...cat.subProjects].sort((a) =>
-          a.locationEn.includes('KSA') || a.locationEn.includes('Riyadh') ? -1 : 1
-        ) as [SubProject, SubProject],
+          a.locationEn.includes('Saudi') || a.locationEn.includes('Riyadh') || a.locationEn.includes('AlUla') ? -1 : 1
+        ) as [ProjectItem, ProjectItem],
       }))
     }
-    return result
+
+    return list
   }, [activeTab, sortBy, dbProjects])
 
   return (
-    <main className="min-h-screen bg-background">
-      {/* 1. CINEMATIC HERO SECTION (Matching Reference Image) */}
-      <section className="relative min-h-[58vh] lg:min-h-[64vh] flex flex-col justify-end surface-dark overflow-hidden select-none">
-        {/* Bespoke Twilight Villa Photo with Reflective Pool & Olive Tree */}
-        <div className="absolute inset-0">
-          <Image
-            src={heroImage}
-            alt="Ultra-luxury modern villa at twilight with illuminated olive tree and reflecting infinity pool"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center scale-100"
-          />
-        </div>
+    <main className="min-h-screen bg-[#FAF9F6] text-charcoal selection:bg-gold selection:text-charcoal">
+      {/* =========================================================================
+          1. EDITORIAL HERO SECTION (Matching Reference Image 2)
+          - Left: OUR WORK / Selected Projects / Subtitle / Accent Line
+          - Right: High-resolution visual with vertical PEOPLE/PLACES/PURPOSE/ALWAYS
+         ========================================================================= */}
+      <section className="relative pt-28 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 bg-[#FAF9F6] border-b border-stone/30 overflow-hidden">
+        <div className="container-viwan">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Column: Heading & Monograph Brief */}
+            <div className="lg:col-span-6 flex flex-col justify-center">
+              <span className="eyebrow text-xs sm:text-sm text-gold tracking-[0.25em] font-semibold uppercase mb-3 block animate-fade-up">
+                {isAr ? 'أعمالنا المختارة' : 'OUR WORK'}
+              </span>
 
-        {/* Directional Gradients for Text Contrast & Architectural Glow */}
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/60 to-charcoal/30 pointer-events-none"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/50 to-transparent rtl:bg-gradient-to-l rtl:from-charcoal/90 rtl:via-charcoal/50 rtl:to-transparent pointer-events-none"
-          aria-hidden="true"
-        />
+              <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl text-charcoal font-normal tracking-tight leading-[1.05] mb-6 animate-fade-up [animation-delay:120ms]">
+                {isAr ? (
+                  <>
+                    مشاريع
+                    <br />
+                    منتقاة
+                  </>
+                ) : (
+                  <>
+                    Selected
+                    <br />
+                    Projects
+                  </>
+                )}
+              </h1>
 
-        {/* Hero Content Container */}
-        <div className="container-viwan relative z-10 w-full pt-36 md:pt-44 pb-16 md:pb-20 flex flex-col md:flex-row md:items-end justify-between gap-10">
-          <div className="flex flex-col gap-3 max-w-3xl">
-            <Eyebrow gold className="animate-fade-up">
-              {t.projectsPage.heroEyebrow}
-            </Eyebrow>
+              <p className="text-sm sm:text-base text-charcoal/75 leading-relaxed max-w-lg mb-8 animate-fade-up [animation-delay:240ms]">
+                {isAr
+                  ? 'ملف أعمال منتقى عبر العمارة، التصميم الداخلي، اللاندسكيب، التخطيط العمراني، والهندسة المتكاملة — نوحد الإنسان والمكان والغاية.'
+                  : 'A curated portfolio across Architecture, Interior Design, Landscape, Urban Design, and Engineering — unifying people, places and purpose.'}
+              </p>
 
-            <h1 className="display text-4xl sm:text-5xl lg:text-6xl text-ivory leading-[1.08] animate-fade-up [animation-delay:150ms]">
-              {t.projectsPage.heroTitle1}
-              <br />
-              {t.projectsPage.heroTitle2}
-            </h1>
+              {/* Accent Line & Motto */}
+              <div className="flex items-center gap-3 text-xs eyebrow text-charcoal/60 font-medium tracking-widest animate-fade-up [animation-delay:360ms]">
+                <span className="w-10 h-px bg-gold inline-block" aria-hidden="true" />
+                <span>
+                  {isAr ? 'مساحات لغدٍ أكثر إشراقاً' : 'SPACES FOR A BRIGHTER TOMORROW'}
+                </span>
+              </div>
+            </div>
 
-            <p className="text-sm sm:text-base md:text-lg text-ivory/85 leading-relaxed max-w-2xl animate-fade-up [animation-delay:300ms]">
-              {t.projectsPage.heroSubtitle}
-            </p>
-          </div>
+            {/* Right Column: Hero Visual with Vertical Editorial Typography */}
+            <div className="lg:col-span-6 relative animate-fade-in [animation-delay:200ms]">
+              <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden bg-stone/20 shadow-md group">
+                <Image
+                  src={heroImage}
+                  alt="Selected Projects architectural villa with pool overlooking horizon"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 via-transparent to-transparent pointer-events-none" />
 
-          {/* Right Brand Pillar Block with Vertical Divider */}
-          <div className="hidden md:flex items-center gap-4 animate-fade-in [animation-delay:450ms]">
-            <span className="h-16 w-px bg-ivory/30 inline-block" aria-hidden="true" />
-            <div className="flex flex-col gap-1 eyebrow text-ivory/70 text-xs tracking-widest font-medium">
-              <span>{t.projectsPage.brandPeople}</span>
-              <span>{t.projectsPage.brandPlaces}</span>
-              <span className="text-gold">{t.projectsPage.brandPurpose}</span>
+                {/* Right Edge Vertical Typography (PEOPLE / PLACES / PURPOSE / ALWAYS) */}
+                <div
+                  dir="ltr"
+                  className="absolute top-0 end-0 bottom-0 px-4 sm:px-6 py-6 flex flex-col justify-between items-center text-[10px] sm:text-xs font-mono tracking-[0.25em] text-ivory/90 uppercase select-none pointer-events-none bg-charcoal/30 backdrop-blur-[2px]"
+                >
+                  <span className="hover:text-gold transition-colors">PEOPLE</span>
+                  <span className="hover:text-gold transition-colors">PLACES</span>
+                  <span className="hover:text-gold transition-colors">PURPOSE</span>
+                  <span className="text-gold font-bold">ALWAYS</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. FILTER & SORT NAVIGATION BAR (Sticky Sub-Header) */}
-      <section className="bg-[#FAF9F6] border-y border-stone/30 sticky top-20 md:top-[88px] z-30 shadow-xs">
+      {/* =========================================================================
+          2. FILTER & SORT NAVIGATION BAR (Sticky Sub-Header)
+          - Tabs: ALL | ARCHITECTURE | INTERIOR DESIGN | LANDSCAPE | URBAN DESIGN | ENGINEERING
+         ========================================================================= */}
+      <section className="bg-[#FAF9F6]/95 backdrop-blur-md border-b border-stone/30 sticky top-20 md:top-[88px] z-30 shadow-xs">
         <div className="container-viwan py-3.5 flex items-center justify-between gap-6">
           {/* Scrollable Tab List */}
           <div
@@ -644,7 +646,7 @@ export default function ProjectsPage() {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`eyebrow text-xs tracking-wider px-3.5 py-2 whitespace-nowrap transition-all duration-200 cursor-pointer rounded-xs ${
+                  className={`eyebrow text-xs tracking-wider px-3.5 py-1.5 whitespace-nowrap transition-all duration-200 cursor-pointer rounded-xs ${
                     isActive
                       ? 'text-charcoal font-semibold border-b-2 border-charcoal bg-stone/20'
                       : 'text-charcoal/60 hover:text-charcoal hover:bg-stone/10'
@@ -678,146 +680,299 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      {/* 3. THE 8 DISCIPLINES ARCHITECTURAL SHOWCASE GRID (24 PROJECTS) */}
-      <section className="bg-[#FAF9F5] py-12 md:py-16 drafting-grid relative">
-        <div className="container-viwan">
-          {/* 4-column layout matching reference image */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-s border-stone/30">
-            {displayedCategories.map((cat, idx) => {
-              const catTitle = isAr ? cat.titleAr : cat.titleEn
-              const featured = cat.featured
-              const fTitle = isAr ? featured.titleAr : featured.titleEn
-              const fLoc = isAr ? featured.locationAr : featured.locationEn
+      {/* =========================================================================
+          3. THE 5 DISCIPLINES EDITORIAL LAYOUT (Exact Order 01 to 05 from Reference)
+          01 Architecture
+          02 Interior Design
+          03 Landscape
+          04 Urban Design
+          05 Engineering
+          Each discipline row:
+          - Left: Index + Title + Description + VIEW ALL ->
+          - Center: Big Featured Card with Title, Location, Year, Scope below
+          - Right: 2 Stacked Horizontal Cards with thumbnail, title, location, scope, and circular arrow button ->
+         ========================================================================= */}
+      <section className="bg-[#FAF9F6] drafting-grid relative">
+        <div className="container-viwan divide-y divide-stone/30">
+          {displayedDisciplines.map((cat) => {
+            const catTitle = isAr ? cat.titleAr : cat.titleEn
+            const catTagline = isAr ? cat.taglineAr : cat.taglineEn
+            const feat = cat.featured
+            const fTitle = isAr ? feat.titleAr : feat.titleEn
+            const fLoc = isAr ? feat.locationAr : feat.locationEn
+            const fScope = isAr ? feat.scopeAr : feat.scopeEn
 
-              return (
-                <article
-                  key={cat.id}
-                  style={{ transitionDelay: `${(idx % 4) * 90}ms` }}
-                  className="reveal p-5 sm:p-6 bg-background hover:bg-[#F9F8F4] transition-colors duration-300 border-e border-b border-stone/30 flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Header: Number + Category Title + VIEW ALL -> */}
-                    <div className="flex items-center justify-between gap-2 mb-4">
-                      <div className="flex items-baseline gap-2.5">
-                        <span className="font-mono text-xs tracking-widest text-gold font-semibold">
-                          + {cat.num}
-                        </span>
-                        <h2 className="display text-lg sm:text-xl text-charcoal tracking-tight font-serif">
-                          {catTitle}
-                        </h2>
-                      </div>
+            return (
+              <div
+                key={cat.id}
+                id={`discipline-${cat.id}`}
+                className="py-14 sm:py-20 lg:py-24 first:pt-12"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+                  {/* Left Column (25%): 01 + Title + Tagline + VIEW ALL -> */}
+                  <div className="lg:col-span-3 flex flex-col justify-between h-full">
+                    <div>
+                      {/* Number Index */}
+                      <span className="font-mono text-sm sm:text-base text-gold/90 font-semibold tracking-widest block mb-2">
+                        {cat.num}
+                      </span>
+
+                      {/* Discipline Title */}
+                      <h2 className="font-serif text-3xl sm:text-4xl text-charcoal font-light tracking-tight leading-tight mb-4">
+                        {catTitle}
+                      </h2>
+
+                      {/* Brief Discipline Statement */}
+                      <p className="text-xs sm:text-sm text-charcoal/70 leading-relaxed max-w-xs mb-6">
+                        {catTagline}
+                      </p>
+                    </div>
+
+                    {/* View All Button */}
+                    <div>
                       <button
                         type="button"
                         onClick={() => setActiveTab(cat.id)}
-                        className="inline-flex items-center gap-1 eyebrow text-[10px] sm:text-[11px] font-semibold text-charcoal/70 hover:text-gold transition-colors shrink-0 group py-1"
+                        className="inline-flex items-center gap-2 eyebrow text-xs font-semibold text-charcoal/80 hover:text-gold transition-colors py-1 group cursor-pointer"
                       >
-                        <span>{t.projectsPage.viewAll}</span>
-                        <ArrowRight className="size-3 rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+                        <span className="border-b border-charcoal/40 group-hover:border-gold pb-0.5">
+                          {isAr ? 'عرض الكل' : 'VIEW ALL'}
+                        </span>
+                        {isAr ? (
+                          <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
+                        ) : (
+                          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                        )}
                       </button>
                     </div>
+                  </div>
 
-                    {/* Primary Featured Project Card */}
-                    <div
+                  {/* Center Column (45%): Large Primary Featured Project Card */}
+                  <div className="lg:col-span-5">
+                    <article
                       onClick={() =>
                         setSelectedProject({
                           title: fTitle,
                           category: catTitle,
                           location: fLoc,
-                          year: featured.year,
-                          image: featured.image,
-                          alt: featured.alt,
-                          desc: isAr ? featured.descAr : featured.descEn,
-                          scope: isAr ? featured.scopeAr : featured.scopeEn,
-                          slug: featured.slug,
+                          year: feat.year,
+                          image: feat.image,
+                          alt: feat.alt,
+                          desc: isAr ? feat.descAr || '' : feat.descEn || '',
+                          scopeText: fScope,
+                          scope: isAr ? feat.scopeListAr : feat.scopeListEn,
+                          slug: feat.slug,
                         })
                       }
-                      className="group/card relative aspect-[16/10] w-full overflow-hidden mb-3 bg-stone/20 border border-stone/20 cursor-pointer corner-ticks"
+                      className="group/feat cursor-pointer flex flex-col"
                     >
-                      <Image
-                        src={featured.image}
-                        alt={featured.alt}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                        className="object-cover group-hover/card:scale-105 transition-transform duration-700 ease-out"
-                      />
-                      {/* Gradient Overlay for Text Readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/85 via-charcoal/30 to-transparent" />
+                      {/* Card Image Container */}
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone/20 border border-stone/20">
+                        <Image
+                          src={feat.image}
+                          alt={feat.alt}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 45vw"
+                          className="object-cover group-hover/feat:scale-105 transition-transform duration-700 ease-out"
+                        />
+                      </div>
 
-                      {/* Bottom Info Overlay */}
-                      <div className="absolute inset-x-0 bottom-0 p-3.5 flex flex-col justify-end text-ivory">
-                        <h3 className="display text-base sm:text-lg text-ivory leading-tight font-serif group-hover/card:text-gold transition-colors">
+                      {/* Text details below card (as in Reference Image) */}
+                      <div className="pt-4 flex flex-col">
+                        <h3 className="text-sm sm:text-base font-bold uppercase tracking-wider text-charcoal group-hover/feat:text-gold transition-colors">
                           {fTitle}
                         </h3>
-                        <p className="eyebrow text-[11px] text-ivory/75 tracking-wider mt-0.5">
-                          {fLoc} | {featured.year}
+                        <p className="text-xs text-charcoal/60 mt-1">
+                          {fLoc} | {feat.year}
+                        </p>
+                        <p className="text-xs text-charcoal/70 font-medium mt-0.5">
+                          {fScope}
                         </p>
                       </div>
-                    </div>
+                    </article>
+                  </div>
 
-                    {/* Dual Sub-Thumbnail Cards (Side-by-Side) */}
-                    <div className="grid grid-cols-2 gap-2 mt-1">
-                      {cat.subProjects.map((sub, idx) => {
-                        const sTitle = isAr ? sub.titleAr : sub.titleEn
-                        const sLoc = isAr ? sub.locationAr : sub.locationEn
+                  {/* Right Column (30%): 2 Stacked Horizontal Sub-Project Cards */}
+                  <div className="lg:col-span-4 flex flex-col gap-6 sm:gap-7">
+                    {cat.subProjects.map((sub) => {
+                      const sTitle = isAr ? sub.titleAr : sub.titleEn
+                      const sLoc = isAr ? sub.locationAr : sub.locationEn
+                      const sScope = isAr ? sub.scopeAr : sub.scopeEn
 
-                        return (
-                          <div
-                            key={idx}
-                            onClick={() =>
-                              setSelectedProject({
-                                title: sTitle,
-                                category: catTitle,
-                                location: sLoc,
-                                year: sub.year,
-                                image: sub.image,
-                                alt: sub.alt,
-                                desc: isAr ? sub.descAr || '' : sub.descEn || '',
-                                slug: sub.slug,
-                              })
-                            }
-                            className="group/sub flex flex-col cursor-pointer"
-                          >
-                            <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone/20 border border-stone/20 mb-1.5">
+                      return (
+                        <article
+                          key={sub.id}
+                          onClick={() =>
+                            setSelectedProject({
+                              title: sTitle,
+                              category: catTitle,
+                              location: sLoc,
+                              year: sub.year,
+                              image: sub.image,
+                              alt: sub.alt,
+                              desc: isAr ? sub.descAr || '' : sub.descEn || '',
+                              scopeText: sScope,
+                              scope: isAr ? sub.scopeListAr : sub.scopeListEn,
+                              slug: sub.slug,
+                            })
+                          }
+                          className="group/sub cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-2.5 sm:p-3 -m-2.5 sm:-m-3 rounded-xs hover:bg-stone/15 transition-colors duration-200"
+                        >
+                          <div className="flex items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                            {/* Horizontal Thumbnail */}
+                            <div className="relative w-28 sm:w-32 aspect-[16/10] shrink-0 overflow-hidden bg-stone/20 border border-stone/20">
                               <Image
                                 src={sub.image}
                                 alt={sub.alt}
                                 fill
-                                sizes="(max-width: 768px) 50vw, 200px"
+                                sizes="(max-width: 640px) 112px, 128px"
                                 className="object-cover group-hover/sub:scale-105 transition-transform duration-500 ease-out"
                               />
                             </div>
-                            <h4 className="text-xs font-medium text-charcoal group-hover/sub:text-gold transition-colors line-clamp-1 leading-snug">
-                              {sTitle}
-                            </h4>
-                            <p className="text-[10px] text-charcoal/60 line-clamp-1 mt-0.5">
-                              {sLoc}
-                            </p>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </article>
-              )
-            })}
-          </div>
 
-          {/* Back to All button if filtered */}
-          {activeTab !== 'all' && (
-            <div className="mt-8 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setActiveTab('all')}
-                className="inline-flex items-center gap-2 eyebrow text-xs px-5 py-2.5 bg-charcoal text-ivory hover:bg-gold transition-colors cursor-pointer rounded-xs"
-              >
-                <span>{isAr ? 'عرض جميع التخصصات (8)' : 'View All Disciplines (8)'}</span>
-              </button>
-            </div>
-          )}
+                            {/* Project Information */}
+                            <div className="flex flex-col min-w-0">
+                              <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-charcoal group-hover/sub:text-gold transition-colors line-clamp-1">
+                                {sTitle}
+                              </h4>
+                              <p className="text-[11px] text-charcoal/60 mt-0.5 line-clamp-1">
+                                {sLoc} | {sub.year}
+                              </p>
+                              <p className="text-[11px] text-charcoal/70 font-medium mt-0.5 line-clamp-1">
+                                {sScope}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Circular Arrow Button (Reference Image) */}
+                          <div className="size-9 sm:size-10 rounded-full border border-stone/30 flex items-center justify-center shrink-0 ms-auto text-charcoal/70 group-hover/sub:border-gold group-hover/sub:bg-gold group-hover/sub:text-charcoal transition-all duration-300">
+                            {isAr ? (
+                              <ArrowLeft className="size-4" strokeWidth={1.75} />
+                            ) : (
+                              <ArrowRight className="size-4" strokeWidth={1.75} />
+                            )}
+                          </div>
+                        </article>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
 
-      {/* 4. INTERACTIVE PROJECT PREVIEW MODAL */}
+      {/* =========================================================================
+          4. OUR PHILOSOPHY SECTION (Exact Section from Reference Image 2)
+          - Left: OUR PHILOSOPHY / Better environments create brighter lives.
+          - Center: We design across disciplines to create meaningful places...
+          - Right: High-resolution visual banner with NATURE/PEOPLE/CULTURE/PROGRESS
+         ========================================================================= */}
+      <section className="bg-[#FAF9F6] border-t border-stone/30 py-16 sm:py-24">
+        <div className="container-viwan">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left: Heading & Eyebrow */}
+            <div className="lg:col-span-4 flex flex-col">
+              <span className="eyebrow text-xs text-gold tracking-[0.25em] font-semibold uppercase mb-3 block">
+                {t.projectsPage.philosophyEyebrow}
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl text-charcoal font-light leading-tight tracking-tight">
+                {t.projectsPage.philosophyTitle}
+              </h2>
+            </div>
+
+            {/* Center: Quote & Architectural Mission */}
+            <div className="lg:col-span-4 flex flex-col justify-center border-s-0 lg:border-s border-stone/30 lg:ps-8">
+              <p className="text-xs sm:text-sm text-charcoal/75 leading-relaxed mb-4">
+                {t.projectsPage.philosophyQuote}
+              </p>
+              <div className="flex items-center gap-3 text-[11px] eyebrow text-gold font-medium tracking-widest">
+                <span className="w-8 h-px bg-gold inline-block" aria-hidden="true" />
+                <span>{t.projectsPage.philosophyAccent}</span>
+              </div>
+            </div>
+
+            {/* Right: Visual Image with Vertical Typography */}
+            <div className="lg:col-span-4 relative">
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-stone/20 shadow-xs group">
+                <Image
+                  src="/images/hero-villa-2.jpg"
+                  alt="Viwan architectural philosophy visual"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-charcoal/25" />
+
+                {/* Vertical overlay words */}
+                <div
+                  dir="ltr"
+                  className="absolute top-0 end-0 bottom-0 px-4 py-4 flex flex-col justify-between items-center text-[9px] sm:text-[10px] font-mono tracking-[0.2em] text-ivory/90 uppercase select-none pointer-events-none bg-charcoal/30 backdrop-blur-[2px]"
+                >
+                  <span>NATURE</span>
+                  <span>PEOPLE</span>
+                  <span>CULTURE</span>
+                  <span className="text-gold font-bold">PROGRESS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5. LET'S BUILD TOGETHER (Bottom Dark Banner from Reference Image 2)
+          - Left: LET'S BUILD TOGETHER / Start your next project.
+          - Center: Share your vision and explore how we can bring it to life...
+          - Right: 30 MINUTES FREE CONSULTATION -> button
+         ========================================================================= */}
+      <section className="bg-[#11110F] text-ivory py-12 sm:py-16 border-t border-stone/30">
+        <div className="container-viwan">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Left Column */}
+            <div className="lg:col-span-4">
+              <span className="eyebrow text-gold text-xs tracking-widest font-medium uppercase block mb-2">
+                {t.projectsPage.letsBuildEyebrow}
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl text-ivory font-light tracking-tight">
+                {t.projectsPage.letsBuildTitle}
+              </h2>
+            </div>
+
+            {/* Center Column */}
+            <div className="lg:col-span-5 border-s-0 lg:border-s border-white/10 lg:ps-8">
+              <p className="text-xs sm:text-sm text-ivory/70 leading-relaxed">
+                {t.projectsPage.letsBuildSubtitle}
+              </p>
+            </div>
+
+            {/* Right Column: CTA Button */}
+            <div className="lg:col-span-3 flex justify-start lg:justify-end">
+              <Link
+                href="/consultation"
+                className="px-6 py-3.5 bg-[#8C6D46] hover:bg-gold text-charcoal font-semibold text-xs tracking-widest uppercase transition-all duration-300 rounded-xs inline-flex items-center gap-3 group shadow-md"
+              >
+                <span>{t.projectsPage.freeConsultationCta}</span>
+                {isAr ? (
+                  <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
+                ) : (
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                )}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          6. ARCHITECTURAL FAQS SECTION (AIA / RIBA Inquiries & Governance)
+         ========================================================================= */}
+      <ProjectsFaqSection />
+
+      {/* =========================================================================
+          7. INTERACTIVE PROJECT PREVIEW MODAL
+         ========================================================================= */}
       {selectedProject && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-charcoal/80 backdrop-blur-sm animate-fade-in"
@@ -834,7 +989,7 @@ export default function ProjectsPage() {
               type="button"
               onClick={() => setSelectedProject(null)}
               aria-label="Close modal"
-              className="absolute top-4 end-4 z-20 size-10 flex items-center justify-center rounded-full bg-charcoal/70 hover:bg-charcoal text-ivory transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              className="absolute top-4 end-4 z-20 size-10 flex items-center justify-center rounded-full bg-charcoal/70 hover:bg-charcoal text-ivory transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold cursor-pointer"
             >
               <X className="size-5" />
             </button>
@@ -860,11 +1015,11 @@ export default function ProjectsPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 sm:p-8 flex flex-col gap-5">
+            <div className="p-6 sm:p-8 flex flex-col gap-5 max-h-[60vh] overflow-y-auto">
               <div>
                 <h3
                   id="project-dialog-title"
-                  className="display text-2xl sm:text-3xl text-charcoal mb-2"
+                  className="font-serif text-2xl sm:text-3xl text-charcoal mb-2"
                 >
                   {selectedProject.title}
                 </h3>
@@ -877,6 +1032,11 @@ export default function ProjectsPage() {
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 text-gold shrink-0" />
                       <span>{selectedProject.year}</span>
+                    </span>
+                  )}
+                  {selectedProject.scopeText && (
+                    <span className="text-gold font-medium">
+                      {selectedProject.scopeText}
                     </span>
                   )}
                 </div>
@@ -912,7 +1072,11 @@ export default function ProjectsPage() {
                     className="w-full sm:w-auto px-5 py-2.5 bg-gold text-charcoal font-semibold text-xs uppercase tracking-wider text-center hover:bg-gold/90 transition-colors rounded-xs inline-flex items-center justify-center gap-2"
                   >
                     <span>{isAr ? 'عرض صفحة المشروع بالكامل' : 'View Full Monograph'}</span>
-                    <ArrowRight className="size-3.5 rtl:rotate-180" />
+                    {isAr ? (
+                      <ArrowLeft className="size-3.5" />
+                    ) : (
+                      <ArrowRight className="size-3.5" />
+                    )}
                   </Link>
                 )}
                 <ButtonLink
@@ -934,42 +1098,6 @@ export default function ProjectsPage() {
           </div>
         </div>
       )}
-
-      {/* 4.5. ARCHITECTURAL FAQS (RIBA/AIA Standards with Typewriter Animation) */}
-      <ProjectsFaqSection />
-
-      {/* 5. READY TO START? BOTTOM CALL-TO-ACTION (Matching Reference Image) */}
-      <section className="surface-dark bg-[#11110F] border-t border-stone/30 py-16 md:py-24 relative overflow-hidden reveal">
-        <div className="container-viwan flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
-          {/* Left: Eyebrow & Headline */}
-          <div className="flex flex-col gap-2 max-w-2xl">
-            <span className="eyebrow text-gold text-xs tracking-widest font-medium uppercase">
-              {t.projectsPage.readyEyebrow}
-            </span>
-            <h2 className="display text-3xl sm:text-4xl lg:text-5xl text-ivory leading-tight text-balance">
-              {t.projectsPage.readyTitle}
-            </h2>
-          </div>
-
-          {/* Right: Two CTA Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0">
-            <ButtonLink href="/consultation" variant="gold">
-              <span>{t.projectsPage.freeConsultationCta}</span>
-              <ArrowRight className="size-4 rtl:rotate-180" />
-            </ButtonLink>
-
-            <ButtonLink
-              href="/contact"
-              variant="outline"
-              className="border-ivory/30 text-ivory hover:bg-ivory/10 hover:border-ivory/60"
-            >
-              <span>{t.projectsPage.startProjectCta}</span>
-              <ArrowRight className="size-4 rtl:rotate-180" />
-            </ButtonLink>
-          </div>
-        </div>
-      </section>
     </main>
   )
 }
-

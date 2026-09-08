@@ -284,11 +284,11 @@ export function SiteHeader() {
         </div>
 
         {/* Drawer Main Content */}
-        <div className="container-viwan w-full max-w-full overflow-x-hidden flex-1 py-6 sm:py-10 md:py-16 relative z-10 flex flex-col justify-start lg:justify-center">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center w-full">
+        <div className="container-viwan w-full max-w-full overflow-x-hidden flex-1 py-4 sm:py-6 lg:py-8 relative z-10 flex flex-col justify-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start w-full">
             {/* Left 7-8 Cols: Numbered Links with Interactive Hover */}
             <div className="w-full lg:col-span-8">
-              <span className="eyebrow text-xs text-gold/70 tracking-[0.25em] uppercase block mb-3 sm:mb-6">
+              <span className="eyebrow text-xs text-gold/70 tracking-[0.25em] uppercase block mb-3 sm:mb-4">
                 {isAr ? 'خريطة الاستوديو والأقسام' : 'NAVIGATION & DISCIPLINES'}
               </span>
 
@@ -306,7 +306,7 @@ export function SiteHeader() {
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        'group/item relative flex items-baseline justify-between py-3 sm:py-4 transition-all duration-300 cursor-pointer overflow-hidden max-w-full',
+                        'group/item relative flex items-baseline justify-between py-2 sm:py-2.5 lg:py-3 transition-all duration-300 cursor-pointer overflow-hidden max-w-full',
                         'group-hover/navlist:opacity-35 hover:!opacity-100',
                         'ltr:hover:translate-x-3 rtl:hover:-translate-x-3',
                       )}
@@ -320,7 +320,7 @@ export function SiteHeader() {
                         {/* Title in Professional Cormorant Serif Font */}
                         <span
                           className={cn(
-                            'font-serif text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight transition-all duration-300',
+                            'font-serif text-2xl sm:text-3xl lg:text-4xl font-light tracking-tight transition-all duration-300',
                             active
                               ? 'text-gold'
                               : 'text-ivory group-hover/item:text-gold group-hover/item:italic',
@@ -354,6 +354,65 @@ export function SiteHeader() {
                   )
                 })}
               </nav>
+
+              {/* Mobile Social Media Icons directly under Contact */}
+              <div className="lg:hidden pt-6 pb-2 border-t border-white/[0.08] mt-4">
+                <span className="eyebrow text-[11px] text-gold/80 tracking-[0.2em] uppercase block mb-3 font-semibold">
+                  {isAr ? 'تواصل معنا' : 'CONNECT WITH US'}
+                </span>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <a
+                    href={CONTACT.whatsapp}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="WhatsApp"
+                    title="WhatsApp"
+                    className="size-9 rounded-full border border-white/20 bg-white/[0.04] flex items-center justify-center text-ivory/80 hover:text-gold hover:border-gold hover:bg-gold/10 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <WhatsAppIcon className="size-4" />
+                  </a>
+                  <a
+                    href={CONTACT.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Instagram"
+                    title="Instagram"
+                    className="size-9 rounded-full border border-white/20 bg-white/[0.04] flex items-center justify-center text-ivory/80 hover:text-gold hover:border-gold hover:bg-gold/10 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <InstagramIcon className="size-4" />
+                  </a>
+                  <a
+                    href={CONTACT.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="LinkedIn"
+                    title="LinkedIn"
+                    className="size-9 rounded-full border border-white/20 bg-white/[0.04] flex items-center justify-center text-ivory/80 hover:text-gold hover:border-gold hover:bg-gold/10 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <LinkedInIcon className="size-4" />
+                  </a>
+                  <a
+                    href={CONTACT.behance}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Behance"
+                    title="Behance"
+                    className="size-9 rounded-full border border-white/20 bg-white/[0.04] flex items-center justify-center text-ivory/80 hover:text-gold hover:border-gold hover:bg-gold/10 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <BehanceIcon className="size-4" />
+                  </a>
+                  <a
+                    href={CONTACT.facebook}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Facebook"
+                    title="Facebook"
+                    className="size-9 rounded-full border border-white/20 bg-white/[0.04] flex items-center justify-center text-ivory/80 hover:text-gold hover:border-gold hover:bg-gold/10 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <FacebookIcon className="size-4" />
+                  </a>
+                </div>
+              </div>
             </div>
 
             {/* Right 4-5 Cols: Studio Identity & Direct Contact (Desktop Only) */}
