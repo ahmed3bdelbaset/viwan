@@ -28,62 +28,67 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
-      <div className="bg-[#161513]/95 border border-stone-700/80 max-w-md w-full p-7 sm:p-8 space-y-6 shadow-[0_25px_60px_rgba(0,0,0,0.9),0_0_50px_rgba(176,138,90,0.1)] text-white relative animate-in zoom-in-95 duration-200 backdrop-blur-2xl rounded-[28px] overflow-hidden">
-        {/* Top Accent Line */}
-        <div
-          className={`absolute top-0 left-0 right-0 h-[2px] ${
-            isDestructive
-              ? 'bg-gradient-to-r from-transparent via-red-600 to-transparent'
-              : 'bg-gradient-to-r from-transparent via-[#B08A5A] to-transparent'
-          }`}
-        />
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[99999] bg-black/65 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+      onClick={onCancel}
+    >
+      <div
+        className="relative w-full max-w-lg bg-[#1a1917]/90 backdrop-blur-2xl border border-white/20 rounded-[32px] p-7 sm:p-9 space-y-6 shadow-[0_25px_60px_rgba(0,0,0,0.6)] text-white overflow-hidden transform animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Subtle Viwan Watermark behind content matching Image 1 */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.07]">
+          <ViwanMark className="w-56 h-56 text-white" isDark={true} />
+        </div>
 
-        {/* Close Icon */}
+        {/* Close Button */}
         <button
           onClick={onCancel}
-          className="absolute top-5 right-5 text-stone-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5 cursor-pointer"
+          className="absolute top-5 end-5 text-stone-400 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors z-10"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Modal Header */}
-        <div className="flex items-start space-x-4 rtl:space-x-reverse pt-2">
-          <div className="w-12 h-12 border border-stone-700 bg-[#1e1e1e] flex items-center justify-center shrink-0 shadow-inner rounded-xl">
+        {/* Centered Icon */}
+        <div className="flex justify-center pt-1 relative z-10">
+          <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-gold/10 border border-gold/30">
             {isDestructive ? (
-              <AlertTriangle className="w-6 h-6 text-red-500" />
+              <AlertTriangle className="w-8 h-8 text-gold" />
             ) : (
-              <ViwanMark className="w-7 h-7" isDark={true} />
+              <ViwanMark className="w-8 h-8 text-gold" isDark={true} />
             )}
-          </div>
-
-          <div className="space-y-1.5 pr-6 rtl:pr-0 rtl:pl-6">
-            <h3 className="font-cinzel text-base tracking-wider uppercase text-white font-semibold">
-              {title}
-            </h3>
-            <p className="text-xs text-stone-300 font-light leading-relaxed">
-              {message}
-            </p>
           </div>
         </div>
 
-        {/* Actions - Centered */}
-        <div className="flex items-center justify-center gap-3 pt-5 border-t border-stone-800">
+        {/* Title & Message Centered */}
+        <div className="space-y-2 text-center relative z-10">
+          <h3 className="font-cinzel text-lg sm:text-xl font-bold tracking-wide text-white uppercase">
+            {title}
+          </h3>
+          <p className="text-xs sm:text-sm text-stone-300 font-light leading-relaxed max-w-sm mx-auto">
+            {message}
+          </p>
+        </div>
+
+        {/* Action Buttons Centered (Pill rounded-full) */}
+        <div className="flex items-center justify-center gap-3 pt-3 relative z-10">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2.5 border border-stone-700 hover:border-stone-500 text-xs font-montserrat tracking-widest uppercase text-stone-300 hover:text-white transition-colors rounded-xl cursor-pointer min-w-[110px]"
+            className="px-7 sm:px-9 py-3 border border-white/20 bg-white/10 hover:bg-white/20 text-xs sm:text-sm font-medium tracking-wider text-stone-200 hover:text-white transition-all rounded-full cursor-pointer min-w-[110px]"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-8 py-2.5 text-xs font-montserrat font-semibold tracking-widest uppercase transition-all shadow-md active:scale-[0.98] rounded-xl cursor-pointer min-w-[130px] ${
+            className={`px-8 sm:px-10 py-3 text-xs sm:text-sm font-semibold tracking-wider transition-all shadow-lg active:scale-95 rounded-full cursor-pointer min-w-[130px] ${
               isDestructive
-                ? 'bg-red-700 hover:bg-red-600 text-white'
-                : 'bg-gold hover:bg-gold-light text-white'
+                ? 'bg-gradient-to-r from-[#967448] to-[#b38e5d] hover:brightness-110 text-white shadow-gold/25'
+                : 'bg-gradient-to-r from-[#967448] to-[#b38e5d] hover:brightness-110 text-white shadow-gold/25'
             }`}
           >
             {confirmLabel}

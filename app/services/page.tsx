@@ -287,8 +287,36 @@ const SERVICES_DATA: ServiceDetail[] = [
 export default function ServicesPage() {
   const { t, lang } = useLanguage()
   const isAr = lang === 'ar'
+  const [servicesList, setServicesList] = useState<ServiceDetail[]>(SERVICES_DATA)
   const [selectedService, setSelectedService] = useState<ServiceDetail | null>(null)
   const [heroImgUrl, setHeroImgUrl] = useState('/images/services-hero-colonnade.jpg')
+
+  // Load dynamic services from backend
+  useEffect(() => {
+    fetch('/api/services')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.data) && data.data.length > 0) {
+          const activeServices = data.data.filter((s: any) => s.status !== 'Inactive');
+          if (activeServices.length > 0) {
+            const mapped: ServiceDetail[] = activeServices.map((s: any, idx: number) => ({
+              num: s.num || String(s.display_order || idx + 1).padStart(2, '0'),
+              slug: s.slug || s.code?.toLowerCase() || `service-${idx + 1}`,
+              titleEn: s.title_en || s.titleEn || '',
+              titleAr: s.title_ar || s.titleAr || '',
+              image: s.image || '/images/service-architecture.jpg',
+              alt: s.alt || s.title_en || 'Viwan Service',
+              scopeEn: s.scope_en || s.scopeEn || (s.desc_en ? [s.desc_en] : []),
+              scopeAr: s.scope_ar || s.scopeAr || (s.desc_ar ? [s.desc_ar] : []),
+              descEn: s.desc_en || s.descEn || '',
+              descAr: s.desc_ar || s.descAr || '',
+            }));
+            setServicesList(mapped);
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   // Load dynamic hero image from site settings
   useEffect(() => {
@@ -431,7 +459,7 @@ export default function ServicesPage() {
       <section className="bg-[#FAF9F5] border-b border-stone/30">
         <div className="container-viwan py-12 md:py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-s border-stone/30">
-            {SERVICES_DATA.map((service, idx) => {
+            {servicesList.map((service, idx) => {
               const title = isAr ? service.titleAr : service.titleEn
               const scope = isAr ? service.scopeAr : service.scopeEn
 

@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { DataStore } from '@/lib/store';
 import { InsightArticle } from '@/lib/types';
 import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
-import { Plus, Edit2, Trash2, Eye, FileText, ArrowRight, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, FileText, ArrowRight, X, Check } from 'lucide-react';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { ImageUploader } from '@/components/ui/ImageUploader';
+import { ViwanMark } from '@/components/ui/Icons';
 
 export default function AdminInsightsPage() {
   const [insights, setInsights] = useState<InsightArticle[]>([]);
@@ -254,95 +255,132 @@ export default function AdminInsightsPage() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="bg-[#FAF6EE] max-w-xl w-full my-auto max-h-[88vh] overflow-y-auto border border-[#E7E2D8] p-6 sm:p-8 space-y-6 relative shadow-2xl">
-            <button onClick={() => setIsModalOpen(false)} className={`absolute top-6 ${isRtl ? 'left-6' : 'right-6'} p-2 text-stone-500 hover:text-charcoal`}>
-              <X className="w-5 h-5" />
-            </button>
-            <h2 className="font-cinzel text-xl text-charcoal uppercase">
-              {editingArticle ? t.insights.editModalTitle : t.insights.addModalTitle}
-            </h2>
-            <form onSubmit={handleSave} className="space-y-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[99999] bg-black/65 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-[#181716]/95 backdrop-blur-2xl border border-white/20 rounded-[32px] sm:rounded-[36px] shadow-[0_25px_60px_rgba(0,0,0,0.6)] text-white max-w-xl w-full my-auto max-h-[88vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative custom-scrollbar animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Subtle Viwan Watermark behind content */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.05]">
+              <ViwanMark className="w-64 h-64 text-white" isDark={true} />
+            </div>
+
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gold/10 border border-gold/30">
+                  <FileText className="w-6 h-6 text-gold" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
+                    {editingArticle ? (isRtl ? 'تعديل مقال' : 'EDIT ARTICLE') : (isRtl ? 'مقال جديد' : 'NEW ARTICLE')}
+                  </span>
+                  <h2 className="font-cinzel text-xl text-white uppercase">
+                    {editingArticle ? t.insights.editModalTitle : t.insights.addModalTitle}
+                  </h2>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 rounded-full text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSave} className="space-y-4 relative z-10">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-semibold text-charcoal block">{t.insights.titleEn}</label>
+                <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">{t.insights.titleEn}</label>
                 <input
                   type="text"
                   required
                   value={formData.title_en || ''}
                   onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
                   placeholder="The Future of Passive Cooling..."
-                  className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                  className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-semibold text-charcoal block">{t.insights.titleAr}</label>
+                <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">{t.insights.titleAr}</label>
                 <input
                   type="text"
                   dir="rtl"
                   value={formData.title_ar || ''}
                   onChange={(e) => setFormData({ ...formData, title_ar: e.target.value })}
                   placeholder="مستقبل التبريد السلبي في المناخات الجافة..."
-                  className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                  className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold font-cairo"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-semibold text-charcoal block">{t.insights.categoryEn}</label>
+                  <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">{t.insights.categoryEn}</label>
                   <select
                     value={formData.category_slug || 'sustainability'}
                     onChange={(e) => setFormData({ ...formData, category_slug: e.target.value as any, category_en: e.target.options[e.target.selectedIndex].text })}
-                    className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                    className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold"
                   >
-                    <option value="sustainability">Sustainability</option>
-                    <option value="urban-design">Urban Design</option>
-                    <option value="technology">Technology</option>
-                    <option value="practice">Practice</option>
+                    <option value="sustainability" className="bg-stone-900 text-white">Sustainability</option>
+                    <option value="urban-design" className="bg-stone-900 text-white">Urban Design</option>
+                    <option value="technology" className="bg-stone-900 text-white">Technology</option>
+                    <option value="practice" className="bg-stone-900 text-white">Practice</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-semibold text-charcoal block">{t.insights.authorEn}</label>
+                  <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">{t.insights.authorEn}</label>
                   <input
                     type="text"
                     value={formData.author_en || ''}
                     onChange={(e) => setFormData({ ...formData, author_en: e.target.value })}
-                    className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                    className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold"
                   />
                 </div>
               </div>
 
-              <ImageUploader
-                label={t.insights.image}
-                value={formData.image || ''}
-                onChange={(val) => setFormData({ ...formData, image: val })}
-                isRtl={isRtl}
-              />
+              <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+                <ImageUploader
+                  label={t.insights.image}
+                  value={formData.image || ''}
+                  onChange={(val) => setFormData({ ...formData, image: val })}
+                  isRtl={isRtl}
+                />
+              </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-semibold text-charcoal block">{t.insights.excerptEn}</label>
+                <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">{t.insights.excerptEn}</label>
                 <textarea
                   rows={2}
                   value={formData.excerpt_en || ''}
                   onChange={(e) => setFormData({ ...formData, excerpt_en: e.target.value })}
-                  className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold resize-none"
+                  className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold resize-none"
                 />
               </div>
 
-              <div className="pt-4 border-t border-[#E7E2D8] flex items-center justify-end space-x-3 rtl:space-x-reverse">
+              {/* Centered Actions */}
+              <div className="flex items-center justify-center gap-3 pt-6 border-t border-white/10 relative z-10">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2 text-xs text-stone-500 uppercase font-medium"
+                  className="px-8 py-3 border border-white/20 bg-white/10 hover:bg-white/20 text-stone-200 hover:text-white text-xs sm:text-sm font-medium tracking-wider rounded-full transition-all cursor-pointer min-w-[110px]"
                 >
                   {t.insights.cancel}
                 </button>
                 <button
                   type="submit"
-                  className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase px-6 py-2 transition-colors"
+                  className="px-9 py-3 bg-gradient-to-r from-[#967448] to-[#b38e5d] hover:brightness-110 text-white text-xs sm:text-sm font-semibold tracking-wider rounded-full transition-all shadow-lg shadow-gold/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer min-w-[140px]"
                 >
-                  {t.insights.save}
+                  <Check className="w-4 h-4" />
+                  <span>{t.insights.save}</span>
                 </button>
               </div>
             </form>

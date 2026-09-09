@@ -228,11 +228,17 @@ export interface ExpertiseSector {
 
 export interface ServiceItem {
   id: string;
-  code: string;
+  code?: string;
+  num?: string;
+  slug?: string;
   title_en: string;
   title_ar: string;
   desc_en: string;
   desc_ar: string;
+  image?: string;
+  alt?: string;
+  scope_en?: string[];
+  scope_ar?: string[];
   status: 'Active' | 'Inactive';
   display_order?: number;
 }

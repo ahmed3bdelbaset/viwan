@@ -7,6 +7,7 @@ import { ExpertiseSector } from '@/lib/types';
 import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { ImageUploader } from '@/components/ui/ImageUploader';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { ViwanMark } from '@/components/ui/Icons';
 import {
   ExternalLink,
   Plus,
@@ -345,32 +346,50 @@ export default function AdminExpertisePage() {
       {/* 3. ADD / EDIT EXPERTISE SECTOR & COUNTER MODAL */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="bg-[#FAF7F2]/95 dark:bg-[#161513]/95 backdrop-blur-2xl border border-white/70 dark:border-stone-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] max-w-2xl w-full my-auto max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[28px] sm:rounded-[36px] custom-scrollbar animate-fade-in">
-            <div className="flex items-start justify-between border-b border-[#E7E2D8]/80 pb-4">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
-                  {editingSector ? (isRtl ? 'تعديل قطاع التخصص' : 'EDIT SECTOR') : (isRtl ? 'قطاع جديد' : 'NEW SECTOR')}
-                </span>
-                <h2 className="font-cinzel text-xl text-charcoal dark:text-ivory font-medium">
-                  {editingSector ? t.expertise.editModalTitle : t.expertise.addModalTitle}
-                </h2>
-                <p className="text-xs text-stone-500 font-light mt-0.5">
-                  {t.expertise.subtitle}
-                </p>
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[99999] bg-black/65 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-[#181716]/95 backdrop-blur-2xl border border-white/20 shadow-[0_25px_60px_rgba(0,0,0,0.6)] text-white max-w-2xl w-full my-auto max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[32px] sm:rounded-[36px] custom-scrollbar animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Subtle Viwan Watermark behind content */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.05]">
+              <ViwanMark className="w-72 h-72 text-white" isDark={true} />
+            </div>
+
+            <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gold/10 border border-gold/30">
+                  <Layers className="w-6 h-6 text-gold" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
+                    {editingSector ? (isRtl ? 'تعديل قطاع التخصص' : 'EDIT SECTOR') : (isRtl ? 'قطاع جديد' : 'NEW SECTOR')}
+                  </span>
+                  <h2 className="font-cinzel text-xl text-white font-medium">
+                    {editingSector ? t.expertise.editModalTitle : t.expertise.addModalTitle}
+                  </h2>
+                  <p className="text-xs text-stone-300 font-light mt-0.5">
+                    {t.expertise.subtitle}
+                  </p>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-full text-stone-400 hover:text-charcoal dark:hover:text-ivory hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                className="p-2 rounded-full text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-5">
+            <form onSubmit={handleSave} className="space-y-5 relative z-10">
               {/* Sector Cover Image */}
               <ImageUploader
                 label={t.expertise.coverImage}
@@ -472,19 +491,19 @@ export default function AdminExpertisePage() {
               </div>
 
               {/* Actions - Centered */}
-              <div className="flex items-center justify-center gap-4 pt-6 border-t border-[#E7E2D8]/80">
+              <div className="flex items-center justify-center gap-3 pt-6 border-t border-white/10 relative z-10">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-3 border border-[#E7E2D8] hover:border-stone-400 bg-white dark:bg-black/30 text-xs font-medium text-stone-600 dark:text-stone-300 rounded-xl transition-colors cursor-pointer min-w-[120px]"
+                  className="px-8 py-3 border border-white/20 bg-white/10 hover:bg-white/20 text-stone-200 hover:text-white text-xs sm:text-sm font-medium tracking-wider rounded-full transition-all cursor-pointer min-w-[110px]"
                 >
                   {t.expertise.cancel}
                 </button>
                 <button
                   type="submit"
-                  className="px-10 py-3 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer min-w-[180px]"
+                  className="px-9 py-3 bg-gradient-to-r from-[#967448] to-[#b38e5d] hover:brightness-110 text-white text-xs sm:text-sm font-semibold tracking-wider rounded-full transition-all shadow-lg shadow-gold/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer min-w-[140px]"
                 >
-                  <Check className="w-4 h-4 text-gold" />
+                  <Check className="w-4 h-4" />
                   <span>{t.expertise.save}</span>
                 </button>
               </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { useViwanModal } from '@/components/ui/ViwanModalProvider';
+import { ViwanMark } from '@/components/ui/Icons';
 import { extractYouTubeId, getYouTubeThumbnail, getYouTubeEmbedUrl } from '@/lib/youtube';
 import {
   FolderKanban,
@@ -676,46 +677,46 @@ export default function AdminProjectsPage() {
         <>
           {/* Filter Tabs & Search */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        {/* Disciplines Filter */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <button
-            onClick={() => setSelectedDiscipline('ALL')}
-            className={`px-3.5 py-2 text-xs tracking-wider uppercase font-medium transition-colors ${
-              selectedDiscipline === 'ALL'
-                ? 'bg-charcoal text-white shadow-xs'
-                : 'bg-white text-stone-600 border border-[#E7E2D8] hover:border-gold'
-            }`}
-          >
-            {isRtl ? 'كافة التخصصات' : 'ALL DISCIPLINES'}
-          </button>
+            {/* Disciplines Filter */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setSelectedDiscipline('ALL')}
+                className={`px-4 py-2 text-xs tracking-wider uppercase font-medium rounded-full transition-all cursor-pointer ${
+                  selectedDiscipline === 'ALL'
+                    ? 'bg-charcoal text-white shadow-sm'
+                    : 'bg-white/90 backdrop-blur-sm text-stone-600 border border-[#E7E2D8] hover:border-gold hover:text-charcoal'
+                }`}
+              >
+                {isRtl ? 'كافة التخصصات' : 'ALL DISCIPLINES'}
+              </button>
 
-          {DISCIPLINES_LIST.map((disc) => (
-            <button
-              key={disc.id}
-              onClick={() => setSelectedDiscipline(disc.id)}
-              className={`px-3.5 py-2 text-xs tracking-wider uppercase font-medium transition-colors ${
-                selectedDiscipline === disc.id
-                  ? 'bg-charcoal text-white shadow-xs'
-                  : 'bg-white text-stone-600 border border-[#E7E2D8] hover:border-gold'
-              }`}
-            >
-              {isRtl ? disc.labelAr : disc.labelEn}
-            </button>
-          ))}
-        </div>
+              {DISCIPLINES_LIST.map((disc) => (
+                <button
+                  key={disc.id}
+                  onClick={() => setSelectedDiscipline(disc.id)}
+                  className={`px-4 py-2 text-xs tracking-wider uppercase font-medium rounded-full transition-all cursor-pointer ${
+                    selectedDiscipline === disc.id
+                      ? 'bg-charcoal text-white shadow-sm'
+                      : 'bg-white/90 backdrop-blur-sm text-stone-600 border border-[#E7E2D8] hover:border-gold hover:text-charcoal'
+                  }`}
+                >
+                  {isRtl ? disc.labelAr : disc.labelEn}
+                </button>
+              ))}
+            </div>
 
-        {/* Search */}
-        <div className="relative w-full lg:w-72">
-          <Search className="w-4 h-4 text-stone-400 absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={isRtl ? 'بحث باسم المشروع أو الموقع...' : 'Search by title, client, location...'}
-            className="w-full bg-white border border-[#E7E2D8] pl-9 rtl:pl-3 rtl:pr-9 pr-3 py-2 text-xs text-charcoal focus:outline-none focus:border-gold shadow-xs"
-          />
-        </div>
-      </div>
+            {/* Search */}
+            <div className="relative w-full lg:w-72">
+              <Search className="w-4 h-4 text-stone-400 absolute left-3.5 rtl:left-auto rtl:right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={isRtl ? 'بحث باسم المشروع أو الموقع...' : 'Search by title, client, location...'}
+                className="w-full bg-white/90 backdrop-blur-sm border border-[#E7E2D8] rounded-full pl-9 rtl:pl-4 rtl:pr-9 pr-4 py-2 text-xs text-charcoal focus:outline-none focus:border-gold shadow-sm"
+              />
+            </div>
+          </div>
 
       {/* Projects Grid / Cards */}
       {loading ? (
@@ -740,14 +741,14 @@ export default function AdminProjectsPage() {
             return (
               <div
                 key={project.id}
-                className="bg-white border border-[#E7E2D8] overflow-hidden flex flex-col justify-between shadow-sm hover:border-gold/60 transition-colors group"
+                className="bg-white/90 backdrop-blur-md border border-[#E7E2D8]/80 rounded-[28px] overflow-hidden flex flex-col justify-between shadow-sm hover:border-gold/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
               >
                 {/* Project Cover Preview */}
                 <div className="relative aspect-[16/10] bg-stone-900 overflow-hidden border-b border-[#E7E2D8]">
                   <img
                     src={project.cover || '/images/hero-villa.png'}
                     alt={project.title_en || project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/images/hero-villa.png';
                     }}
@@ -755,11 +756,11 @@ export default function AdminProjectsPage() {
 
                   {/* Discipline Badge */}
                   <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3 flex items-center gap-1.5 z-10">
-                    <span className="bg-charcoal/90 backdrop-blur-xs text-white text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 border border-white/10">
+                    <span className="bg-charcoal/80 backdrop-blur-md text-white text-[10px] font-mono uppercase tracking-wider px-3 py-1 rounded-full border border-white/10">
                       {project.category || (project.disciplines && project.disciplines[0]) || 'Architecture'}
                     </span>
                     {isFeatured && (
-                      <span className="bg-gold text-charcoal text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 flex items-center gap-1">
+                      <span className="bg-gold text-charcoal text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
                         <Star className="w-3 h-3 fill-charcoal text-charcoal" />
                         <span>{isRtl ? 'مميز' : 'FEATURED'}</span>
                       </span>
@@ -768,7 +769,7 @@ export default function AdminProjectsPage() {
 
                   {/* Year Tag */}
                   <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3 z-10">
-                    <span className="bg-black/60 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5">
+                    <span className="bg-black/60 backdrop-blur-md text-white text-[10px] font-mono px-3 py-1 rounded-full border border-white/10">
                       {project.year || 2026}
                     </span>
                   </div>
@@ -777,7 +778,7 @@ export default function AdminProjectsPage() {
                 {/* Card Info */}
                 <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
                   <div className="space-y-1.5">
-                    <h3 className="font-cinzel text-base font-semibold text-charcoal leading-snug">
+                    <h3 className="font-cinzel text-base font-semibold text-charcoal leading-snug group-hover:text-gold transition-colors">
                       {isRtl ? project.title_ar || project.title_en : project.title_en || project.title_ar}
                     </h3>
 
@@ -805,16 +806,16 @@ export default function AdminProjectsPage() {
                     <div className="flex items-center space-x-1.5 rtl:space-x-reverse">
                       <button
                         onClick={() => openEditModal(project)}
-                        className="border border-[#E7E2D8] hover:border-gold bg-[#FAF6EE] px-3 py-1.5 text-xs text-charcoal flex items-center space-x-1 rtl:space-x-reverse transition-colors"
+                        className="border border-[#E7E2D8] hover:border-gold hover:bg-gold hover:text-white bg-[#FAF6EE] px-3.5 py-1.5 text-xs text-charcoal rounded-full flex items-center space-x-1 rtl:space-x-reverse transition-all cursor-pointer shadow-2xs"
                         title={isRtl ? 'تعديل بيانات المشروع' : 'Edit project'}
                       >
-                        <Edit2 className="w-3.5 h-3.5 text-gold" />
+                        <Edit2 className="w-3.5 h-3.5 text-gold group-hover:text-white" />
                         <span>{isRtl ? 'تعديل' : 'EDIT'}</span>
                       </button>
 
                       <button
                         onClick={() => handleToggleFeatured(project)}
-                        className={`border px-2.5 py-1.5 text-xs transition-colors ${
+                        className={`border p-2 text-xs rounded-full transition-all cursor-pointer ${
                           isFeatured
                             ? 'border-gold bg-gold/15 text-charcoal'
                             : 'border-[#E7E2D8] hover:border-stone-400 bg-white text-stone-500'
@@ -827,7 +828,7 @@ export default function AdminProjectsPage() {
                       <Link
                         href="/projects"
                         target="_blank"
-                        className="border border-[#E7E2D8] hover:border-stone-400 px-2.5 py-1.5 text-xs text-stone-500 bg-white transition-colors"
+                        className="border border-[#E7E2D8] hover:border-stone-400 p-2 text-xs text-stone-500 bg-white rounded-full transition-all cursor-pointer"
                         title={isRtl ? 'معاينة في صفحة المشاريع العامة' : 'View on public projects page'}
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -836,7 +837,7 @@ export default function AdminProjectsPage() {
 
                     <button
                       onClick={() => handleDeleteProject(project)}
-                      className="p-1.5 text-stone-400 hover:text-red-500 transition-colors"
+                      className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all cursor-pointer"
                       title={isRtl ? 'حذف المشروع' : 'Delete project'}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -1281,26 +1282,44 @@ export default function AdminProjectsPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* ADD / EDIT PROJECT MODAL (Frosted Glassmorphism + Rounded + Concise Guidance) */}
+      {/* ADD / EDIT PROJECT MODAL (Frosted Glassmorphism + Rounded + Image 1 Aesthetic) */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="bg-[#FAF7F2]/95 dark:bg-[#161513]/95 backdrop-blur-2xl border border-white/70 dark:border-stone-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[28px] sm:rounded-[36px] custom-scrollbar animate-fade-in">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[99999] bg-black/65 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-[#181716]/95 backdrop-blur-2xl border border-white/20 shadow-[0_25px_60px_rgba(0,0,0,0.6)] text-white max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[32px] sm:rounded-[36px] custom-scrollbar animate-fade-in my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Subtle Viwan Watermark behind content */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.05]">
+              <ViwanMark className="w-80 h-80 text-white" isDark={true} />
+            </div>
+
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-[#E7E2D8]/80 pb-4">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
-                  {editingId ? (isRtl ? 'تعديل مشروع' : 'EDIT PROJECT') : (isRtl ? 'مشروع جديد' : 'NEW PROJECT')}
-                </span>
-                <h2 className="font-cinzel text-xl text-charcoal dark:text-ivory font-medium">
-                  {form.title_en || form.title_ar || (isRtl ? 'بيانات المشروع' : 'Project Details')}
-                </h2>
+            <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gold/10 border border-gold/30">
+                  <FolderKanban className="w-6 h-6 text-gold" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
+                    {editingId ? (isRtl ? 'تعديل مشروع' : 'EDIT PROJECT') : (isRtl ? 'مشروع جديد' : 'NEW PROJECT')}
+                  </span>
+                  <h2 className="font-cinzel text-xl text-white font-medium">
+                    {form.title_en || form.title_ar || (isRtl ? 'بيانات المشروع' : 'Project Details')}
+                  </h2>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-full text-stone-400 hover:text-charcoal dark:hover:text-ivory hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                className="p-2 rounded-full text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
@@ -1308,7 +1327,7 @@ export default function AdminProjectsPage() {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSaveProject} className="space-y-6">
+            <form onSubmit={handleSaveProject} className="space-y-6 relative z-10">
               {/* Row 1: Title English & Arabic */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -1881,11 +1900,11 @@ export default function AdminProjectsPage() {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end space-x-3 rtl:space-x-reverse pt-4 border-t border-[#E7E2D8]/80">
+              <div className="flex items-center justify-center gap-3 pt-6 border-t border-white/10 relative z-10">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 border border-[#E7E2D8] hover:border-stone-400 bg-white dark:bg-black/30 text-xs font-medium text-stone-600 dark:text-stone-300 rounded-xl transition-colors"
+                  className="px-8 py-3 border border-white/20 bg-white/10 hover:bg-white/20 text-stone-200 hover:text-white text-xs sm:text-sm font-medium tracking-wider rounded-full transition-all cursor-pointer min-w-[110px]"
                 >
                   {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
@@ -1893,8 +1912,9 @@ export default function AdminProjectsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-7 py-2.5 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase rounded-xl transition-all shadow-md active:scale-98"
+                  className="px-9 py-3 bg-gradient-to-r from-[#967448] to-[#b38e5d] hover:brightness-110 text-white text-xs sm:text-sm font-semibold tracking-wider rounded-full transition-all shadow-lg shadow-gold/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer min-w-[140px]"
                 >
+                  <Check className="w-4 h-4" />
                   {saving
                     ? (isRtl ? 'جاري الحفظ...' : 'SAVING...')
                     : editingId

@@ -384,12 +384,20 @@ export default function AdminMediaPage() {
 
       {/* Full Preview Modal */}
       {previewImage && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-8">
-          <div className="bg-charcoal border border-stone-800 max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl animate-fade-in">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 bg-black/85 backdrop-blur-md z-[99999] flex items-center justify-center p-4 sm:p-8"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="bg-[#181716]/95 backdrop-blur-2xl border border-white/20 rounded-[32px] max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-[0_25px_60px_rgba(0,0,0,0.6)] animate-fade-in my-auto text-white"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-stone-800 flex items-center justify-between bg-charcoal">
+            <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-black/20">
               <div>
-                <span className="text-[10px] font-mono text-gold uppercase tracking-widest">
+                <span className="text-[10px] font-mono text-gold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
                   {previewImage.section} • {previewImage.id}
                 </span>
                 <h3 className="font-cinzel text-base text-white font-medium">
@@ -398,34 +406,36 @@ export default function AdminMediaPage() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setPreviewImage(null)}
-                className="text-stone-400 hover:text-white px-3 py-1 text-xs font-mono uppercase tracking-wider"
+                className="text-stone-400 hover:text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-full hover:bg-white/10 transition-colors cursor-pointer"
               >
                 {isRtl ? 'إغلاق ✕' : 'CLOSE ✕'}
               </button>
             </div>
 
             {/* Modal Image View */}
-            <div className="relative flex-1 min-h-[50vh] max-h-[70vh] bg-black flex items-center justify-center p-4 overflow-hidden">
+            <div className="relative flex-1 min-h-[50vh] max-h-[70vh] bg-black/40 flex items-center justify-center p-4 overflow-hidden">
               <img
                 src={previewImage.currentUrl}
                 alt={previewImage.labelEn}
-                className="max-h-[65vh] w-auto max-w-full object-contain mx-auto"
+                className="max-h-[65vh] w-auto max-w-full object-contain mx-auto rounded-xl"
               />
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 sm:p-5 border-t border-stone-800 bg-[#161616] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-              <p className="text-stone-400 font-light">
+            <div className="p-4 sm:p-5 border-t border-white/10 bg-black/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <p className="text-stone-300 font-light">
                 {isRtl ? previewImage.descriptionAr || previewImage.description : previewImage.description}
               </p>
 
               <button
+                type="button"
                 onClick={() => {
                   fileInputRef.current[previewImage.id]?.click();
                   setPreviewImage(null);
                 }}
-                className="bg-gold hover:bg-white text-charcoal px-4 py-2 font-semibold tracking-wider uppercase transition-colors shrink-0"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#967448] to-[#b38e5d] hover:brightness-110 text-white font-semibold tracking-wider uppercase rounded-full transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
               >
                 {isRtl ? 'استبدال هذه الصورة' : 'CHANGE THIS IMAGE'}
               </button>

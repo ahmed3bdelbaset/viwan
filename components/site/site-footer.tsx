@@ -6,14 +6,7 @@ import { ArrowUp } from 'lucide-react'
 import { Logo } from './logo'
 import { useLanguage } from '@/lib/i18n'
 import { useSiteSettings, formatPhoneTel } from '@/hooks/use-site-settings'
-import {
-  SocialLinks,
-  WhatsAppIcon,
-  InstagramIcon,
-  FacebookIcon,
-  LinkedInIcon,
-  YouTubeIcon,
-} from './social-icons'
+import { SocialLinks } from './social-icons'
 
 export function SiteFooter() {
   const pathname = usePathname()
@@ -47,133 +40,96 @@ export function SiteFooter() {
     <footer className="surface-dark">
       <div className="container-viwan py-16 md:py-20 flex flex-col gap-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
+          {/* Col 1: Brand & Connect with studio and social media */}
           <div className="md:col-span-4 flex flex-col gap-5">
             <Logo showSubtitleOnMobile />
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
               {footerSummary}
             </p>
-            {/* Quick-access Social Icon Buttons (Desktop only here) */}
-            <div className="hidden md:flex flex-col gap-2.5 pt-2">
-              <span className="eyebrow text-[10.5px] tracking-widest text-muted-foreground/70 uppercase">
-                {lang === 'ar' ? 'تابعنا على المنصات' : 'Connect With Studio'}
+            {/* Merged Connect with studio & social media icons */}
+            <div className="flex flex-col gap-2.5 pt-2">
+              <span className="eyebrow text-[10.5px] tracking-widest text-muted-foreground/80 uppercase">
+                {lang === 'ar' ? 'تواصل مع الاستوديو وقنوات التواصل' : 'Connect with studio and social media'}
               </span>
               <SocialLinks size="md" />
             </div>
           </div>
 
-          {/* Navigation & Social Media side-by-side on mobile to save vertical space */}
-          <div className="grid grid-cols-2 gap-8 md:contents">
-            <nav aria-label="Footer" className="md:col-span-3 flex flex-col gap-3">
-              <span className="eyebrow text-xs text-foreground/90 font-medium mb-1 tracking-wider uppercase">
-                {lang === 'ar' ? 'التنقل الرئيسي' : 'Navigation'}
-              </span>
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="eyebrow text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {item.label}
-                </Link>
+          {/* Col 2: Navigation */}
+          <nav aria-label="Footer" className="md:col-span-2 flex flex-col gap-3">
+            <span className="eyebrow text-xs text-foreground/90 font-medium mb-1 tracking-wider uppercase">
+              {lang === 'ar' ? 'التنقل الرئيسي' : 'Navigation'}
+            </span>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="eyebrow text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Col 3: OUR STUDIOS (Dynamic Cairo, Riyadh, and any added studios) */}
+          <div className="md:col-span-6 flex flex-col gap-4">
+            <span className="eyebrow text-xs text-foreground/90 font-medium mb-1 tracking-wider uppercase">
+              {lang === 'ar' ? 'مقرات الاستوديو' : 'Our Studios'}
+            </span>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {(contact.studios && contact.studios.length > 0 ? contact.studios : [
+                {
+                  id: 'cairo',
+                  title_ar: 'استوديو القاهرة',
+                  title_en: 'Cairo Studio',
+                  address_ar: contact.addressCairoAr,
+                  address_en: contact.addressCairoEn,
+                  phone: contact.phoneCairo,
+                  email: contact.email,
+                },
+                {
+                  id: 'riyadh',
+                  title_ar: 'استوديو الرياض',
+                  title_en: 'Riyadh Studio',
+                  address_ar: contact.addressRiyadhAr,
+                  address_en: contact.addressRiyadhEn,
+                  phone: contact.phoneRiyadh,
+                  email: contact.email,
+                }
+              ]).map((studio, idx) => (
+                <div key={studio.id || idx} className="flex flex-col gap-2 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-gold/30 transition-colors">
+                  <h4 className="font-cinzel text-xs font-semibold tracking-wider text-foreground/95 uppercase">
+                    {lang === 'ar' ? (studio.title_ar || 'مقر الاستوديو') : (studio.title_en || 'Studio Location')}
+                  </h4>
+                  
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {lang === 'ar' ? studio.address_ar : studio.address_en}
+                  </p>
+
+                  <div className="flex flex-col gap-1 pt-1.5 border-t border-white/[0.04]">
+                    {studio.phone && (
+                      <a
+                        href={`tel:${formatPhoneTel(studio.phone)}`}
+                        className="hover:text-gold transition-colors text-xs font-mono text-foreground/90 flex items-center gap-1.5 w-fit"
+                        dir="ltr"
+                      >
+                        <span className="text-[10px] text-muted-foreground uppercase">{lang === 'ar' ? 'هاتف:' : 'Tel:'}</span>
+                        <span>{studio.phone}</span>
+                      </a>
+                    )}
+
+                    {studio.email && (
+                      <a
+                        href={`mailto:${studio.email}`}
+                        className="hover:text-gold transition-colors text-xs font-mono text-muted-foreground/80 hover:underline w-fit"
+                      >
+                        {studio.email}
+                      </a>
+                    )}
+                  </div>
+                </div>
               ))}
-            </nav>
-
-            {/* Social Platforms with Icons & Labels */}
-            <div className="md:col-span-2 flex flex-col gap-3">
-              <span className="eyebrow text-xs text-foreground/90 font-medium mb-1 tracking-wider uppercase">
-                {lang === 'ar' ? 'منصات التواصل' : 'Social Media'}
-              </span>
-              <a
-                href={contact.whatsapp}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="WhatsApp"
-                className="group flex items-center gap-2.5 eyebrow text-muted-foreground hover:text-gold transition-colors text-xs py-0.5"
-              >
-                <WhatsAppIcon className="size-4 shrink-0 text-muted-foreground group-hover:text-gold transition-colors" />
-                <span>{lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
-              </a>
-              <a
-                href={contact.instagram}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Instagram"
-                className="group flex items-center gap-2.5 eyebrow text-muted-foreground hover:text-gold transition-colors text-xs py-0.5"
-              >
-                <InstagramIcon className="size-4 shrink-0 text-muted-foreground group-hover:text-gold transition-colors" />
-                <span>{lang === 'ar' ? 'إنستغرام' : 'Instagram'}</span>
-              </a>
-              <a
-                href={contact.facebook}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Facebook"
-                className="group flex items-center gap-2.5 eyebrow text-muted-foreground hover:text-gold transition-colors text-xs py-0.5"
-              >
-                <FacebookIcon className="size-4 shrink-0 text-muted-foreground group-hover:text-gold transition-colors" />
-                <span>{lang === 'ar' ? 'فيسبوك' : 'Facebook'}</span>
-              </a>
-              <a
-                href={contact.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-                className="group flex items-center gap-2.5 eyebrow text-muted-foreground hover:text-gold transition-colors text-xs py-0.5"
-              >
-                <LinkedInIcon className="size-4 shrink-0 text-muted-foreground group-hover:text-gold transition-colors" />
-                <span>{lang === 'ar' ? 'لينكد إن' : 'LinkedIn'}</span>
-              </a>
-              <a
-                href={contact.youtube}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="YouTube"
-                className="group flex items-center gap-2.5 eyebrow text-muted-foreground hover:text-gold transition-colors text-xs py-0.5"
-              >
-                <YouTubeIcon className="size-4 shrink-0 text-muted-foreground group-hover:text-gold transition-colors" />
-                <span>{lang === 'ar' ? 'يوتيوب' : 'YouTube'}</span>
-              </a>
-            </div>
-          </div>
-
-          <div className="md:col-span-3 flex flex-col gap-6">
-            <address className="not-italic flex flex-col gap-2.5 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground/90">
-                {lang === 'ar'
-                  ? companyInfo?.stats?.presence_ar || 'القاهرة · الرياض'
-                  : companyInfo?.stats?.presence_en || contact.city}
-              </span>
-              <a
-                href={`mailto:${contact.email}`}
-                className="hover:text-gold transition-colors font-mono text-xs"
-              >
-                {contact.email}
-              </a>
-              {/* Dynamic Studio Phone Numbers from Admin Settings */}
-              <div className="flex flex-col gap-1.5 pt-1">
-                {contact.phones.map((p, idx) => (
-                  <a
-                    key={p.id || idx}
-                    href={`tel:${formatPhoneTel(p.number)}`}
-                    className="hover:text-gold transition-colors flex items-center justify-between gap-2 text-xs group"
-                  >
-                    <span className="text-muted-foreground/80 group-hover:text-foreground transition-colors text-[11px]">
-                      {lang === 'ar' ? p.label_ar : p.label_en}:
-                    </span>
-                    <span dir="ltr" className="font-mono text-foreground/90 group-hover:text-gold transition-colors">
-                      {p.number}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </address>
-
-            {/* Connect With Studio at the end on mobile */}
-            <div className="flex md:hidden flex-col gap-2.5 pt-4 border-t border-border/40">
-              <span className="eyebrow text-[10.5px] tracking-widest text-muted-foreground/70 uppercase">
-                {lang === 'ar' ? 'تابعنا على المنصات' : 'Connect With Studio'}
-              </span>
-              <SocialLinks size="md" />
             </div>
           </div>
         </div>
