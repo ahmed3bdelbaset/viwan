@@ -306,24 +306,31 @@ export default function AdminServicesPage() {
       {/* 3. ADD / EDIT SERVICE LUXURY MODAL */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="bg-[#FAF6EE] max-w-xl w-full my-auto max-h-[88vh] overflow-y-auto border border-[#E7E2D8] p-6 sm:p-8 space-y-6 shadow-2xl relative">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className={`absolute top-6 ${isRtl ? 'left-6' : 'right-6'} p-2 text-stone-500 hover:text-charcoal`}
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF7F2]/95 dark:bg-[#161513]/95 backdrop-blur-2xl border border-white/70 dark:border-stone-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] max-w-2xl w-full my-auto max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[28px] sm:rounded-[36px] custom-scrollbar animate-fade-in">
+            <div className="flex items-start justify-between border-b border-[#E7E2D8]/80 pb-4">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
+                  {editingService ? (isRtl ? 'تعديل التخصص' : 'EDIT SERVICE') : (isRtl ? 'خدمة جديدة' : 'NEW SERVICE')}
+                </span>
+                <h2 className="font-cinzel text-xl text-charcoal dark:text-ivory font-medium">
+                  {editingService
+                    ? (isRtl ? 'تعديل التخصص والخدمة' : 'Edit Architecture Service')
+                    : (isRtl ? 'إضافة خدمة معمارية جديدة' : 'Add New Architecture Service')}
+                </h2>
+                <p className="text-xs text-stone-500 font-light mt-0.5">
+                  {isRtl ? 'تحديث ونشر الخدمات المعمارية والهندسية المتكاملة.' : 'Configure discipline codes and bilingual descriptions.'}
+                </p>
+              </div>
 
-            <div className="space-y-1">
-              <h2 className="font-cinzel text-xl font-semibold text-charcoal uppercase">
-                {editingService
-                  ? (isRtl ? 'تعديل التخصص والخدمة' : 'Edit Architecture Service')
-                  : (isRtl ? 'إضافة خدمة معمارية جديدة' : 'Add New Architecture Service')}
-              </h2>
-              <p className="text-xs text-stone-text font-light">
-                {isRtl ? 'تحديث ونشر الخدمات المعمارية والهندسية المتكاملة.' : 'Configure discipline codes and bilingual descriptions.'}
-              </p>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 rounded-full text-stone-400 hover:text-charcoal dark:hover:text-ivory hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <form onSubmit={handleSave} className="space-y-4">
@@ -425,19 +432,20 @@ export default function AdminServicesPage() {
                 </select>
               </div>
 
-              <div className="pt-4 border-t border-[#E7E2D8] flex items-center justify-end space-x-3 rtl:space-x-reverse">
+              <div className="flex items-center justify-center gap-4 pt-6 border-t border-[#E7E2D8]/80">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 border border-[#E7E2D8] hover:border-stone-400 text-xs text-stone-dark font-medium transition-colors"
+                  className="px-6 py-3 border border-[#E7E2D8] hover:border-stone-400 bg-white dark:bg-black/30 text-xs font-medium text-stone-600 dark:text-stone-300 rounded-xl transition-colors cursor-pointer min-w-[120px]"
                 >
                   {t.projects.cancel}
                 </button>
                 <button
                   type="submit"
-                  className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase px-6 py-2.5 transition-all shadow-sm"
+                  className="px-10 py-3 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer min-w-[180px]"
                 >
-                  {editingService ? (isRtl ? 'حفظ التعديلات' : 'Save Changes') : (isRtl ? 'حفظ ونشر الخدمة' : 'Save Service')}
+                  <Check className="w-4 h-4 text-gold" />
+                  <span>{editingService ? (isRtl ? 'حفظ التعديلات' : 'Save Changes') : (isRtl ? 'حفظ ونشر الخدمة' : 'Save Service')}</span>
                 </button>
               </div>
             </form>

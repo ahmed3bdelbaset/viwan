@@ -186,7 +186,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ========================================================================= */}
       <div className={`flex-1 flex flex-col min-w-0 ${isRtl ? 'lg:pr-64' : 'lg:pl-64'}`}>
         {/* Top Bar Header */}
-        <header className="h-20 bg-[#FAF6EE] border-b border-[#E7E2D8] px-6 flex items-center justify-between sticky top-0 z-40">
+        <header className="h-20 bg-[#FAF6EE] border-b border-[#E7E2D8] px-6 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -257,11 +257,11 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Dynamic Page Canvas with Luxury V Watermark */}
         <div className="relative flex-1 min-h-[calc(100vh-5rem)]">
           {/* Subtle Architectural V Watermark */}
-          <div className="fixed inset-0 pointer-events-none select-none flex items-center justify-center overflow-hidden z-0">
+          <div className="fixed inset-0 pointer-events-none select-none flex items-center justify-center overflow-hidden -z-10">
             <ViwanMark className="w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] text-charcoal opacity-[0.025] transform translate-y-12" />
           </div>
 
-          <main className="relative z-10 flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto">
+          <main className="relative flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto">
             {children}
           </main>
         </div>

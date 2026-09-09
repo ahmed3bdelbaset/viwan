@@ -386,15 +386,15 @@ export default function AdminJobsPage() {
       {/* ADD / EDIT JOB MODAL */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-[#E7E2D8] max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl relative animate-fade-in">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[99999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF7F2]/95 dark:bg-[#161513]/95 backdrop-blur-2xl border border-white/70 dark:border-stone-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[28px] sm:rounded-[36px] custom-scrollbar animate-fade-in">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-[#E7E2D8] pb-4">
+            <div className="flex items-start justify-between border-b border-[#E7E2D8]/80 pb-4">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
                   {editingSlug ? (isRtl ? 'تعديل فرصة وظيفية' : 'EDIT ARCHITECTURAL ROLE') : (isRtl ? 'إضافة شاغر وظيفي جديد' : 'ADD NEW VACANCY')}
                 </span>
-                <h2 className="font-cinzel text-xl text-charcoal font-semibold mt-1">
+                <h2 className="font-cinzel text-xl text-charcoal dark:text-ivory font-semibold mt-0.5">
                   {form.titleAr || form.title || (isRtl ? 'وظيفة جديدة' : 'New Role')}
                 </h2>
               </div>
@@ -402,7 +402,8 @@ export default function AdminJobsPage() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-stone-400 hover:text-charcoal transition-colors cursor-pointer"
+                className="p-2 rounded-full text-stone-400 hover:text-charcoal dark:hover:text-ivory hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -641,12 +642,12 @@ export default function AdminJobsPage() {
                 />
               </div>
 
-              {/* Buttons */}
-              <div className="flex items-center justify-end space-x-3 rtl:space-x-reverse pt-4 border-t border-[#E7E2D8]">
+              {/* Modal Actions Footer - Centered */}
+              <div className="flex items-center justify-center gap-4 pt-6 border-t border-[#E7E2D8]/80">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 border border-[#E7E2D8] text-xs text-stone-600 hover:text-charcoal transition-colors cursor-pointer"
+                  className="px-6 py-3 border border-[#E7E2D8] hover:border-stone-400 bg-white dark:bg-black/30 text-xs font-medium text-stone-600 dark:text-stone-300 rounded-xl transition-colors cursor-pointer min-w-[120px]"
                 >
                   {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
@@ -654,7 +655,7 @@ export default function AdminJobsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase px-6 py-2.5 transition-all shadow-sm flex items-center space-x-2 rtl:space-x-reverse cursor-pointer disabled:opacity-50"
+                  className="px-10 py-3 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 min-w-[180px]"
                 >
                   <Check className="w-4 h-4 text-gold" />
                   <span>{saving ? (isRtl ? 'جاري الحفظ...' : 'Saving...') : (isRtl ? 'حفظ ونشر الوظيفة' : 'Save & Publish')}</span>

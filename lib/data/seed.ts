@@ -785,6 +785,32 @@ export const INITIAL_COMPANY_INFO: CompanyInfo = {
     lat: 24.7677,
     lng: 46.6384
   },
+  studios: [
+    {
+      id: 'studio-cairo',
+      title_en: 'Cairo Main Studio',
+      title_ar: 'استوديو القاهرة الرئيسي',
+      address_en: '12 Design District, Zamalek, Cairo, Egypt',
+      address_ar: '12 حي التصميم، الزمالك، القاهرة، مصر',
+      postal_code: '11211',
+      phone: '+20 12 3456 7890',
+      email: 'studio@viwan.com',
+      lat: 30.0617,
+      lng: 31.2198
+    },
+    {
+      id: 'studio-riyadh',
+      title_en: 'Riyadh Studio',
+      title_ar: 'استوديو الرياض',
+      address_en: 'King Abdullah Financial District (KAFD), Riyadh, Saudi Arabia',
+      address_ar: 'مركز الملك عبد الله المالي (KAFD)، الرياض، المملكة العربية السعودية',
+      postal_code: '13512',
+      phone: '+966 11 234 5678',
+      email: 'riyadh@viwan.com',
+      lat: 24.7677,
+      lng: 46.6384
+    }
+  ],
   stats: {
     years_experience: '15+',
     architects_count: '40+',

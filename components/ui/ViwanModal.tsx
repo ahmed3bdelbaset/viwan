@@ -106,7 +106,7 @@ export const ViwanModal: React.FC<ViwanModalProps> = ({ isOpen, options, onClose
       onClick={handleCancel}
     >
       <div
-        className="relative w-full max-w-md bg-[#161616] text-[#FAF6EE] border border-gold/40 shadow-2xl shadow-black/80 overflow-hidden transform animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md bg-[#161616]/95 backdrop-blur-2xl text-[#FAF6EE] border border-gold/40 rounded-[28px] shadow-2xl shadow-black/80 overflow-hidden transform animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Luxury Gold Top Accent Line */}
@@ -115,7 +115,7 @@ export const ViwanModal: React.FC<ViwanModalProps> = ({ isOpen, options, onClose
         {/* Header */}
         <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-stone-800/80">
           <div className="flex items-center space-x-3.5 rtl:space-x-reverse">
-            <div className="w-10 h-10 rounded-none bg-[#0D0D0D] border border-gold/30 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#0D0D0D] border border-gold/30 flex items-center justify-center shrink-0">
               {getIcon()}
             </div>
             <div>
@@ -130,7 +130,7 @@ export const ViwanModal: React.FC<ViwanModalProps> = ({ isOpen, options, onClose
 
           <button
             onClick={handleCancel}
-            className="text-stone-500 hover:text-white p-1 transition-colors"
+            className="text-stone-500 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -138,16 +138,16 @@ export const ViwanModal: React.FC<ViwanModalProps> = ({ isOpen, options, onClose
         </div>
 
         {/* Message Content */}
-        <div className="px-6 py-6 text-sm text-stone-300 font-light leading-relaxed whitespace-pre-line">
+        <div className="px-6 py-6 text-sm text-stone-300 font-light leading-relaxed whitespace-pre-line text-center sm:text-start">
           {message}
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 bg-[#0F0F0F] border-t border-stone-800/80 flex items-center justify-end space-x-3 rtl:space-x-reverse">
+        <div className="px-6 py-4 bg-[#0F0F0F]/80 border-t border-stone-800/80 flex items-center justify-center space-x-3 rtl:space-x-reverse">
           {type === 'confirm' && (
             <button
               onClick={handleCancel}
-              className="border border-stone-700 hover:border-stone-500 text-stone-300 hover:text-white text-xs font-semibold tracking-wider uppercase px-5 py-2.5 transition-all"
+              className="border border-stone-700 hover:border-stone-500 text-stone-300 hover:text-white text-xs font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition-all"
             >
               {cancelText || (isRtl ? 'إلغاء' : 'Cancel')}
             </button>
@@ -156,7 +156,7 @@ export const ViwanModal: React.FC<ViwanModalProps> = ({ isOpen, options, onClose
           <button
             onClick={handleConfirm}
             autoFocus
-            className="bg-gold hover:bg-[#967448] text-white text-xs font-semibold tracking-wider uppercase px-6 py-2.5 transition-all shadow-md active:scale-95 flex items-center justify-center min-w-[90px]"
+            className="bg-gold hover:bg-[#967448] text-white text-xs font-semibold tracking-wider uppercase px-8 py-2.5 rounded-full transition-all shadow-md active:scale-95 flex items-center justify-center min-w-[100px]"
           >
             {confirmText || (type === 'confirm' ? (isRtl ? 'تأكيد' : 'Confirm') : (isRtl ? 'حسناً' : 'OK'))}
           </button>

@@ -380,38 +380,48 @@ export default function AdminUsersPage() {
       {/* 3. ADD / EDIT ADMIN USER MODAL */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="bg-[#FAF6EE] max-w-xl w-full my-auto max-h-[88vh] overflow-y-auto border border-[#E7E2D8] p-6 sm:p-8 space-y-6 shadow-2xl relative">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className={`absolute top-6 ${isRtl ? 'left-6' : 'right-6'} p-2 text-stone-500 hover:text-charcoal`}
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF7F2]/95 dark:bg-[#161513]/95 backdrop-blur-2xl border border-white/70 dark:border-stone-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] max-w-2xl w-full my-auto max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[28px] sm:rounded-[36px] custom-scrollbar animate-fade-in">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-[#E7E2D8]/80 pb-4">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
+                  {editingUser ? (isRtl ? 'تعديل بيانات المسؤول' : 'EDIT TEAM MEMBER') : (isRtl ? 'مسؤول جديد' : 'NEW TEAM MEMBER')}
+                </span>
+                <h2 className="font-cinzel text-xl text-charcoal dark:text-ivory font-medium">
+                  {editingUser ? t.users.editModalTitle : t.users.addModalTitle}
+                </h2>
+                <p className="text-xs text-stone-500 font-light mt-0.5">
+                  {t.users.subtitle}
+                </p>
+              </div>
 
-            <div className="space-y-1">
-              <h2 className="font-cinzel text-xl font-semibold text-charcoal uppercase">
-                {editingUser ? t.users.editModalTitle : t.users.addModalTitle}
-              </h2>
-              <p className="text-xs text-stone-text font-light">
-                {t.users.subtitle}
-              </p>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 rounded-full text-stone-400 hover:text-charcoal dark:hover:text-ivory hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <form onSubmit={handleSave} className="space-y-5">
               {/* Photo Upload (Device File Upload + Live Preview) */}
-              <ImageUploader
-                label={t.users.avatar}
-                value={formData.avatar || ''}
-                onChange={(val) => setFormData({ ...formData, avatar: val })}
-                isRtl={isRtl}
-              />
+              <div className="bg-white/70 dark:bg-black/20 p-4 border border-[#E7E2D8] rounded-2xl">
+                <ImageUploader
+                  label={t.users.avatar}
+                  value={formData.avatar || ''}
+                  onChange={(val) => setFormData({ ...formData, avatar: val })}
+                  isRtl={isRtl}
+                />
+              </div>
 
               {/* Full Name Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block">
-                    {t.users.nameEn}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {t.users.nameEn} *
                   </label>
                   <input
                     type="text"
@@ -419,13 +429,13 @@ export default function AdminUsersPage() {
                     value={formData.name || ''}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Eng. Sarah Mansour"
-                    className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block">
-                    {t.users.nameAr}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {t.users.nameAr} *
                   </label>
                   <input
                     type="text"
@@ -433,16 +443,16 @@ export default function AdminUsersPage() {
                     value={formData.name_ar || ''}
                     onChange={(e) => setFormData({ ...formData, name_ar: e.target.value })}
                     placeholder="م. سارة منصور"
-                    className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all font-cairo"
                   />
                 </div>
               </div>
 
               {/* Email & Password Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block">
-                    {t.users.email}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {t.users.email} *
                   </label>
                   <input
                     type="email"
@@ -451,13 +461,13 @@ export default function AdminUsersPage() {
                     value={formData.email || ''}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="architect@viwan.com"
-                    className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal font-mono outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal font-mono outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block">
-                    {t.users.password}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                    {t.users.password} *
                   </label>
                   <div className="relative">
                     <input
@@ -467,12 +477,12 @@ export default function AdminUsersPage() {
                       value={formData.password || ''}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal font-mono outline-none focus:border-gold pr-9"
+                      className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal font-mono outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-charcoal"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-charcoal cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -482,8 +492,8 @@ export default function AdminUsersPage() {
 
               {/* Phone & Role */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
                     {t.users.phone}
                   </label>
                   <input
@@ -492,50 +502,60 @@ export default function AdminUsersPage() {
                     value={formData.phone || ''}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+966 50 000 0000"
-                    className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal font-mono outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal font-mono outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block">
+                    <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
                       {t.users.role}
                     </label>
                     <button
                       type="button"
                       onClick={() => setIsCustomRole(!isCustomRole)}
-                      className="text-[10px] text-gold hover:underline font-semibold flex items-center space-x-1 rtl:space-x-reverse"
+                      className="text-[11px] text-gold hover:underline font-semibold flex items-center space-x-1 rtl:space-x-reverse cursor-pointer"
                     >
-                      <Sparkles className="w-3 h-3 text-gold" />
-                      <span>{isCustomRole ? (isRtl ? '← اختيار من القائمة' : '← Standard Preset') : (isRtl ? '✍️ إدخال مسمى يدوي' : '✍️ Custom Role')}</span>
+                      <Edit2 className="w-3 h-3 text-gold" />
+                      <span>
+                        {isCustomRole
+                          ? (isRtl ? 'اختيار من القائمة' : 'Select from Presets')
+                          : (isRtl ? 'تحديد مسمى مخصص' : 'Custom Role')}
+                      </span>
                     </button>
                   </div>
 
                   {isCustomRole ? (
-                    <div className="space-y-2 bg-[#F8F3E9] p-2.5 border border-gold/40">
+                    <div className="space-y-2 bg-white/80 dark:bg-black/20 p-3.5 border border-gold/40 rounded-xl">
                       <div>
-                        <label className="text-[9px] uppercase font-semibold text-stone-500 block mb-0.5">
-                          {isRtl ? 'المسمى الوظيفي بالعربي (يدوي)' : 'CUSTOM ROLE (AR)'}
+                        <label className="text-[10px] uppercase font-semibold text-stone-500 block mb-1">
+                          {isRtl ? 'المسمى الوظيفي بالعربية' : 'CUSTOM ROLE (AR)'}
                         </label>
                         <input
                           type="text"
                           dir="rtl"
                           value={formData.role_ar || ''}
-                          onChange={(e) => setFormData({ ...formData, role_ar: e.target.value, role: (formData.role || e.target.value) as any })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              role_ar: e.target.value,
+                              role: (formData.role || e.target.value) as any,
+                            })
+                          }
                           placeholder="مثال: مهندس واجهات / مدير فرع الرياض"
-                          className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                          className="w-full bg-white border border-[#E7E2D8] rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-gold"
                         />
                       </div>
                       <div>
-                        <label className="text-[9px] uppercase font-semibold text-stone-500 block mb-0.5">
-                          {isRtl ? 'المسمى الوظيفي بالإنجليزي (يدوي)' : 'CUSTOM ROLE (EN)'}
+                        <label className="text-[10px] uppercase font-semibold text-stone-500 block mb-1">
+                          {isRtl ? 'المسمى الوظيفي بالإنجليزية' : 'CUSTOM ROLE (EN)'}
                         </label>
                         <input
                           type="text"
                           value={formData.role || ''}
                           onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                           placeholder="e.g. Façade Engineering Lead"
-                          className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                          className="w-full bg-white border border-[#E7E2D8] rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-gold"
                         />
                       </div>
                     </div>
@@ -553,56 +573,59 @@ export default function AdminUsersPage() {
                           'Chief Architect': 'كبير المعماريين',
                           'Senior Project Architect': 'مهندس مشاريع أول',
                           'Lead Designer': 'رئيس قسم التصميم',
-                          'Editor': 'محرر محتوى'
+                          'Editor': 'محرر محتوى',
                         };
                         setFormData({
                           ...formData,
                           role: selectedRole as any,
-                          role_ar: roleArabicMap[selectedRole] || selectedRole
+                          role_ar: roleArabicMap[selectedRole] || selectedRole,
                         });
                       }}
-                      className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal outline-none focus:border-gold"
+                      className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all cursor-pointer"
                     >
                       <option value="Super Admin">{t.users.roleSuperAdmin}</option>
                       <option value="Chief Architect">{t.users.roleChiefArchitect}</option>
                       <option value="Senior Project Architect">{t.users.roleSeniorArchitect}</option>
                       <option value="Lead Designer">{t.users.roleLeadDesigner}</option>
                       <option value="Editor">{t.users.roleEditor}</option>
-                      <option value="CUSTOM">➕ {isRtl ? 'إدخال دور / مسمى مخصص يدوياً...' : 'Custom Role / Manual Entry...'}</option>
+                      <option value="CUSTOM">
+                        {isRtl ? 'تحديد مسمى وظيفي مخصص يدوياً...' : 'Custom Role / Manual Entry...'}
+                      </option>
                     </select>
                   )}
                 </div>
               </div>
 
               {/* Status */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-semibold tracking-wider uppercase text-charcoal block">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
                   {t.users.status}
                 </label>
                 <select
                   value={formData.status || 'Active'}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                  className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal outline-none focus:border-gold"
+                  className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all cursor-pointer"
                 >
                   <option value="Active">{t.users.active}</option>
                   <option value="Inactive">{t.users.inactive}</option>
                 </select>
               </div>
 
-              {/* Actions */}
-              <div className="pt-4 border-t border-[#E7E2D8] flex items-center justify-end space-x-3 rtl:space-x-reverse">
+              {/* Modal Actions Footer - Centered */}
+              <div className="flex items-center justify-center gap-4 pt-6 border-t border-[#E7E2D8]/80">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 border border-[#E7E2D8] text-xs text-stone-dark hover:text-charcoal uppercase font-medium"
+                  className="px-6 py-3 border border-[#E7E2D8] hover:border-stone-400 bg-white dark:bg-black/30 text-xs font-medium text-stone-600 dark:text-stone-300 rounded-xl transition-colors cursor-pointer min-w-[120px]"
                 >
                   {t.users.cancel}
                 </button>
                 <button
                   type="submit"
-                  className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase px-7 py-2.5 transition-colors"
+                  className="px-10 py-3 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer min-w-[170px]"
                 >
-                  {t.users.save}
+                  <UserCheck className="w-4 h-4 text-gold" />
+                  <span>{editingUser ? (isRtl ? 'حفظ التعديلات' : 'Save Changes') : (isRtl ? 'إضافة المسؤول' : 'Create User')}</span>
                 </button>
               </div>
             </form>

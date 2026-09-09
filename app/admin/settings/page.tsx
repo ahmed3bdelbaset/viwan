@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { DataStore } from '@/lib/store';
-import { CompanyInfo, ContactPhone, ContactEmail } from '@/lib/types';
+import { CompanyInfo, ContactPhone, ContactEmail, StudioLocation } from '@/lib/types';
 import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { useViwanModal } from '@/components/ui/ViwanModalProvider';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -28,7 +28,8 @@ import {
   Upload,
   Database,
   HardDrive,
-  ShieldCheck
+  ShieldCheck,
+  MapPin
 } from 'lucide-react';
 
 export default function AdminSettingsPage() {
@@ -59,51 +60,132 @@ export default function AdminSettingsPage() {
 
   if (!info) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveSection = async (sectionTitle?: string) => {
     if (!info) return;
 
-    // Save locally and in memory
-    DataStore.saveCompanyInfo(info);
+    // Synchronize cairo_studio & riyadh_studio with studios list
+    const updatedInfo: CompanyInfo = { ...info };
+    if (updatedInfo.studios && updatedInfo.studios.length > 0) {
+      const cairo =
+        updatedInfo.studios.find(
+          (s) =>
+            s.id === 'studio-cairo' ||
+            s.title_en?.toLowerCase().includes('cairo') ||
+            s.title_ar?.includes('القاهرة')
+        ) || updatedInfo.studios[0];
 
-    const generalEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('general') || e.label_ar.includes('عام'))?.email || info.emails?.[0]?.email || 'info@viwan.net';
-    const consultEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('consult') || e.label_ar.includes('استشار'))?.email || info.emails?.[1]?.email || generalEmail;
-    const careersEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('career') || e.label_ar.includes('توظيف'))?.email || info.emails?.[2]?.email || generalEmail;
+      const riyadh =
+        updatedInfo.studios.find(
+          (s) =>
+            s.id === 'studio-riyadh' ||
+            s.title_en?.toLowerCase().includes('riyadh') ||
+            s.title_ar?.includes('الرياض')
+        ) || (updatedInfo.studios.length > 1 ? updatedInfo.studios[1] : updatedInfo.studios[0]);
+
+      if (cairo) {
+        updatedInfo.cairo_studio = {
+          ...updatedInfo.cairo_studio,
+          title_en: cairo.title_en,
+          title_ar: cairo.title_ar,
+          address_en: cairo.address_en,
+          address_ar: cairo.address_ar,
+          phone: cairo.phone || updatedInfo.cairo_studio?.phone || '',
+          email: cairo.email || updatedInfo.cairo_studio?.email || '',
+        };
+      }
+
+      if (riyadh) {
+        updatedInfo.riyadh_studio = {
+          ...updatedInfo.riyadh_studio,
+          title_en: riyadh.title_en,
+          title_ar: riyadh.title_ar,
+          address_en: riyadh.address_en,
+          address_ar: riyadh.address_ar,
+          phone: riyadh.phone || updatedInfo.riyadh_studio?.phone || '',
+          email: riyadh.email || updatedInfo.riyadh_studio?.email || '',
+        };
+      }
+    }
+
+    DataStore.saveCompanyInfo(updatedInfo);
+    setInfo(updatedInfo);
+
+    const generalEmail =
+      updatedInfo.emails?.find(
+        (e) => e.label_en.toLowerCase().includes('general') || e.label_ar.includes('عام')
+      )?.email ||
+      updatedInfo.emails?.[0]?.email ||
+      'info@viwan.net';
+
+    const consultEmail =
+      updatedInfo.emails?.find(
+        (e) => e.label_en.toLowerCase().includes('consult') || e.label_ar.includes('استشار')
+      )?.email ||
+      updatedInfo.emails?.[1]?.email ||
+      generalEmail;
+
+    const careersEmail =
+      updatedInfo.emails?.find(
+        (e) => e.label_en.toLowerCase().includes('career') || e.label_ar.includes('توظيف')
+      )?.email ||
+      updatedInfo.emails?.[2]?.email ||
+      generalEmail;
 
     try {
       await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyInfo: info,
+          companyInfo: updatedInfo,
           settings: {
-            phone: info.phones?.[0]?.number || '+20 100 000 0000',
-            phoneCairo: info.phones?.find(p => p.label_en.toLowerCase().includes('cairo') || p.label_ar.includes('القاهرة'))?.number || info.phones?.[0]?.number,
-            phoneRiyadh: info.phones?.find(p => p.label_en.toLowerCase().includes('riyadh') || p.label_ar.includes('الرياض'))?.number || info.phones?.[1]?.number,
-            whatsapp: info.social?.whatsapp || info.phones?.find(p => p.is_whatsapp)?.number || '+20 100 000 0000',
+            phone: updatedInfo.phones?.[0]?.number || '+20 100 000 0000',
+            phoneCairo:
+              updatedInfo.phones?.find(
+                (p) => p.label_en.toLowerCase().includes('cairo') || p.label_ar.includes('القاهرة')
+              )?.number || updatedInfo.phones?.[0]?.number,
+            phoneRiyadh:
+              updatedInfo.phones?.find(
+                (p) => p.label_en.toLowerCase().includes('riyadh') || p.label_ar.includes('الرياض')
+              )?.number || updatedInfo.phones?.[1]?.number,
+            whatsapp:
+              updatedInfo.social?.whatsapp ||
+              updatedInfo.phones?.find((p) => p.is_whatsapp)?.number ||
+              '+20 100 000 0000',
             email: generalEmail,
             emailGeneral: generalEmail,
             emailConsultations: consultEmail,
             emailCareers: careersEmail,
-            linkedin: info.social?.linkedin || '',
-            instagram: info.social?.instagram || '',
-            facebook: info.social?.facebook || '',
-            youtube: info.social?.youtube || '',
-            behance: info.social?.behance || '',
-            footerSummaryEn: info.footer_summary_en || '',
-            footerSummaryAr: info.footer_summary_ar || '',
-            addressCairo: info.cairo_studio?.address_ar || info.cairo_studio?.address_en || '',
-            addressRiyadh: info.riyadh_studio?.address_ar || info.riyadh_studio?.address_en || '',
-          }
-        })
+            linkedin: updatedInfo.social?.linkedin || '',
+            instagram: updatedInfo.social?.instagram || '',
+            facebook: updatedInfo.social?.facebook || '',
+            youtube: updatedInfo.social?.youtube || '',
+            behance: updatedInfo.social?.behance || '',
+            footerSummaryEn: updatedInfo.footer_summary_en || '',
+            footerSummaryAr: updatedInfo.footer_summary_ar || '',
+            addressCairo:
+              updatedInfo.cairo_studio?.address_ar || updatedInfo.cairo_studio?.address_en || '',
+            addressRiyadh:
+              updatedInfo.riyadh_studio?.address_ar || updatedInfo.riyadh_studio?.address_en || '',
+          },
+        }),
       });
-      showSuccess(isRtl ? 'تم حفظ وتحديث كافة بيانات الاستوديو والفوتر بنجاح' : 'Studio & footer settings successfully saved and synced');
+
+      showSuccess(
+        isRtl
+          ? `تم حفظ ${sectionTitle || 'البيانات'} وتحديث الفوتر والموقع مباشرة بنجاح`
+          : `${sectionTitle || 'Settings'} saved and live website/footer updated successfully!`
+      );
     } catch (err) {
       console.error('Failed to sync settings:', err);
     }
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleSaveSection(isRtl ? 'كافة الإعدادات' : 'All Settings');
   };
 
   const handleConfirmReset = () => {
@@ -168,6 +250,93 @@ export default function AdminSettingsPage() {
     setInfo({
       ...info,
       emails: (info.emails || []).filter((e) => e.id !== id)
+    });
+  };
+
+  // Studio Handlers
+  const handleAddStudio = () => {
+    const currentStudios: StudioLocation[] =
+      info.studios && info.studios.length > 0
+        ? [...info.studios]
+        : [
+            {
+              id: 'studio-cairo',
+              title_en: info.cairo_studio?.title_en || 'Cairo Main Studio',
+              title_ar: info.cairo_studio?.title_ar || 'استوديو القاهرة الرئيسي',
+              address_en: info.cairo_studio?.address_en || '12 Design District, Zamalek, Cairo, Egypt',
+              address_ar: info.cairo_studio?.address_ar || '12 حي التصميم، الزمالك، القاهرة، مصر',
+              phone: info.cairo_studio?.phone || '+20 12 3456 7890',
+              email: info.cairo_studio?.email || 'studio@viwan.com',
+            },
+            {
+              id: 'studio-riyadh',
+              title_en: info.riyadh_studio?.title_en || 'Riyadh Studio',
+              title_ar: info.riyadh_studio?.title_ar || 'استوديو الرياض',
+              address_en: info.riyadh_studio?.address_en || 'King Abdullah Financial District (KAFD), Riyadh, Saudi Arabia',
+              address_ar: info.riyadh_studio?.address_ar || 'مركز الملك عبد الله المالي (KAFD)، الرياض، المملكة العربية السعودية',
+              phone: info.riyadh_studio?.phone || '+966 11 234 5678',
+              email: info.riyadh_studio?.email || 'riyadh@viwan.com',
+            },
+          ];
+
+    const newStudio: StudioLocation = {
+      id: `studio-${Date.now()}`,
+      title_en: 'New Studio Branch',
+      title_ar: 'مقر استوديو جديد',
+      address_en: '',
+      address_ar: '',
+      phone: '',
+      email: '',
+    };
+
+    setInfo({
+      ...info,
+      studios: [...currentStudios, newStudio],
+    });
+  };
+
+  const handleUpdateStudio = (id: string, field: keyof StudioLocation, val: any) => {
+    const currentStudios: StudioLocation[] =
+      info.studios && info.studios.length > 0
+        ? [...info.studios]
+        : [
+            {
+              id: 'studio-cairo',
+              title_en: info.cairo_studio?.title_en || 'Cairo Main Studio',
+              title_ar: info.cairo_studio?.title_ar || 'استوديو القاهرة الرئيسي',
+              address_en: info.cairo_studio?.address_en || '',
+              address_ar: info.cairo_studio?.address_ar || '',
+              phone: info.cairo_studio?.phone || '',
+              email: info.cairo_studio?.email || '',
+            },
+            {
+              id: 'studio-riyadh',
+              title_en: info.riyadh_studio?.title_en || 'Riyadh Studio',
+              title_ar: info.riyadh_studio?.title_ar || 'استوديو الرياض',
+              address_en: info.riyadh_studio?.address_en || '',
+              address_ar: info.riyadh_studio?.address_ar || '',
+              phone: info.riyadh_studio?.phone || '',
+              email: info.riyadh_studio?.email || '',
+            },
+          ];
+
+    setInfo({
+      ...info,
+      studios: currentStudios.map((s) => (s.id === id ? { ...s, [field]: val } : s)),
+    });
+  };
+
+  const handleDeleteStudio = (id: string) => {
+    const currentStudios = info.studios || [];
+    if (currentStudios.length <= 1) {
+      showError(
+        isRtl ? 'يجب الإبقاء على مقر استوديو رئيسي واحد على الأقل' : 'At least one studio location must remain'
+      );
+      return;
+    }
+    setInfo({
+      ...info,
+      studios: currentStudios.filter((s) => s.id !== id),
     });
   };
 
@@ -289,6 +458,21 @@ export default function AdminSettingsPage() {
               />
             </div>
           </div>
+
+          {/* Section 1 Save Button */}
+          <div className="pt-4 border-t border-[#E7E2D8] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-[11px] text-stone-500 font-light">
+              {isRtl ? 'حفظ وتحديث قنوات وروابط التواصل الاجتماعي مباشرة دون الحاجة للنزول لآخر الصفحة' : 'Save social channels directly without scrolling to page bottom'}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSaveSection(isRtl ? 'قنوات التواصل الاجتماعي' : 'Social Channels')}
+              className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase px-5 py-2.5 transition-all flex items-center space-x-2 rtl:space-x-reverse shadow-xs cursor-pointer active:scale-98"
+            >
+              <Save className="w-3.5 h-3.5 text-gold" />
+              <span>{isRtl ? 'حفظ قنوات التواصل' : 'Save Social Channels'}</span>
+            </button>
+          </div>
         </div>
 
         {/* ========================================================================= */}
@@ -377,6 +561,21 @@ export default function AdminSettingsPage() {
               </div>
             ))}
           </div>
+
+          {/* Section 2 Save Button */}
+          <div className="pt-4 border-t border-[#E7E2D8] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-[11px] text-stone-500 font-light">
+              {isRtl ? 'حفظ وتحديث أرقام هواتف الاستوديو والواتساب مباشرة في الفوتر والموقع' : 'Save studio phone numbers and WhatsApp directly to live site'}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSaveSection(isRtl ? 'أرقام الهواتف والتواصل' : 'Phone Numbers')}
+              className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase px-5 py-2.5 transition-all flex items-center space-x-2 rtl:space-x-reverse shadow-xs cursor-pointer active:scale-98"
+            >
+              <Save className="w-3.5 h-3.5 text-gold" />
+              <span>{isRtl ? 'حفظ أرقام الهواتف' : 'Save Phone Numbers'}</span>
+            </button>
+          </div>
         </div>
 
         {/* ========================================================================= */}
@@ -441,6 +640,21 @@ export default function AdminSettingsPage() {
               </div>
             ))}
           </div>
+
+          {/* Section 3 Save Button */}
+          <div className="pt-4 border-t border-[#E7E2D8] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-[11px] text-stone-500 font-light">
+              {isRtl ? 'حفظ وتحديث عناوين البريد الإلكتروني الرسمية للاستوديو مباشرة' : 'Save official email addresses directly to live site'}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSaveSection(isRtl ? 'عناوين البريد الإلكتروني' : 'Email Addresses')}
+              className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase px-5 py-2.5 transition-all flex items-center space-x-2 rtl:space-x-reverse shadow-xs cursor-pointer active:scale-98"
+            >
+              <Save className="w-3.5 h-3.5 text-gold" />
+              <span>{isRtl ? 'حفظ عناوين البريد' : 'Save Email Addresses'}</span>
+            </button>
+          </div>
         </div>
 
         {/* ========================================================================= */}
@@ -482,69 +696,203 @@ export default function AdminSettingsPage() {
               />
             </div>
           </div>
+
+          {/* Section 4 Save Button */}
+          <div className="pt-4 border-t border-[#E7E2D8] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-[11px] text-stone-500 font-light">
+              {isRtl ? 'حفظ وتحديث نبذة وهوية الفوتر بالعربية والإنجليزية مباشرة في الموقع' : 'Save footer bio and studio summary directly to live site'}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSaveSection(isRtl ? 'نبذة الفوتر والتعريف' : 'Footer Bio')}
+              className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase px-5 py-2.5 transition-all flex items-center space-x-2 rtl:space-x-reverse shadow-xs cursor-pointer active:scale-98"
+            >
+              <Save className="w-3.5 h-3.5 text-gold" />
+              <span>{isRtl ? 'حفظ نبذة الفوتر' : 'Save Footer Bio'}</span>
+            </button>
+          </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 5. STUDIO HEADQUARTERS & ADDRESSES */}
+        {/* 5. STUDIO HEADQUARTERS & ADDRESSES (DYNAMIC MULTI-BRANCH) */}
         {/* ========================================================================= */}
         <div className="bg-white p-7 border border-[#E7E2D8] shadow-sm space-y-6">
-          <div className="flex items-center space-x-3 rtl:space-x-reverse pb-4 border-b border-[#E7E2D8]">
-            <Building className="w-4 h-4 text-gold" />
-            <div>
-              <h2 className="font-cinzel text-sm font-semibold uppercase text-charcoal">
-                {t.settings.studiosTitle}
-              </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E7E2D8]">
+            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+              <div className="w-8 h-8 bg-[#FAF6EE] border border-[#E7E2D8] flex items-center justify-center text-charcoal">
+                <Building className="w-4 h-4 text-gold" />
+              </div>
+              <div>
+                <h2 className="font-cinzel text-sm font-semibold uppercase text-charcoal">
+                  {t.settings.studiosTitle}
+                </h2>
+                <p className="text-[11px] text-stone-text font-light">
+                  {isRtl ? 'إدارة مقرات ومكاتب الاستوديو الحالية وإضافة مقرات وعناوين جديدة ديناميكياً' : 'Manage existing and new studio branches and locations dynamically'}
+                </p>
+              </div>
             </div>
+
+            <button
+              type="button"
+              onClick={handleAddStudio}
+              className="bg-charcoal hover:bg-gold text-white text-[11px] font-semibold tracking-wider uppercase px-4 py-2 transition-all flex items-center space-x-1.5 rtl:space-x-reverse shadow-sm shrink-0 cursor-pointer active:scale-98"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{isRtl ? 'إضافة مقر استوديو جديد' : 'Add New Studio'}</span>
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Cairo Studio */}
-            <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
-              <h3 className="font-cinzel text-xs font-semibold uppercase text-charcoal">{t.settings.cairoStudio}</h3>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase text-stone-500">{t.settings.addressEn}</label>
-                <input
-                  type="text"
-                  value={info.cairo_studio.address_en}
-                  onChange={(e) => setInfo({ ...info, cairo_studio: { ...info.cairo_studio, address_en: e.target.value } })}
-                  className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase text-stone-500">{t.settings.addressAr}</label>
-                <input
-                  type="text"
-                  dir="rtl"
-                  value={info.cairo_studio.address_ar}
-                  onChange={(e) => setInfo({ ...info, cairo_studio: { ...info.cairo_studio, address_ar: e.target.value } })}
-                  className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none"
-                />
-              </div>
-            </div>
+          <div className="space-y-5">
+            {((info.studios && info.studios.length > 0)
+              ? info.studios
+              : [
+                  {
+                    id: 'studio-cairo',
+                    title_en: info.cairo_studio?.title_en || 'Cairo Main Studio',
+                    title_ar: info.cairo_studio?.title_ar || 'استوديو القاهرة الرئيسي',
+                    address_en: info.cairo_studio?.address_en || '12 Design District, Zamalek, Cairo, Egypt',
+                    address_ar: info.cairo_studio?.address_ar || '12 حي التصميم، الزمالك، القاهرة، مصر',
+                    phone: info.cairo_studio?.phone || '+20 12 3456 7890',
+                    email: info.cairo_studio?.email || 'studio@viwan.com',
+                  },
+                  {
+                    id: 'studio-riyadh',
+                    title_en: info.riyadh_studio?.title_en || 'Riyadh Studio',
+                    title_ar: info.riyadh_studio?.title_ar || 'استوديو الرياض',
+                    address_en: info.riyadh_studio?.address_en || 'King Abdullah Financial District (KAFD), Riyadh, Saudi Arabia',
+                    address_ar: info.riyadh_studio?.address_ar || 'مركز الملك عبد الله المالي (KAFD)، الرياض، المملكة العربية السعودية',
+                    phone: info.riyadh_studio?.phone || '+966 11 234 5678',
+                    email: info.riyadh_studio?.email || 'riyadh@viwan.com',
+                  },
+                ]
+            ).map((studio, idx) => (
+              <div key={studio.id || idx} className="p-5 bg-[#FAF6EE]/40 border border-[#E7E2D8] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E7E2D8]/60">
+                  <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
+                    <MapPin className="w-4 h-4 text-gold shrink-0" />
+                    <span className="font-cinzel text-xs font-semibold text-charcoal uppercase">
+                      {isRtl
+                        ? (studio.title_ar || `مقر استوديو #${idx + 1}`)
+                        : (studio.title_en || `Studio Branch #${idx + 1}`)}
+                    </span>
+                  </div>
 
-            {/* Riyadh Studio */}
-            <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
-              <h3 className="font-cinzel text-xs font-semibold uppercase text-charcoal">{t.settings.riyadhStudio}</h3>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase text-stone-500">{t.settings.addressEn}</label>
-                <input
-                  type="text"
-                  value={info.riyadh_studio.address_en}
-                  onChange={(e) => setInfo({ ...info, riyadh_studio: { ...info.riyadh_studio, address_en: e.target.value } })}
-                  className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none"
-                />
+                  {(info.studios || []).length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteStudio(studio.id)}
+                      className="p-1.5 text-stone-400 hover:text-red-600 transition-colors cursor-pointer"
+                      title={isRtl ? 'حذف هذا المقر' : 'Delete this studio'}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Studio Names (EN & AR) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-stone-500 font-semibold">
+                      {isRtl ? 'اسم المقر (بالإنجليزية)' : 'Studio Name (EN)'}
+                    </label>
+                    <input
+                      type="text"
+                      value={studio.title_en || ''}
+                      onChange={(e) => handleUpdateStudio(studio.id, 'title_en', e.target.value)}
+                      placeholder="e.g. Cairo Main Studio"
+                      className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-stone-500 font-semibold">
+                      {isRtl ? 'اسم المقر (بالعربية)' : 'Studio Name (AR)'}
+                    </label>
+                    <input
+                      type="text"
+                      dir="rtl"
+                      value={studio.title_ar || ''}
+                      onChange={(e) => handleUpdateStudio(studio.id, 'title_ar', e.target.value)}
+                      placeholder="مثال: استوديو القاهرة الرئيسي"
+                      className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                    />
+                  </div>
+                </div>
+
+                {/* Studio Addresses (EN & AR) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-stone-500 font-semibold">
+                      {t.settings.addressEn}
+                    </label>
+                    <input
+                      type="text"
+                      value={studio.address_en || ''}
+                      onChange={(e) => handleUpdateStudio(studio.id, 'address_en', e.target.value)}
+                      placeholder="e.g. 12 Design District, Zamalek, Cairo, Egypt"
+                      className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-stone-500 font-semibold">
+                      {t.settings.addressAr}
+                    </label>
+                    <input
+                      type="text"
+                      dir="rtl"
+                      value={studio.address_ar || ''}
+                      onChange={(e) => handleUpdateStudio(studio.id, 'address_ar', e.target.value)}
+                      placeholder="مثال: 12 حي التصميم، الزمالك، القاهرة، مصر"
+                      className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none focus:border-gold"
+                    />
+                  </div>
+                </div>
+
+                {/* Direct Phone & Email for Branch */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-stone-500 font-semibold">
+                      {isRtl ? 'الهاتف المباشر للمقر (اختياري)' : 'Branch Direct Phone (Optional)'}
+                    </label>
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={studio.phone || ''}
+                      onChange={(e) => handleUpdateStudio(studio.id, 'phone', e.target.value)}
+                      placeholder="+20 12 3456 7890"
+                      className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal font-mono outline-none focus:border-gold"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-stone-500 font-semibold">
+                      {isRtl ? 'البريد الإلكتروني للمقر (اختياري)' : 'Branch Direct Email (Optional)'}
+                    </label>
+                    <input
+                      type="email"
+                      dir="ltr"
+                      value={studio.email || ''}
+                      onChange={(e) => handleUpdateStudio(studio.id, 'email', e.target.value)}
+                      placeholder="studio@viwan.com"
+                      className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal font-mono outline-none focus:border-gold"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase text-stone-500">{t.settings.addressAr}</label>
-                <input
-                  type="text"
-                  dir="rtl"
-                  value={info.riyadh_studio.address_ar}
-                  onChange={(e) => setInfo({ ...info, riyadh_studio: { ...info.riyadh_studio, address_ar: e.target.value } })}
-                  className="w-full bg-white border border-[#E7E2D8] p-2 text-xs text-charcoal outline-none"
-                />
-              </div>
-            </div>
+            ))}
+          </div>
+
+          {/* Section 5 Save Button */}
+          <div className="pt-4 border-t border-[#E7E2D8] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-[11px] text-stone-500 font-light">
+              {isRtl ? 'حفظ وتحديث كافة مقرات الاستوديو وعناوين المكاتب الحالية والجديدة' : 'Save all studio headquarters and branch locations'}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSaveSection(isRtl ? 'مقرات الاستوديو والعناوين' : 'Studio Locations')}
+              className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase px-5 py-2.5 transition-all flex items-center space-x-2 rtl:space-x-reverse shadow-xs cursor-pointer active:scale-98"
+            >
+              <Save className="w-3.5 h-3.5 text-gold" />
+              <span>{isRtl ? 'حفظ مقرات الاستوديو' : 'Save Studio Locations'}</span>
+            </button>
           </div>
         </div>
 

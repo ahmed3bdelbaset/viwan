@@ -345,22 +345,29 @@ export default function AdminExpertisePage() {
       {/* 3. ADD / EDIT EXPERTISE SECTOR & COUNTER MODAL */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="bg-[#FAF6EE] max-w-xl w-full my-auto max-h-[88vh] overflow-y-auto border border-[#E7E2D8] p-6 sm:p-8 space-y-6 shadow-2xl relative">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className={`absolute top-6 ${isRtl ? 'left-6' : 'right-6'} p-2 text-stone-500 hover:text-charcoal`}
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF7F2]/95 dark:bg-[#161513]/95 backdrop-blur-2xl border border-white/70 dark:border-stone-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] max-w-2xl w-full my-auto max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[28px] sm:rounded-[36px] custom-scrollbar animate-fade-in">
+            <div className="flex items-start justify-between border-b border-[#E7E2D8]/80 pb-4">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
+                  {editingSector ? (isRtl ? 'تعديل قطاع التخصص' : 'EDIT SECTOR') : (isRtl ? 'قطاع جديد' : 'NEW SECTOR')}
+                </span>
+                <h2 className="font-cinzel text-xl text-charcoal dark:text-ivory font-medium">
+                  {editingSector ? t.expertise.editModalTitle : t.expertise.addModalTitle}
+                </h2>
+                <p className="text-xs text-stone-500 font-light mt-0.5">
+                  {t.expertise.subtitle}
+                </p>
+              </div>
 
-            <div className="space-y-1">
-              <h2 className="font-cinzel text-xl font-semibold text-charcoal uppercase">
-                {editingSector ? t.expertise.editModalTitle : t.expertise.addModalTitle}
-              </h2>
-              <p className="text-xs text-stone-text font-light">
-                {t.expertise.subtitle}
-              </p>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 rounded-full text-stone-400 hover:text-charcoal dark:hover:text-ivory hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <form onSubmit={handleSave} className="space-y-5">
@@ -464,20 +471,21 @@ export default function AdminExpertisePage() {
                 />
               </div>
 
-              {/* Actions */}
-              <div className="pt-4 border-t border-[#E7E2D8] flex items-center justify-end space-x-3 rtl:space-x-reverse">
+              {/* Actions - Centered */}
+              <div className="flex items-center justify-center gap-4 pt-6 border-t border-[#E7E2D8]/80">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 border border-[#E7E2D8] text-xs text-stone-dark hover:text-charcoal uppercase font-medium"
+                  className="px-6 py-3 border border-[#E7E2D8] hover:border-stone-400 bg-white dark:bg-black/30 text-xs font-medium text-stone-600 dark:text-stone-300 rounded-xl transition-colors cursor-pointer min-w-[120px]"
                 >
                   {t.expertise.cancel}
                 </button>
                 <button
                   type="submit"
-                  className="bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase px-7 py-2.5 transition-colors"
+                  className="px-10 py-3 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-widest uppercase rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer min-w-[180px]"
                 >
-                  {t.expertise.save}
+                  <Check className="w-4 h-4 text-gold" />
+                  <span>{t.expertise.save}</span>
                 </button>
               </div>
             </form>

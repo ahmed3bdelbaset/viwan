@@ -242,6 +242,7 @@ export const DataStore = {
             },
             phones: (parsed.phones && parsed.phones.length > 0) ? parsed.phones : INITIAL_COMPANY_INFO.phones,
             emails: (parsed.emails && parsed.emails.length > 0) ? parsed.emails : INITIAL_COMPANY_INFO.emails,
+            studios: (parsed.studios && parsed.studios.length > 0) ? parsed.studios : INITIAL_COMPANY_INFO.studios,
           };
           return merged;
         } catch (e) {

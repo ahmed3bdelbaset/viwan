@@ -138,6 +138,19 @@ export interface SocialLinks {
   behance?: string;
 }
 
+export interface StudioLocation {
+  id: string;
+  title_en: string;
+  title_ar: string;
+  address_en: string;
+  address_ar: string;
+  postal_code?: string;
+  phone?: string;
+  email?: string;
+  lat?: number;
+  lng?: number;
+}
+
 export interface CompanyInfo {
   name_en: string;
   name_ar: string;
@@ -154,6 +167,7 @@ export interface CompanyInfo {
   phones: ContactPhone[];
   emails: ContactEmail[];
   social: SocialLinks;
+  studios?: StudioLocation[];
   cairo_studio: {
     title_en: string;
     title_ar: string;

@@ -28,8 +28,8 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
-      <div className="bg-[#141414]/95 border border-stone-700 max-w-md w-full p-8 sm:p-9 space-y-6 shadow-[0_25px_60px_rgba(0,0,0,0.9),0_0_50px_rgba(176,138,90,0.1)] text-white relative animate-in zoom-in-95 duration-200 backdrop-blur-2xl">
+    <div className="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+      <div className="bg-[#161513]/95 border border-stone-700/80 max-w-md w-full p-7 sm:p-8 space-y-6 shadow-[0_25px_60px_rgba(0,0,0,0.9),0_0_50px_rgba(176,138,90,0.1)] text-white relative animate-in zoom-in-95 duration-200 backdrop-blur-2xl rounded-[28px] overflow-hidden">
         {/* Top Accent Line */}
         <div
           className={`absolute top-0 left-0 right-0 h-[2px] ${
@@ -42,7 +42,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         {/* Close Icon */}
         <button
           onClick={onCancel}
-          className="absolute top-5 right-5 text-stone-400 hover:text-white transition-colors p-1"
+          className="absolute top-5 right-5 text-stone-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5 cursor-pointer"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
@@ -50,7 +50,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
         {/* Modal Header */}
         <div className="flex items-start space-x-4 rtl:space-x-reverse pt-2">
-          <div className="w-12 h-12 border border-stone-700 bg-[#1e1e1e] flex items-center justify-center shrink-0 shadow-inner">
+          <div className="w-12 h-12 border border-stone-700 bg-[#1e1e1e] flex items-center justify-center shrink-0 shadow-inner rounded-xl">
             {isDestructive ? (
               <AlertTriangle className="w-6 h-6 text-red-500" />
             ) : (
@@ -68,19 +68,19 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-end space-x-3 rtl:space-x-reverse pt-5 border-t border-stone-800">
+        {/* Actions - Centered */}
+        <div className="flex items-center justify-center gap-3 pt-5 border-t border-stone-800">
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2.5 border border-stone-700 hover:border-stone-500 text-xs font-montserrat tracking-widest uppercase text-stone-300 hover:text-white transition-colors"
+            className="px-6 py-2.5 border border-stone-700 hover:border-stone-500 text-xs font-montserrat tracking-widest uppercase text-stone-300 hover:text-white transition-colors rounded-xl cursor-pointer min-w-[110px]"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-7 py-2.5 text-xs font-montserrat font-semibold tracking-widest uppercase transition-all shadow-md active:scale-[0.98] ${
+            className={`px-8 py-2.5 text-xs font-montserrat font-semibold tracking-widest uppercase transition-all shadow-md active:scale-[0.98] rounded-xl cursor-pointer min-w-[130px] ${
               isDestructive
                 ? 'bg-red-700 hover:bg-red-600 text-white'
                 : 'bg-gold hover:bg-gold-light text-white'
