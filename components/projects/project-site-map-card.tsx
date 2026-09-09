@@ -100,15 +100,15 @@ export function ProjectSiteMapCard({
 
   return (
     <div
-      className={`border border-stone/30 bg-[#FAF7F2] dark:bg-[#161513] overflow-hidden flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch transition-colors duration-500 rounded-xs shadow-sm ${className}`}
+      className={`@container border border-stone/30 bg-[#FAF7F2] dark:bg-[#161513] overflow-hidden flex flex-col @sm:flex-row items-stretch transition-colors duration-500 rounded-xs shadow-sm ${className}`}
     >
       {/* Real Interactive Map Section */}
-      <div className="relative w-full sm:w-[58%] lg:w-full xl:w-[58%] min-h-[220px] sm:min-h-[230px] bg-[#EFE9DF] dark:bg-[#1C1A17] overflow-hidden select-none">
+      <div className="relative w-full @sm:w-[58%] min-h-[220px] @sm:min-h-[230px] bg-[#EFE9DF] dark:bg-[#1C1A17] overflow-hidden select-none">
         {/* Real Map Embed */}
         <iframe
           title={`${locationName} - Site Map`}
           src={embedUrl}
-          className="w-full h-full min-h-[220px] sm:min-h-[230px] border-0 block contrast-[1.04] saturate-[0.9]"
+          className="w-full h-full min-h-[220px] @sm:min-h-[230px] border-0 block contrast-[1.04] saturate-[0.9]"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
         />
@@ -135,7 +135,7 @@ export function ProjectSiteMapCard({
       </div>
 
       {/* Narrative & Location Information Section */}
-      <div className="w-full sm:w-[42%] lg:w-full xl:w-[42%] p-5 flex flex-col justify-center gap-3 border-t sm:border-t-0 sm:border-s lg:border-s-0 lg:border-t xl:border-t-0 xl:border-s border-stone/30">
+      <div className="w-full @sm:w-[42%] p-5 flex flex-col justify-center gap-3 border-t @sm:border-t-0 @sm:border-s border-stone/30">
         <div className="flex items-center gap-2 text-gold">
           <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
           <span className="eyebrow text-[10px] tracking-wider uppercase font-semibold line-clamp-1">

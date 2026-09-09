@@ -126,7 +126,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Main Nav Items */}
-        <nav className="p-4 space-y-1.5 flex-grow overflow-y-auto">
+        <nav className="p-4 space-y-1.5 flex-grow overflow-y-auto custom-scrollbar">
           {navItems.map((item) => {
             const active = pathname === item.href;
             return (

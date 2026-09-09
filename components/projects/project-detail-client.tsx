@@ -304,7 +304,7 @@ export function ProjectDetailClient({
       )}
 
       {/* Curated Gallery Section */}
-      <section className="section-gap">
+      <section className="section-gap defer-render">
         <div className="container-viwan flex flex-col gap-16">
           <div className="flex flex-col gap-3">
             <SectionIndex n="03" label={lang === 'ar' ? 'معرض المشروع' : 'PROJECT GALLERY'} />

@@ -1281,25 +1281,27 @@ export default function AdminProjectsPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* ADD / EDIT PROJECT MODAL */}
+      {/* ADD / EDIT PROJECT MODAL (Frosted Glassmorphism + Rounded + Concise Guidance) */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-[#E7E2D8] max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl relative animate-fade-in">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF7F2]/95 dark:bg-[#161513]/95 backdrop-blur-2xl border border-white/70 dark:border-stone-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative rounded-[28px] sm:rounded-[36px] custom-scrollbar animate-fade-in">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-[#E7E2D8] pb-4">
+            <div className="flex items-start justify-between border-b border-[#E7E2D8]/80 pb-4">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold">
-                  {editingId ? (isRtl ? 'تعديل مشروع قائم' : 'EDIT ARCHITECTURAL PROJECT') : (isRtl ? 'إضافة مشروع جديد' : 'ADD NEW ARCHITECTURAL PROJECT')}
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gold font-bold px-2.5 py-0.5 rounded-full bg-gold/10 inline-block mb-1">
+                  {editingId ? (isRtl ? 'تعديل مشروع' : 'EDIT PROJECT') : (isRtl ? 'مشروع جديد' : 'NEW PROJECT')}
                 </span>
-                <h2 className="font-cinzel text-xl text-charcoal font-medium mt-1">
-                  {form.title_en || form.title_ar || (isRtl ? 'مشروع جديد' : 'New Project')}
+                <h2 className="font-cinzel text-xl text-charcoal dark:text-ivory font-medium">
+                  {form.title_en || form.title_ar || (isRtl ? 'بيانات المشروع' : 'Project Details')}
                 </h2>
               </div>
 
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-stone-400 hover:text-charcoal transition-colors"
+                className="p-2 rounded-full text-stone-400 hover:text-charcoal dark:hover:text-ivory hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1311,7 +1313,7 @@ export default function AdminProjectsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'اسم المشروع (باللغة الإنجليزية) *' : 'PROJECT TITLE (ENGLISH) *'}
+                    {isRtl ? 'اسم المشروع (EN) *' : 'PROJECT TITLE (EN) *'}
                   </label>
                   <input
                     type="text"
@@ -1325,14 +1327,14 @@ export default function AdminProjectsPage() {
                         slug: prev.slug || val.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
                       }));
                     }}
-                    placeholder="e.g. Private Residence 01"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                    placeholder="e.g. Al-Noor Villa"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'اسم المشروع (باللغة العربية) *' : 'PROJECT TITLE (ARABIC) *'}
+                    {isRtl ? 'اسم المشروع (AR) *' : 'PROJECT TITLE (AR) *'}
                   </label>
                   <input
                     type="text"
@@ -1340,21 +1342,21 @@ export default function AdminProjectsPage() {
                     dir="rtl"
                     value={form.title_ar || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, title_ar: e.target.value }))}
-                    placeholder="مثال: إقامة خاصة 01"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-cairo"
+                    placeholder="مثال: فيلا النور"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all font-cairo"
                   />
                 </div>
               </div>
 
-              {/* Row 2: The 5 Disciplines (الخصائص الـ 5 والتخصص المعماري) */}
-              <div className="space-y-3 p-4 bg-[#FAF6EE] border border-[#E7E2D8]">
+              {/* Row 2: The Disciplines */}
+              <div className="space-y-3 p-4 sm:p-5 bg-white/60 dark:bg-black/20 backdrop-blur-xs border border-[#E7E2D8] rounded-2xl sm:rounded-3xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                      {isRtl ? 'الخصائص الـ 5 والتخصص المعماري للمشروع *' : 'THE 5 DISCIPLINES (PROJECT CATEGORY) *'}
+                      {isRtl ? 'التخصص المعماري للمشروع *' : 'PROJECT DISCIPLINE *'}
                     </label>
-                    <p className="text-[11px] text-stone-500 mt-0.5">
-                      {isRtl ? 'اختر التخصص الذي ينتمي إليه المشروع ليتم ربطه وعرضه معه في صفحة المشاريع العامة.' : 'Select the primary discipline to group this project with in the public portfolio.'}
+                    <p className="text-[11px] text-stone-500">
+                      {isRtl ? 'حدد تخصصات المشروع والتصنيف الأساسي' : 'Select primary and related disciplines'}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -1363,7 +1365,7 @@ export default function AdminProjectsPage() {
                       type="number"
                       value={form.year || 2026}
                       onChange={(e) => setForm((prev) => ({ ...prev, year: parseInt(e.target.value) || 2026 }))}
-                      className="w-24 bg-white border border-[#E7E2D8] px-2 py-1 text-xs text-charcoal focus:outline-none focus:border-gold font-mono text-center"
+                      className="w-24 bg-white dark:bg-black/40 border border-[#E7E2D8] rounded-xl px-2.5 py-1.5 text-xs text-charcoal focus:outline-none focus:border-gold font-mono text-center"
                     />
                   </div>
                 </div>
@@ -1382,7 +1384,6 @@ export default function AdminProjectsPage() {
                         onClick={() => {
                           let updated: string[];
                           if (isSelected) {
-                            // Only allow unselecting if more than one discipline is chosen
                             updated = currentDisciplines.length > 1 
                               ? currentDisciplines.filter((x) => x !== d.id && x !== d.slug)
                               : currentDisciplines;
@@ -1396,10 +1397,10 @@ export default function AdminProjectsPage() {
                             category: newCat,
                           }));
                         }}
-                        className={`p-3 text-start border transition-all flex flex-col justify-between gap-2 cursor-pointer rounded-xs ${
+                        className={`p-3 text-start border transition-all flex flex-col justify-between gap-2 cursor-pointer rounded-xl ${
                           isSelected
                             ? 'border-gold bg-charcoal text-ivory ring-1 ring-gold shadow-xs'
-                            : 'border-[#E7E2D8] bg-white hover:border-gold/60 text-charcoal'
+                            : 'border-[#E7E2D8] bg-white/90 hover:border-gold/60 text-charcoal'
                         }`}
                       >
                         <div className="flex items-center justify-between w-full">
@@ -1409,7 +1410,7 @@ export default function AdminProjectsPage() {
                           {isSelected ? (
                             <span className="flex items-center gap-1">
                               {isPrimary && (
-                                <span className="text-[8.5px] font-mono bg-gold text-charcoal px-1 py-0.5 rounded-xs uppercase font-bold">
+                                <span className="text-[8.5px] font-mono bg-gold text-charcoal px-1.5 py-0.5 rounded-full uppercase font-bold">
                                   {isRtl ? 'رئيسي' : 'PRIMARY'}
                                 </span>
                               )}
@@ -1432,23 +1433,23 @@ export default function AdminProjectsPage() {
                   })}
                 </div>
 
-                {/* Clear visual feedback & Primary Discipline Selection */}
-                <div className="p-2.5 bg-white border border-[#E7E2D8] text-[11px] text-stone-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                {/* Selected Disciplines pill & Primary selection */}
+                <div className="p-3 bg-white/80 dark:bg-black/40 border border-[#E7E2D8] rounded-xl text-[11px] text-stone-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-gold shrink-0" />
                     <span>
                       {isRtl
-                        ? `التخصصات المعمارية المحددة: ${(form.disciplines || []).map(d => DISCIPLINES_LIST.find(item => item.id === d)?.labelAr || d).join(' + ')}`
-                        : `Selected Disciplines: ${(form.disciplines || []).join(' + ')}`}
+                        ? `المحدد: ${(form.disciplines || []).map(d => DISCIPLINES_LIST.find(item => item.id === d)?.labelAr || d).join(' + ')}`
+                        : `Selected: ${(form.disciplines || []).join(' + ')}`}
                     </span>
                   </div>
                   {Array.isArray(form.disciplines) && form.disciplines.length > 1 && (
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-stone-500">{isRtl ? 'التخصص الأساسي للعرض:' : 'Primary Category:'}</span>
+                      <span className="text-[10px] text-stone-500">{isRtl ? 'الأساسي:' : 'Primary:'}</span>
                       <select
                         value={form.category || form.disciplines[0]}
                         onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-                        className="bg-[#FAF6EE] border border-[#E7E2D8] px-2 py-1 text-xs text-charcoal focus:outline-none"
+                        className="bg-[#FAF6EE] border border-[#E7E2D8] rounded-lg px-2 py-1 text-xs text-charcoal focus:outline-none"
                       >
                         {form.disciplines.map((d) => (
                           <option key={d} value={d}>
@@ -1465,20 +1466,20 @@ export default function AdminProjectsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'الموقع (باللغة الإنجليزية)' : 'LOCATION (ENGLISH)'}
+                    {isRtl ? 'الموقع (EN)' : 'LOCATION (EN)'}
                   </label>
                   <input
                     type="text"
                     value={form.location_en || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, location_en: e.target.value, location: e.target.value }))}
                     placeholder="e.g. New Cairo, Egypt"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'الموقع (باللغة العربية)' : 'LOCATION (ARABIC)'}
+                    {isRtl ? 'الموقع (AR)' : 'LOCATION (AR)'}
                   </label>
                   <input
                     type="text"
@@ -1486,7 +1487,7 @@ export default function AdminProjectsPage() {
                     value={form.location_ar || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, location_ar: e.target.value }))}
                     placeholder="مثال: القاهرة الجديدة، مصر"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-cairo"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all font-cairo"
                   />
                 </div>
               </div>
@@ -1502,7 +1503,7 @@ export default function AdminProjectsPage() {
                     value={form.client_en || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, client_en: e.target.value, client_ar: e.target.value }))}
                     placeholder="e.g. Private VIP Client"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
@@ -1515,37 +1516,37 @@ export default function AdminProjectsPage() {
                     value={form.area_sqm || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, area_sqm: e.target.value }))}
                     placeholder="e.g. 1,850 m²"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
               </div>
 
-              {/* Row 5: Subtitles */}
+              {/* Row 5: Subtitles / Taglines */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'شعار / نبذة سريعة (EN)' : 'SUBTITLE / TAGLINE (EN)'}
+                    {isRtl ? 'شعار المشروع (EN)' : 'SUBTITLE (EN)'}
                   </label>
                   <input
                     type="text"
                     value={form.subtitle_en || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, subtitle_en: e.target.value, tagline: e.target.value }))}
-                    placeholder="A home in harmony with its surroundings."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                    placeholder="A home in harmony with nature."
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'شعار / نبذة سريعة (AR)' : 'SUBTITLE / TAGLINE (AR)'}
+                    {isRtl ? 'شعار المشروع (AR)' : 'SUBTITLE (AR)'}
                   </label>
                   <input
                     type="text"
                     dir="rtl"
                     value={form.subtitle_ar || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, subtitle_ar: e.target.value }))}
-                    placeholder="منزل متناغم مع محيطه الطبيعي ويوفر ملاذاً هادئاً."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-cairo"
+                    placeholder="منزل متناغم مع المحيط الطبيعي"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all font-cairo"
                   />
                 </div>
               </div>
@@ -1554,28 +1555,28 @@ export default function AdminProjectsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'عنوان الموجز المعماري (EN)' : 'ARCHITECTURAL BRIEF HEADING (EN)'}
+                    {isRtl ? 'عنوان الموجز المعماري (EN)' : 'BRIEF HEADING (EN)'}
                   </label>
                   <input
                     type="text"
                     value={form.heading || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, heading: e.target.value }))}
                     placeholder="A refined balance of architecture and nature."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'عنوان الموجز المعماري (AR)' : 'ARCHITECTURAL BRIEF HEADING (AR)'}
+                    {isRtl ? 'عنوان الموجز المعماري (AR)' : 'BRIEF HEADING (AR)'}
                   </label>
                   <input
                     type="text"
                     dir="rtl"
                     value={form.headingAr || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, headingAr: e.target.value }))}
-                    placeholder="توازن دقيق بين روعة العمارة وجمال الطبيعة."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-cairo"
+                    placeholder="توازن دقيق بين روعة العمارة وجمال الطبيعة"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all font-cairo"
                   />
                 </div>
               </div>
@@ -1584,20 +1585,20 @@ export default function AdminProjectsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'الوصف المعماري الكامل وتفاصيل المشروع (EN)' : 'FULL ARCHITECTURAL DESCRIPTION (EN)'}
+                    {isRtl ? 'الوصف المعماري (EN)' : 'DESCRIPTION (EN)'}
                   </label>
                   <textarea
                     rows={4}
                     value={form.description || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                    placeholder="Detailed spatial program, materials, and structural narrative..."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y"
+                    placeholder="Spatial program, materials, and structural narrative..."
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all resize-y"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'الوصف المعماري الكامل وتفاصيل المشروع (AR)' : 'FULL ARCHITECTURAL DESCRIPTION (AR)'}
+                    {isRtl ? 'الوصف المعماري (AR)' : 'DESCRIPTION (AR)'}
                   </label>
                   <textarea
                     rows={4}
@@ -1605,7 +1606,7 @@ export default function AdminProjectsPage() {
                     value={form.descriptionAr || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, descriptionAr: e.target.value }))}
                     placeholder="تفاصيل البرنامج الفراغي، خامات التشطيب، الكتل المعمارية..."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y font-cairo"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all resize-y font-cairo"
                   />
                 </div>
               </div>
@@ -1614,20 +1615,20 @@ export default function AdminProjectsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'فلسفة ورؤية التصميم الفراغي (EN)' : 'DESIGN PHILOSOPHY & CONCEPT (EN)'}
+                    {isRtl ? 'فلسفة التصميم (EN)' : 'DESIGN PHILOSOPHY (EN)'}
                   </label>
                   <textarea
                     rows={2}
                     value={form.philosophy || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, philosophy: e.target.value }))}
                     placeholder="Architecture shaped by light and proportion."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all resize-y"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'فلسفة ورؤية التصميم (AR)' : 'DESIGN PHILOSOPHY & CONCEPT (AR)'}
+                    {isRtl ? 'فلسفة التصميم (AR)' : 'DESIGN PHILOSOPHY (AR)'}
                   </label>
                   <textarea
                     rows={2}
@@ -1635,19 +1636,19 @@ export default function AdminProjectsPage() {
                     value={form.philosophyAr || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, philosophyAr: e.target.value }))}
                     placeholder="حوار هندسي بين متطلبات المعيشة والسكينة الطبيعية..."
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold resize-y font-cairo"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all resize-y font-cairo"
                   />
                 </div>
               </div>
 
               {/* Row 9: YouTube Video Tour (Optional) */}
-              <div className="p-4 bg-[#FAF6EE] border border-[#E7E2D8] space-y-3">
+              <div className="p-4 sm:p-5 bg-white/60 dark:bg-black/20 backdrop-blur-xs border border-[#E7E2D8] rounded-2xl sm:rounded-3xl space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider flex items-center gap-1.5">
                     <Film className="w-3.5 h-3.5 text-gold" />
-                    <span>{isRtl ? 'رابط فيديو يوتيوب للمشروع (اختياري)' : 'PROJECT YOUTUBE VIDEO TOUR (OPTIONAL)'}</span>
+                    <span>{isRtl ? 'فيديو يوتيوب للمشروع (اختياري)' : 'YOUTUBE VIDEO (OPTIONAL)'}</span>
                   </label>
-                  <span className="text-[10px] text-stone-500 font-mono">YouTube Zero-Disk Integration</span>
+                  <span className="text-[10px] text-stone-500 font-mono">4K Cinema Stream</span>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
@@ -1656,29 +1657,24 @@ export default function AdminProjectsPage() {
                       type="url"
                       value={form.youtubeUrl || ''}
                       onChange={(e) => setForm((prev) => ({ ...prev, youtubeUrl: e.target.value }))}
-                      placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
-                      className="w-full bg-white border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-mono"
+                      placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                      className="w-full bg-white dark:bg-black/40 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold font-mono"
                     />
                   </div>
 
                   {form.youtubeUrl && extractYouTubeId(form.youtubeUrl) && (
-                    <div className="flex items-center gap-2 border border-[#E7E2D8] bg-white p-1 shrink-0">
+                    <div className="flex items-center gap-2 border border-[#E7E2D8] bg-white dark:bg-black/50 p-1.5 rounded-xl shrink-0">
                       <img
                         src={getYouTubeThumbnail(extractYouTubeId(form.youtubeUrl)!)}
                         alt="YouTube Preview"
-                        className="w-16 h-10 object-cover"
+                        className="w-16 h-10 object-cover rounded-lg"
                       />
-                      <span className="text-[10px] text-emerald-700 font-medium px-2">
-                        {isRtl ? 'تم التعرف على الفيديو ✓' : 'Valid YouTube Video ✓'}
+                      <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium px-2">
+                        {isRtl ? 'تم التحقق ✓' : 'Verified ✓'}
                       </span>
                     </div>
                   )}
                 </div>
-                <p className="text-[10px] text-stone-500">
-                  {isRtl
-                    ? 'سيظهر هذا الفيديو بمشغل سينمائي عالي الدقة داخل صفحة المشروع، ويُعرض تلقائياً في سكشن الفيديوهات بصفحة المشاريع العامة (/projects).'
-                    : 'This video will appear in a 4K cinema player inside the project monograph, and automatically appears in the video showcase on /projects.'}
-                </p>
               </div>
 
               {/* Row 10: Coordinates & External Links (Optional) */}
@@ -1686,47 +1682,41 @@ export default function AdminProjectsPage() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-gold" />
-                    <span>{isRtl ? 'إحداثيات موقع المشروع (اختياري)' : 'PROJECT COORDINATES (OPTIONAL)'}</span>
+                    <span>{isRtl ? 'إحداثيات الموقع (اختياري)' : 'COORDINATES (OPTIONAL)'}</span>
                   </label>
                   <input
                     type="text"
                     value={form.coordinates || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, coordinates: e.target.value }))}
-                    placeholder="مثال: 30.0444° N, 31.2357° E أو إحداثيات جوجل ماب"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold font-mono"
+                    placeholder="30.0444, 31.2357"
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold font-mono"
                   />
-                  <p className="text-[10px] text-stone-500">
-                    {isRtl ? 'يتم عرضها برابط مباشر إلى خرائط Google Maps في المواصفات الفنية للمشروع.' : 'Linked to Google Maps in project specifications.'}
-                  </p>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-charcoal uppercase tracking-wider flex items-center gap-1">
                     <ExternalLink className="w-3.5 h-3.5 text-gold" />
-                    <span>{isRtl ? 'رابط المشروع الخارجي / جولة 3D (اختياري)' : 'EXTERNAL / 3D VIRTUAL TOUR LINK (OPTIONAL)'}</span>
+                    <span>{isRtl ? 'رابط جولة 3D أو موقع (اختياري)' : '3D / EXTERNAL LINK (OPTIONAL)'}</span>
                   </label>
                   <input
                     type="url"
                     value={form.projectUrl || ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, projectUrl: e.target.value }))}
-                    placeholder="https://... (Behance, 3D Matterport, or Live Site)"
-                    className="w-full bg-[#FAF6EE] border border-[#E7E2D8] p-2.5 text-xs text-charcoal focus:outline-none focus:border-gold"
+                    placeholder="https://..."
+                    className="w-full bg-white/80 dark:bg-black/20 border border-[#E7E2D8] rounded-xl p-3 text-xs text-charcoal focus:outline-none focus:border-gold"
                   />
-                  <p className="text-[10px] text-stone-500">
-                    {isRtl ? 'زر أنيق لزيارة الموقع أو استكشاف الجولة الفراغية ثلاثية الأبعاد.' : 'Direct button for visitors to view virtual tour or documentation.'}
-                  </p>
                 </div>
               </div>
 
               {/* Cover Image Upload Section */}
-              <div className="p-4 bg-[#FAF6EE] border border-[#E7E2D8] space-y-3">
+              <div className="p-4 sm:p-5 bg-white/60 dark:bg-black/20 backdrop-blur-xs border border-[#E7E2D8] rounded-2xl sm:rounded-3xl space-y-3">
                 <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                  {isRtl ? 'صورة الغلاف الرئيسية (Cover Image) *' : 'PRIMARY COVER IMAGE *'}
+                  {isRtl ? 'صورة الغلاف الرئيسية *' : 'COVER IMAGE *'}
                 </label>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   {/* Thumbnail */}
-                  <div className="w-32 h-20 bg-stone-200 border border-[#E7E2D8] overflow-hidden shrink-0 relative">
+                  <div className="w-32 h-20 bg-stone-200 border border-[#E7E2D8] rounded-xl overflow-hidden shrink-0 relative">
                     <img
                       src={form.cover || '/images/hero-villa.png'}
                       alt="Cover Preview"
@@ -1756,10 +1746,10 @@ export default function AdminProjectsPage() {
                         type="button"
                         onClick={() => coverInputRef.current?.click()}
                         disabled={uploadingCover}
-                        className="px-3 py-1.5 bg-charcoal hover:bg-gold text-white text-xs font-medium flex items-center space-x-1.5 rtl:space-x-reverse transition-colors"
+                        className="px-3.5 py-2 bg-charcoal hover:bg-gold text-white text-xs font-medium rounded-xl flex items-center space-x-1.5 rtl:space-x-reverse transition-colors"
                       >
                         <Upload className="w-3.5 h-3.5 text-gold group-hover:text-white" />
-                        <span>{isRtl ? 'رفع صورة غلاف' : 'UPLOAD COVER'}</span>
+                        <span>{isRtl ? 'رفع صورة' : 'UPLOAD'}</span>
                       </button>
 
                       <input
@@ -1767,22 +1757,24 @@ export default function AdminProjectsPage() {
                         value={form.cover || ''}
                         onChange={(e) => setForm((prev) => ({ ...prev, cover: e.target.value }))}
                         placeholder="/images/... or URL"
-                        className="flex-1 bg-white border border-[#E7E2D8] px-2.5 py-1.5 text-xs text-charcoal focus:outline-none"
+                        className="flex-1 bg-white dark:bg-black/40 border border-[#E7E2D8] rounded-xl px-3 py-2 text-xs text-charcoal focus:outline-none"
                       />
                     </div>
-                    <p className="text-[10px] text-stone-500">
-                      {isRtl ? 'يفضل استخدام صورة أفقية بنسبة 16:9 أو 16:10 بدقة عالية.' : 'Recommended: 16:9 or 16:10 landscape high-resolution architectural photograph.'}
-                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Gallery Images Upload Section */}
-              <div className="p-4 bg-[#FAF6EE] border border-[#E7E2D8] space-y-3">
+              <div className="p-4 sm:p-5 bg-white/60 dark:bg-black/20 backdrop-blur-xs border border-[#E7E2D8] rounded-2xl sm:rounded-3xl space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                    {isRtl ? 'معرض صور المشروع (Gallery Assets)' : 'PROJECT GALLERY ASSETS'}
-                  </label>
+                  <div>
+                    <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
+                      {isRtl ? 'معرض صور المشروع' : 'PROJECT GALLERY'}
+                    </label>
+                    <span className="text-[11px] text-stone-500">
+                      {isRtl ? 'اللقطات واللوحات المعمارية' : 'Architectural visual plates'}
+                    </span>
+                  </div>
 
                   <input
                     type="file"
@@ -1799,22 +1791,22 @@ export default function AdminProjectsPage() {
                     type="button"
                     onClick={() => galleryInputRef.current?.click()}
                     disabled={uploadingGallery}
-                    className="px-3 py-1 bg-white hover:bg-stone-100 border border-[#E7E2D8] text-xs font-medium text-charcoal flex items-center space-x-1 rtl:space-x-reverse transition-colors"
+                    className="px-3.5 py-1.5 bg-white hover:bg-stone-100 border border-[#E7E2D8] rounded-xl text-xs font-medium text-charcoal flex items-center space-x-1.5 rtl:space-x-reverse transition-colors"
                   >
-                    <Plus className="w-3 h-3 text-gold" />
-                    <span>{isRtl ? 'إضافة صور للمعرض' : 'ADD GALLERY IMAGES'}</span>
+                    <Plus className="w-3.5 h-3.5 text-gold" />
+                    <span>{isRtl ? 'إضافة صور' : 'ADD IMAGES'}</span>
                   </button>
                 </div>
 
                 {Array.isArray(form.gallery) && form.gallery.length > 0 ? (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
                     {form.gallery.map((imgUrl, idx) => (
-                      <div key={idx} className="relative aspect-square bg-stone-200 border border-[#E7E2D8] group overflow-hidden">
+                      <div key={idx} className="relative aspect-square bg-stone-200 border border-[#E7E2D8] rounded-xl group overflow-hidden">
                         <img src={imgUrl} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                         <button
                           type="button"
                           onClick={() => handleRemoveGalleryImage(idx)}
-                          className="absolute top-1 right-1 bg-black/70 hover:bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1.5 right-1.5 bg-black/70 hover:bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -1823,24 +1815,24 @@ export default function AdminProjectsPage() {
                   </div>
                 ) : (
                   <p className="text-[11px] text-stone-500 italic">
-                    {isRtl ? 'لم تتم إضافة صور للمعرض بعد.' : 'No gallery images added yet.'}
+                    {isRtl ? 'لم تضف صوراً للمعرض بعد.' : 'No gallery images added yet.'}
                   </p>
                 )}
               </div>
 
-              {/* Display Position in Public Page (Featured vs Related Subproject) */}
-              <div className="p-4 bg-[#FAF6EE] border border-[#E7E2D8] space-y-3">
+              {/* Display Position in Public Page */}
+              <div className="p-4 sm:p-5 bg-white/60 dark:bg-black/20 backdrop-blur-xs border border-[#E7E2D8] rounded-2xl sm:rounded-3xl space-y-3">
                 <label className="text-xs font-semibold text-charcoal uppercase tracking-wider block">
-                  {isRtl ? 'مكان عرض المشروع في صفحة المشاريع العامة (/projects) *' : 'DISPLAY POSITION ON /PROJECTS PAGE *'}
+                  {isRtl ? 'موقع العرض في صفحة المشاريع (/projects) *' : 'DISPLAY POSITION ON /PROJECTS *'}
                 </label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div
                     onClick={() => setForm((prev) => ({ ...prev, is_featured: false, featured: false }))}
-                    className={`p-3 border flex items-start gap-2.5 cursor-pointer transition-all rounded-xs ${
+                    className={`p-3.5 border flex items-start gap-2.5 cursor-pointer transition-all rounded-xl ${
                       !form.is_featured
                         ? 'border-gold bg-white shadow-xs ring-1 ring-gold/40'
-                        : 'border-[#E7E2D8] bg-white/60 hover:border-stone-400'
+                        : 'border-[#E7E2D8] bg-white/70 hover:border-stone-400'
                     }`}
                   >
                     <input
@@ -1852,22 +1844,20 @@ export default function AdminProjectsPage() {
                     />
                     <div className="space-y-0.5 text-start">
                       <div className="text-xs font-bold text-charcoal">
-                        {isRtl ? 'المشاريع المرتبطة (القائمة الجانبية على اليسار)' : 'Related Subproject (Left Column)'}
+                        {isRtl ? 'مشروع فرعي (القائمة الجانبية)' : 'Subproject (Side Column)'}
                       </div>
                       <div className="text-[10px] text-stone-500 leading-normal">
-                        {isRtl
-                          ? 'يضاف بجانب المشاريع الأخرى لنفس التخصص (مثل فندق الريفييرا ومطعم أوليف في قسم التصميم الداخلي).'
-                          : 'Appears in the left column alongside existing projects of this category.'}
+                        {isRtl ? 'يظهر ضمن قائمة المشاريع الإضافية للتخصص' : 'Shows in the discipline sidebar list'}
                       </div>
                     </div>
                   </div>
 
                   <div
                     onClick={() => setForm((prev) => ({ ...prev, is_featured: true, featured: true }))}
-                    className={`p-3 border flex items-start gap-2.5 cursor-pointer transition-all rounded-xs ${
+                    className={`p-3.5 border flex items-start gap-2.5 cursor-pointer transition-all rounded-xl ${
                       Boolean(form.is_featured)
                         ? 'border-gold bg-white shadow-xs ring-1 ring-gold/40'
-                        : 'border-[#E7E2D8] bg-white/60 hover:border-stone-400'
+                        : 'border-[#E7E2D8] bg-white/70 hover:border-stone-400'
                     }`}
                   >
                     <input
@@ -1879,13 +1869,11 @@ export default function AdminProjectsPage() {
                     />
                     <div className="space-y-0.5 text-start">
                       <div className="text-xs font-bold text-charcoal flex items-center gap-1.5">
-                        <span>{isRtl ? 'مشروع رئيسي مميز (Featured في المنتصف)' : 'Featured Primary Project (Center)'}</span>
+                        <span>{isRtl ? 'مشروع رئيسي مميز (Featured)' : 'Featured Hero Project'}</span>
                         <Star className="w-3 h-3 text-gold fill-gold" />
                       </div>
                       <div className="text-[10px] text-stone-500 leading-normal">
-                        {isRtl
-                          ? 'يظهر كالمشروع الرئيسي الكبير في منتصف قسم التخصص بصورة عريضة وتفاصيل كاملة.'
-                          : 'Appears as the large prominent hero project in the center of the discipline section.'}
+                        {isRtl ? 'يظهر كغلاف عريض وبارز في منتصف القسم' : 'Prominent center hero in discipline showcase'}
                       </div>
                     </div>
                   </div>
@@ -1893,11 +1881,11 @@ export default function AdminProjectsPage() {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="flex items-center justify-end space-x-3 rtl:space-x-reverse pt-4 border-t border-[#E7E2D8]">
+              <div className="flex items-center justify-end space-x-3 rtl:space-x-reverse pt-4 border-t border-[#E7E2D8]/80">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-[#E7E2D8] hover:border-stone-400 bg-white text-xs font-medium text-stone-600 transition-colors"
+                  className="px-5 py-2.5 border border-[#E7E2D8] hover:border-stone-400 bg-white dark:bg-black/30 text-xs font-medium text-stone-600 dark:text-stone-300 rounded-xl transition-colors"
                 >
                   {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
@@ -1905,7 +1893,7 @@ export default function AdminProjectsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase transition-colors shadow-xs"
+                  className="px-7 py-2.5 bg-charcoal hover:bg-gold text-white text-xs font-semibold tracking-wider uppercase rounded-xl transition-all shadow-md active:scale-98"
                 >
                   {saving
                     ? (isRtl ? 'جاري الحفظ...' : 'SAVING...')
