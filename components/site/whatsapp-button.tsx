@@ -1,14 +1,15 @@
 'use client'
 
-import { CONTACT } from '@/lib/site'
 import { useLanguage } from '@/lib/i18n'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 
 export function WhatsAppButton() {
   const { lang } = useLanguage()
+  const { contact } = useSiteSettings()
 
   return (
     <a
-      href={CONTACT.whatsapp}
+      href={contact.whatsapp}
       target="_blank"
       rel="noreferrer noopener"
       aria-label={lang === 'ar' ? 'تواصل عبر واتساب' : 'Chat on WhatsApp'}

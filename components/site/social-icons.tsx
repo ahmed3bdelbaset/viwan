@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { CONTACT } from '@/lib/site'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 
 export function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -127,6 +128,41 @@ export function SocialLinks({
   itemClassName?: string
   size?: 'sm' | 'md' | 'lg'
 }) {
+  const { contact } = useSiteSettings()
+
+  const platforms = [
+    {
+      name: 'WhatsApp',
+      nameAr: 'واتساب',
+      href: contact.whatsapp,
+      icon: WhatsAppIcon,
+    },
+    {
+      name: 'Instagram',
+      nameAr: 'إنستغرام',
+      href: contact.instagram,
+      icon: InstagramIcon,
+    },
+    {
+      name: 'Facebook',
+      nameAr: 'فيسبوك',
+      href: contact.facebook,
+      icon: FacebookIcon,
+    },
+    {
+      name: 'LinkedIn',
+      nameAr: 'لينكد إن',
+      href: contact.linkedin,
+      icon: LinkedInIcon,
+    },
+    {
+      name: 'YouTube',
+      nameAr: 'يوتيوب',
+      href: contact.youtube,
+      icon: YouTubeIcon,
+    },
+  ]
+
   const sizeClasses = {
     sm: 'size-8 min-w-[32px] min-h-[32px] [&_svg]:size-3.5',
     md: 'size-10 min-w-[40px] min-h-[40px] [&_svg]:size-4',
@@ -135,7 +171,7 @@ export function SocialLinks({
 
   return (
     <div className={cn('flex items-center gap-2.5 sm:gap-3 flex-wrap', className)}>
-      {SOCIAL_PLATFORMS.map((platform) => {
+      {platforms.map((platform) => {
         const Icon = platform.icon
         return (
           <a

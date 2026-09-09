@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowUp } from 'lucide-react'
-import { CONTACT } from '@/lib/site'
 import { Logo } from './logo'
 import { useLanguage } from '@/lib/i18n'
+import { useSiteSettings, formatPhoneTel } from '@/hooks/use-site-settings'
 import {
   SocialLinks,
   WhatsAppIcon,
@@ -18,6 +18,7 @@ import {
 export function SiteFooter() {
   const pathname = usePathname()
   const { t, lang } = useLanguage()
+  const { contact, companyInfo } = useSiteSettings()
 
   if (
     pathname?.startsWith('/studio-gateway-vw') ||
@@ -37,6 +38,11 @@ export function SiteFooter() {
     { label: t.nav.contact, href: '/contact' },
   ]
 
+  const footerSummary =
+    lang === 'ar'
+      ? companyInfo?.footer_summary_ar || contact.footerSummaryAr || t.footer.tagline
+      : companyInfo?.footer_summary_en || contact.footerSummaryEn || t.footer.tagline
+
   return (
     <footer className="surface-dark">
       <div className="container-viwan py-16 md:py-20 flex flex-col gap-16">
@@ -44,7 +50,7 @@ export function SiteFooter() {
           <div className="md:col-span-4 flex flex-col gap-5">
             <Logo showSubtitleOnMobile />
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-              {t.footer.tagline}
+              {footerSummary}
             </p>
             {/* Quick-access Social Icon Buttons (Desktop only here) */}
             <div className="hidden md:flex flex-col gap-2.5 pt-2">
@@ -78,7 +84,7 @@ export function SiteFooter() {
                 {lang === 'ar' ? 'منصات التواصل' : 'Social Media'}
               </span>
               <a
-                href={CONTACT.whatsapp}
+                href={contact.whatsapp}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="WhatsApp"
@@ -88,7 +94,7 @@ export function SiteFooter() {
                 <span>{lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
               </a>
               <a
-                href={CONTACT.instagram}
+                href={contact.instagram}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
@@ -98,7 +104,7 @@ export function SiteFooter() {
                 <span>{lang === 'ar' ? 'إنستغرام' : 'Instagram'}</span>
               </a>
               <a
-                href={CONTACT.facebook}
+                href={contact.facebook}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
@@ -108,7 +114,7 @@ export function SiteFooter() {
                 <span>{lang === 'ar' ? 'فيسبوك' : 'Facebook'}</span>
               </a>
               <a
-                href={CONTACT.linkedin}
+                href={contact.linkedin}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="LinkedIn"
@@ -118,7 +124,7 @@ export function SiteFooter() {
                 <span>{lang === 'ar' ? 'لينكد إن' : 'LinkedIn'}</span>
               </a>
               <a
-                href={CONTACT.youtube}
+                href={contact.youtube}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="YouTube"
@@ -131,14 +137,35 @@ export function SiteFooter() {
           </div>
 
           <div className="md:col-span-3 flex flex-col gap-6">
-            <address className="not-italic flex flex-col gap-3 text-sm text-muted-foreground">
-              <span>{lang === 'ar' ? 'القاهرة · الرياض' : CONTACT.city}</span>
-              <a href={`mailto:${CONTACT.email}`} className="hover:text-foreground transition-colors">
-                {CONTACT.email}
+            <address className="not-italic flex flex-col gap-2.5 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground/90">
+                {lang === 'ar'
+                  ? companyInfo?.stats?.presence_ar || 'القاهرة · الرياض'
+                  : companyInfo?.stats?.presence_en || contact.city}
+              </span>
+              <a
+                href={`mailto:${contact.email}`}
+                className="hover:text-gold transition-colors font-mono text-xs"
+              >
+                {contact.email}
               </a>
-              <a href={`tel:${CONTACT.phone.replace(/\s/g, '')}`} className="hover:text-foreground transition-colors">
-                {CONTACT.phone}
-              </a>
+              {/* Dynamic Studio Phone Numbers from Admin Settings */}
+              <div className="flex flex-col gap-1.5 pt-1">
+                {contact.phones.map((p, idx) => (
+                  <a
+                    key={p.id || idx}
+                    href={`tel:${formatPhoneTel(p.number)}`}
+                    className="hover:text-gold transition-colors flex items-center justify-between gap-2 text-xs group"
+                  >
+                    <span className="text-muted-foreground/80 group-hover:text-foreground transition-colors text-[11px]">
+                      {lang === 'ar' ? p.label_ar : p.label_en}:
+                    </span>
+                    <span dir="ltr" className="font-mono text-foreground/90 group-hover:text-gold transition-colors">
+                      {p.number}
+                    </span>
+                  </a>
+                ))}
+              </div>
             </address>
 
             {/* Connect With Studio at the end on mobile */}

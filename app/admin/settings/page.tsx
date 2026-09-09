@@ -41,35 +41,67 @@ export default function AdminSettingsPage() {
   const { showSuccess, showError, showConfirm } = useViwanModal();
 
   useEffect(() => {
-    setInfo(DataStore.getCompanyInfo());
+    // Start with cached or initial data
+    const initial = DataStore.getCompanyInfo();
+    setInfo(initial);
+
+    // Sync from persistent server database
+    fetch('/api/admin/settings')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.companyInfo) {
+          setInfo(json.companyInfo);
+          localStorage.setItem('viwan_company_info', JSON.stringify(json.companyInfo));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   if (!info) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!info) return;
+
+    // Save locally and in memory
     DataStore.saveCompanyInfo(info);
+
     const generalEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('general') || e.label_ar.includes('عام'))?.email || info.emails?.[0]?.email || 'info@viwan.net';
     const consultEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('consult') || e.label_ar.includes('استشار'))?.email || info.emails?.[1]?.email || generalEmail;
     const careersEmail = info.emails?.find(e => e.label_en.toLowerCase().includes('career') || e.label_ar.includes('توظيف'))?.email || info.emails?.[2]?.email || generalEmail;
 
-    fetch('/api/admin/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        settings: {
-          phoneCairo: info.phones?.[0]?.number,
-          phoneRiyadh: info.phones?.[1]?.number,
-          email: generalEmail,
-          emailGeneral: generalEmail,
-          emailConsultations: consultEmail,
-          emailCareers: careersEmail,
-          linkedin: info.social?.linkedin,
-          instagram: info.social?.instagram,
-          facebook: info.social?.facebook,
-        }
-      })
-    }).catch(() => {});
+    try {
+      await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyInfo: info,
+          settings: {
+            phone: info.phones?.[0]?.number || '+20 100 000 0000',
+            phoneCairo: info.phones?.find(p => p.label_en.toLowerCase().includes('cairo') || p.label_ar.includes('القاهرة'))?.number || info.phones?.[0]?.number,
+            phoneRiyadh: info.phones?.find(p => p.label_en.toLowerCase().includes('riyadh') || p.label_ar.includes('الرياض'))?.number || info.phones?.[1]?.number,
+            whatsapp: info.social?.whatsapp || info.phones?.find(p => p.is_whatsapp)?.number || '+20 100 000 0000',
+            email: generalEmail,
+            emailGeneral: generalEmail,
+            emailConsultations: consultEmail,
+            emailCareers: careersEmail,
+            linkedin: info.social?.linkedin || '',
+            instagram: info.social?.instagram || '',
+            facebook: info.social?.facebook || '',
+            youtube: info.social?.youtube || '',
+            behance: info.social?.behance || '',
+            footerSummaryEn: info.footer_summary_en || '',
+            footerSummaryAr: info.footer_summary_ar || '',
+            addressCairo: info.cairo_studio?.address_ar || info.cairo_studio?.address_en || '',
+            addressRiyadh: info.riyadh_studio?.address_ar || info.riyadh_studio?.address_en || '',
+          }
+        })
+      });
+      showSuccess(isRtl ? 'تم حفظ وتحديث كافة بيانات الاستوديو والفوتر بنجاح' : 'Studio & footer settings successfully saved and synced');
+    } catch (err) {
+      console.error('Failed to sync settings:', err);
+    }
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };

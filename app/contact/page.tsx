@@ -20,32 +20,32 @@ import { CairoMapCard } from '@/components/site/cairo-map-card'
 import { CONTACT } from '@/lib/site'
 import { useLanguage } from '@/lib/i18n'
 import { PhoneInput } from '@/components/ui/phone-input'
+import { useSiteSettings, formatPhoneTel } from '@/hooks/use-site-settings'
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect x="2" y="9" width="4" height="12" />
-      <circle cx="4" cy="4" r="2" />
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.88a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28z" />
     </svg>
   )
 }
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+      <circle cx="12" cy="12" r="4" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" strokeWidth="2.5" />
     </svg>
   )
 }
 
 export default function ContactPage() {
+  const { t, lang } = useLanguage()
+  const { contact } = useSiteSettings()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { t, lang } = useLanguage()
 
   const [form, setForm] = useState({
     name: '',
@@ -424,10 +424,10 @@ export default function ContactPage() {
               <div className="flex items-center gap-3.5">
                 <Mail className="size-4 text-charcoal dark:text-ivory shrink-0" aria-hidden="true" />
                 <a
-                  href={`mailto:${t.contactPage.studioEmail}`}
-                  className="text-xs sm:text-sm hover:text-gold transition-colors"
+                  href={`mailto:${contact.email}`}
+                  className="text-xs sm:text-sm hover:text-gold transition-colors font-mono"
                 >
-                  {t.contactPage.studioEmail}
+                  {contact.email}
                 </a>
               </div>
 
@@ -435,10 +435,11 @@ export default function ContactPage() {
               <div className="flex items-center gap-3.5">
                 <Phone className="size-4 text-charcoal dark:text-ivory shrink-0" aria-hidden="true" />
                 <a
-                  href={`tel:${t.contactPage.studioPhone.replace(/\s/g, '')}`}
-                  className="text-xs sm:text-sm hover:text-gold transition-colors tabular-nums"
+                  href={`tel:${formatPhoneTel(contact.phone)}`}
+                  className="text-xs sm:text-sm hover:text-gold transition-colors tabular-nums font-mono"
+                  dir="ltr"
                 >
-                  {t.contactPage.studioPhone}
+                  {contact.phone}
                 </a>
               </div>
 
@@ -446,7 +447,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-3.5">
                 <LinkedinIcon className="size-4 text-charcoal dark:text-ivory shrink-0" />
                 <a
-                  href={CONTACT.linkedin}
+                  href={contact.linkedin}
                   target="_blank"
                   rel="noreferrer"
                   className="text-xs sm:text-sm hover:text-gold transition-colors"
@@ -459,7 +460,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-3.5">
                 <InstagramIcon className="size-4 text-charcoal dark:text-ivory shrink-0" />
                 <a
-                  href={CONTACT.instagram}
+                  href={contact.instagram}
                   target="_blank"
                   rel="noreferrer"
                   className="text-xs sm:text-sm hover:text-gold transition-colors"

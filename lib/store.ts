@@ -72,9 +72,27 @@ function syncWithServerDB() {
   fetch('/api/settings')
     .then((res) => res.json())
     .then((json) => {
-      if (json.success && json.data) {
-        inMemoryCompanyInfo = json.data;
-        localStorage.setItem('viwan_company_info', JSON.stringify(json.data));
+      const data = json.companyInfo || json.data || (json.settings ? { ...INITIAL_COMPANY_INFO, ...json.settings } : null);
+      if (data) {
+        inMemoryCompanyInfo = {
+          ...INITIAL_COMPANY_INFO,
+          ...data,
+          social: {
+            ...INITIAL_COMPANY_INFO.social,
+            ...(data.social || {}),
+            ...(json.settings ? {
+              facebook: json.settings.facebook || data.social?.facebook,
+              instagram: json.settings.instagram || data.social?.instagram,
+              linkedin: json.settings.linkedin || data.social?.linkedin,
+              whatsapp: json.settings.whatsapp || data.social?.whatsapp,
+              youtube: json.settings.youtube || data.social?.youtube,
+            } : {})
+          }
+        };
+        localStorage.setItem('viwan_company_info', JSON.stringify(inMemoryCompanyInfo));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('viwan_settings_updated', { detail: inMemoryCompanyInfo }));
+        }
       }
     })
     .catch(() => {});
@@ -236,16 +254,24 @@ export const DataStore = {
   },
 
   saveCompanyInfo: (info: CompanyInfo): CompanyInfo => {
+    inMemoryCompanyInfo = { ...info };
     if (typeof window !== 'undefined') {
       localStorage.setItem('viwan_company_info', JSON.stringify(info));
-      // Save permanently to SQLite physical database
+      window.dispatchEvent(new CustomEvent('viwan_settings_updated', { detail: info }));
+
+      // Save permanently to server DB
       fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(info)
+        body: JSON.stringify({ companyInfo: info })
       }).catch((e) => console.error('Error saving to DB:', e));
+
+      fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ companyInfo: info })
+      }).catch((e) => console.error('Error saving to admin settings:', e));
     }
-    inMemoryCompanyInfo = { ...info };
     return inMemoryCompanyInfo;
   },
 

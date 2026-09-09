@@ -8,6 +8,7 @@ import { NAV, CONTACT } from '@/lib/site'
 import { cn } from '@/lib/utils'
 import { Logo } from './logo'
 import { useLanguage } from '@/lib/i18n'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 import {
   WhatsAppIcon,
   InstagramIcon,
@@ -23,15 +24,16 @@ const isDarkHeroRoute = (path: string) => {
   if (path === '/services' || path.startsWith('/services/')) return true
   if (path === '/careers' || path.startsWith('/careers/')) return true
   if (path === '/consultation' || path.startsWith('/consultation/')) return true
+  if (path === '/contact' || path.startsWith('/contact/')) return true
   if (path === '/how-we-work' || path.startsWith('/how-we-work/')) return true
   if (path === '/studio' || path.startsWith('/studio/')) return true
-  if (path === '/contact' || path.startsWith('/contact/')) return true
   return false
 }
 
 export function SiteHeader() {
   const pathname = usePathname()
   const { lang, toggleLang, setLang, t } = useLanguage()
+  const { contact } = useSiteSettings()
   const isAr = lang === 'ar'
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -365,7 +367,7 @@ export function SiteHeader() {
                 </span>
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <a
-                    href={CONTACT.whatsapp}
+                    href={contact.whatsapp}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="WhatsApp"
@@ -375,7 +377,7 @@ export function SiteHeader() {
                     <WhatsAppIcon className="size-4" />
                   </a>
                   <a
-                    href={CONTACT.instagram}
+                    href={contact.instagram}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Instagram"
@@ -385,7 +387,7 @@ export function SiteHeader() {
                     <InstagramIcon className="size-4" />
                   </a>
                   <a
-                    href={CONTACT.linkedin}
+                    href={contact.linkedin}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="LinkedIn"
@@ -395,7 +397,7 @@ export function SiteHeader() {
                     <LinkedInIcon className="size-4" />
                   </a>
                   <a
-                    href={CONTACT.behance}
+                    href={contact.behance}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Behance"
@@ -405,7 +407,7 @@ export function SiteHeader() {
                     <BehanceIcon className="size-4" />
                   </a>
                   <a
-                    href={CONTACT.facebook}
+                    href={contact.facebook}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Facebook"
@@ -445,24 +447,24 @@ export function SiteHeader() {
               {/* Inquiries */}
               <div className="space-y-2 pt-2 border-t border-white/10 text-xs text-ivory/75">
                 <a
-                  href={`mailto:${CONTACT.email}`}
+                  href={`mailto:${contact.email}`}
                   className="flex items-center gap-2 hover:text-gold transition-colors"
                 >
                   <Mail className="size-3.5 text-gold shrink-0" />
-                  <span>{CONTACT.email}</span>
+                  <span>{contact.email}</span>
                 </a>
                 <a
-                  href={`tel:${CONTACT.phone}`}
+                  href={`tel:${contact.phone}`}
                   className="flex items-center gap-2 hover:text-gold transition-colors"
                 >
                   <Phone className="size-3.5 text-gold shrink-0" />
-                  <span dir="ltr">{CONTACT.phone}</span>
+                  <span dir="ltr">{contact.phone}</span>
                 </a>
 
                 {/* Social Media Icons directly under Phone Number */}
                 <div className="pt-2 flex items-center gap-2.5">
                   <a
-                    href={CONTACT.whatsapp}
+                    href={contact.whatsapp}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="WhatsApp"
@@ -472,7 +474,7 @@ export function SiteHeader() {
                     <WhatsAppIcon className="size-3.5" />
                   </a>
                   <a
-                    href={CONTACT.instagram}
+                    href={contact.instagram}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Instagram"
@@ -482,7 +484,7 @@ export function SiteHeader() {
                     <InstagramIcon className="size-3.5" />
                   </a>
                   <a
-                    href={CONTACT.linkedin}
+                    href={contact.linkedin}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="LinkedIn"
@@ -492,7 +494,7 @@ export function SiteHeader() {
                     <LinkedInIcon className="size-3.5" />
                   </a>
                   <a
-                    href={CONTACT.behance}
+                    href={contact.behance}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Behance"
@@ -502,7 +504,7 @@ export function SiteHeader() {
                     <BehanceIcon className="size-3.5" />
                   </a>
                   <a
-                    href={CONTACT.facebook}
+                    href={contact.facebook}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Facebook"
@@ -547,7 +549,7 @@ export function SiteHeader() {
 
             {/* WhatsApp */}
             <a
-              href={CONTACT.whatsapp}
+              href={contact.whatsapp}
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
@@ -559,7 +561,7 @@ export function SiteHeader() {
 
             {/* Instagram */}
             <a
-              href={CONTACT.instagram}
+              href={contact.instagram}
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
@@ -571,7 +573,7 @@ export function SiteHeader() {
 
             {/* LinkedIn */}
             <a
-              href={CONTACT.linkedin}
+              href={contact.linkedin}
               target="_blank"
               rel="noreferrer"
               aria-label="LinkedIn"
@@ -583,7 +585,7 @@ export function SiteHeader() {
 
             {/* Behance */}
             <a
-              href={CONTACT.behance}
+              href={contact.behance}
               target="_blank"
               rel="noreferrer"
               aria-label="Behance"
@@ -595,7 +597,7 @@ export function SiteHeader() {
 
             {/* Facebook */}
             <a
-              href={CONTACT.facebook}
+              href={contact.facebook}
               target="_blank"
               rel="noreferrer"
               aria-label="Facebook"

@@ -154,6 +154,11 @@ export interface SiteSettings {
   behance?: string
   houzz?: string
   facebook?: string
+  youtube?: string
+
+  // Footer & Bio
+  footerSummaryEn?: string
+  footerSummaryAr?: string
 
   // Animated Counters & Impact
   impactProjects: string
@@ -182,6 +187,7 @@ export interface DatabaseSchema {
   contacts: ContactSubmission[]
   consultations: ConsultationBooking[]
   settings: SiteSettings
+  companyInfo?: any
   admins?: AdminUser[]
   siteImages?: SiteImageItem[]
   counters?: CounterMetric[]
