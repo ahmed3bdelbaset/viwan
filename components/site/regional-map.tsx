@@ -151,10 +151,10 @@ export function RegionalMap() {
   }, [pins])
 
   // Mobile focused viewBox: Close-up zoom on Egypt, Saudi Arabia, and Syria (MENA core)
-  const mobileViewBox = lang === 'ar' ? '315 205 140 160' : '445 205 140 160'
+  const mobileViewBox = lang === 'ar' ? '280 165 210 240' : '410 165 210 240'
 
   // Desktop regional viewBox: Zoomed into Middle East & North Africa region for maximum detail
-  const desktopViewBox = lang === 'ar' ? '300 215 170 135' : '430 215 170 135'
+  const desktopViewBox = lang === 'ar' ? '258 181 255 203' : '388 181 255 203'
 
   // Common SVG Map Renderer with Refined Architectural Micro-Beacons
   const renderMapSvg = (isMobile: boolean) => (
