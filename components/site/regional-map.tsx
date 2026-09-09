@@ -106,7 +106,7 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
 
 export function RegionalMap() {
   const { lang } = useLanguage()
-  const [selectedId, setSelectedId] = useState<'egypt' | 'saudi' | 'syria'>('egypt')
+  const [selectedId, setSelectedId] = useState<'egypt' | 'saudi' | 'syria' | null>(null)
   const [hoveredCountry, setHoveredCountry] = useState<TerritoryInfo | null>(null)
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
   const [mapViewMode, setMapViewMode] = useState<'cartography' | 'satellite'>('cartography')
@@ -151,10 +151,10 @@ export function RegionalMap() {
   }, [pins])
 
   // Mobile focused viewBox: Close-up zoom on Egypt, Saudi Arabia, and Syria (MENA core)
-  const mobileViewBox = lang === 'ar' ? '238 117 294 336' : '368 117 294 336'
+  const mobileViewBox = lang === 'ar' ? '224 100 323 370' : '354 100 323 370'
 
   // Desktop regional viewBox: Zoomed into Middle East & North Africa region
-  const desktopViewBox = lang === 'ar' ? '207 141 357 284' : '337 141 357 284'
+  const desktopViewBox = lang === 'ar' ? '189 127 393 312' : '319 127 393 312'
 
   // Common SVG Map Renderer with Refined Architectural Micro-Beacons
   const renderMapSvg = (isMobile: boolean) => (
@@ -282,9 +282,10 @@ export function RegionalMap() {
             cursor = 'pointer'
             filter = `url(#gold-glow-${isMobile ? 'm' : 'd'})`
           } else if (isWorkedCountry) {
-            fill = isHovered ? '#B5AC9A' : '#C0B7A5'
+            // By default (no selection), clean parchment with distinct gold border; when another country is selected, subtle 10% stone tint
+            fill = isHovered ? '#CCC2B0' : (selectedId ? '#CCC2B0' : '#D6CCB9')
             stroke = '#C5A880'
-            strokeWidth = isMobile ? 0.6 : 0.9
+            strokeWidth = isMobile ? 0.5 : 0.75
             cursor = 'pointer'
             filter = 'none'
           } else if (isHovered) {
@@ -331,7 +332,7 @@ export function RegionalMap() {
         })}
       </g>
 
-      {/* Minimal Elegant Location Pins */}
+      {/* Minimal Elegant Location Pins (15% Smaller & Delicate) */}
       <g className="rsm-markers pointer-events-auto">
         {pinMarkers.map((pin) => {
           const isSelected = pin.id === selectedId
@@ -346,46 +347,46 @@ export function RegionalMap() {
                 {/* Subtle pulse ring for selected */}
                 {isSelected && (
                   <circle
-                    r={isMobile ? 3 : 4.5}
+                    r={isMobile ? 2.1 : 3.2}
                     fill="none"
                     stroke="#C5A880"
-                    strokeWidth={isMobile ? 0.3 : 0.4}
+                    strokeWidth={isMobile ? 0.2 : 0.3}
                     opacity="0.5"
                     className="animate-ping"
                     style={{ animationDuration: '3s' }}
                   />
                 )}
 
-                {/* Pin drop shape */}
+                {/* Minimal Location Pin-drop shape (15% further reduction) */}
                 <path
                   d={isMobile
-                    ? 'M0,-3.5 C1.5,-3.5 2.8,-2.2 2.8,-0.7 C2.8,0.8 0,3.5 0,3.5 C0,3.5 -2.8,0.8 -2.8,-0.7 C-2.8,-2.2 -1.5,-3.5 0,-3.5Z'
-                    : 'M0,-5 C2.2,-5 4,-3.2 4,-1 C4,1.2 0,5 0,5 C0,5 -4,1.2 -4,-1 C-4,-3.2 -2.2,-5 0,-5Z'
+                    ? 'M0,-2.5 C1.1,-2.5 2,-1.6 2,-0.5 C2,0.6 0,2.5 0,2.5 C0,2.5 -2,0.6 -2,-0.5 C-2,-1.6 -1.1,-2.5 0,-2.5Z'
+                    : 'M0,-3.6 C1.6,-3.6 2.9,-2.3 2.9,-0.7 C2.9,0.85 0,3.6 0,3.6 C0,3.6 -2.9,0.85 -2.9,-0.7 C-2.9,-2.3 -1.6,-3.6 0,-3.6Z'
                   }
                   fill={isSelected ? '#C5A880' : '#8C7355'}
                   stroke={isSelected ? '#FAF8F5' : '#C5A880'}
-                  strokeWidth={isMobile ? 0.3 : 0.4}
+                  strokeWidth={isMobile ? 0.22 : 0.3}
                   className="group-hover:fill-gold transition-colors duration-300"
                   filter={`url(#pin-shadow-${isMobile ? 'm' : 'd'})`}
                 />
 
                 {/* Inner dot */}
                 <circle
-                  r={isMobile ? 0.8 : 1.2}
-                  cy={isMobile ? -0.7 : -1}
+                  r={isMobile ? 0.6 : 0.85}
+                  cy={isMobile ? -0.5 : -0.7}
                   fill={isSelected ? '#181715' : '#FAF8F5'}
                 />
 
-                {/* Tiny label - only on desktop for selected */}
+                {/* Tiny discreet label - only on desktop for selected */}
                 {isSelected && !isMobile && (
                   <text
                     x="0"
-                    y={-8}
+                    y={-5.5}
                     fill="#C5A880"
-                    fontSize="3"
+                    fontSize="2.2"
                     fontFamily="var(--font-serif), serif"
                     fontWeight="500"
-                    letterSpacing="0.06em"
+                    letterSpacing="0.05em"
                     textAnchor="middle"
                     opacity="0.9"
                   >
