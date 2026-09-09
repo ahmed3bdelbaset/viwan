@@ -155,7 +155,7 @@ export default function AdminExpertisePage() {
 
           {/* Public Page Link */}
           <Link
-            href={`/${locale}/expertise`}
+            href="/services"
             target="_blank"
             className="hidden md:flex text-xs text-gold hover:underline items-center space-x-1 rtl:space-x-reverse font-medium shrink-0"
           >

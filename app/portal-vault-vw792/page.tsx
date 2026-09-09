@@ -664,7 +664,7 @@ export default function AdminLoginPage() {
                 {/* Back to Public Site Link */}
                 <div className="text-center pt-0.5">
                   <Link
-                    href={`/${locale}`}
+                    href="/"
                     className="inline-flex items-center gap-1.5 text-xs text-[#8C6D45] hover:text-[#111111] font-medium transition-colors group"
                   >
                     {isRtl ? (

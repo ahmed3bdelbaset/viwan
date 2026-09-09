@@ -390,7 +390,7 @@ export default function AdminStatisticsPage() {
               </h2>
             </div>
             <Link
-              href={`/${locale}/projects`}
+              href="/projects"
               target="_blank"
               className="text-xs text-gold hover:underline flex items-center space-x-1 rtl:space-x-reverse"
             >
