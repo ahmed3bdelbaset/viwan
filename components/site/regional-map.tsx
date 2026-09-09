@@ -2,10 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
-import { MapPin, ArrowUpRight, Compass, Navigation } from 'lucide-react'
+import { MapPin, ArrowUpRight, Compass, Navigation, Layers, ExternalLink, Globe, Sparkles, Satellite } from 'lucide-react'
 import { SectionIndex, Display } from '@/components/site/primitives'
 import { Reveal } from '@/components/site/reveal'
 import { useLanguage } from '@/lib/i18n'
+import { cn } from '@/lib/utils'
 import {
   LTR_MAP_PATHS,
   RTL_MAP_PATHS,
@@ -22,6 +23,9 @@ export interface CountryProjectData {
   hubEn: string
   hubAr: string
   coordinates: string
+  lat: number
+  lng: number
+  zoom: number
   projectsCount: number
   descriptionEn: string
   descriptionAr: string
@@ -37,6 +41,9 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
     hubEn: 'Cairo & New Cairo · Main Headquarters',
     hubAr: 'القاهرة والقاهرة الجديدة · المقر الرئيسي',
     coordinates: '30.0444° N, 31.2357° E',
+    lat: 30.0444,
+    lng: 31.2357,
+    zoom: 6,
     projectsCount: 28,
     descriptionEn:
       'Main headquarters delivering 28+ luxury residences, commercial headquarters, and integrated masterplans across New Cairo, Katameya, and the Red Sea.',
@@ -57,6 +64,9 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
     hubEn: 'Riyadh & Diriyah · Regional Office',
     hubAr: 'الرياض والدرعية · المكتب الإقليمي',
     coordinates: '24.7136° N, 46.6753° E',
+    lat: 24.7136,
+    lng: 46.6753,
+    zoom: 5,
     projectsCount: 14,
     descriptionEn:
       'Regional office delivering 14+ bespoke private palaces, villa compounds, and contemporary Najdi landscape masterplans across Riyadh.',
@@ -77,6 +87,9 @@ export const COUNTRIES_DATA: CountryProjectData[] = [
     hubEn: 'Damascus & Latakia · Architectural Heritage',
     hubAr: 'دمشق واللاذقية · عمارة وتراث',
     coordinates: '33.5138° N, 36.2765° E',
+    lat: 33.5138,
+    lng: 36.2765,
+    zoom: 7,
     projectsCount: 6,
     descriptionEn:
       'Delivering 6 landmark private estates, courtyard heritage restorations, and coastal luxury villas celebrating stone craftsmanship.',
@@ -96,6 +109,7 @@ export function RegionalMap() {
   const [selectedId, setSelectedId] = useState<'egypt' | 'saudi' | 'syria'>('egypt')
   const [hoveredCountry, setHoveredCountry] = useState<TerritoryInfo | null>(null)
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+  const [mapViewMode, setMapViewMode] = useState<'cartography' | 'satellite'>('cartography')
 
   const active = COUNTRIES_DATA.find((c) => c.id === selectedId) || COUNTRIES_DATA[0]
 
@@ -139,10 +153,13 @@ export function RegionalMap() {
   // Mobile focused viewBox: Close-up zoom on Egypt, Saudi Arabia, and Syria (MENA core)
   const mobileViewBox = lang === 'ar' ? '315 205 140 160' : '445 205 140 160'
 
+  // Desktop regional viewBox: Zoomed into Middle East & North Africa region for maximum detail
+  const desktopViewBox = lang === 'ar' ? '300 215 170 135' : '430 215 170 135'
+
   // Common SVG Map Renderer with Refined Architectural Micro-Beacons
   const renderMapSvg = (isMobile: boolean) => (
     <svg
-      viewBox={isMobile ? mobileViewBox : '0 0 800 600'}
+      viewBox={isMobile ? mobileViewBox : desktopViewBox}
       className="w-full h-full select-none pointer-events-auto block"
       style={{ shapeRendering: 'geometricPrecision' }}
     >
@@ -174,14 +191,70 @@ export function RegionalMap() {
             floodOpacity="0.25"
           />
         </filter>
+        <linearGradient id={`ocean-gradient-${isMobile ? 'm' : 'd'}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#B8CCD8" stopOpacity="0.6" />
+          <stop offset="50%" stopColor="#A3B8C8" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#95AABA" stopOpacity="0.4" />
+        </linearGradient>
       </defs>
 
+      {/* Deep Ocean Water Background */}
+      <rect x="0" y="0" width="800" height="600" fill={`url(#ocean-gradient-${isMobile ? 'm' : 'd'})`} />
+
       {/* Cartographic Coordinate Reference Lat/Long Lines */}
+      <g className="cartographic-reference opacity-20 pointer-events-none">
+        <line x1="0" y1="255" x2="800" y2="255" stroke="#7A8A96" strokeWidth="0.3" strokeDasharray="2 3" />
+        <line x1="0" y1="290" x2="800" y2="290" stroke="#7A8A96" strokeWidth="0.3" strokeDasharray="2 3" />
+        <line x1="0" y1="330" x2="800" y2="330" stroke="#7A8A96" strokeWidth="0.3" strokeDasharray="2 3" />
+        <line x1={lang === 'ar' ? '340' : '470'} y1="0" x2={lang === 'ar' ? '340' : '470'} y2="600" stroke="#7A8A96" strokeWidth="0.3" strokeDasharray="2 3" />
+        <line x1={lang === 'ar' ? '380' : '510'} y1="0" x2={lang === 'ar' ? '380' : '510'} y2="600" stroke="#7A8A96" strokeWidth="0.3" strokeDasharray="2 3" />
+        <line x1={lang === 'ar' ? '420' : '550'} y1="0" x2={lang === 'ar' ? '420' : '550'} y2="600" stroke="#7A8A96" strokeWidth="0.3" strokeDasharray="2 3" />
+      </g>
+
+      {/* Cartographic Water Body Labels */}
       {!isMobile && (
-        <g className="cartographic-reference opacity-15 pointer-events-none">
-          <line x1="0" y1="255" x2="800" y2="255" stroke="#C5A880" strokeWidth="0.6" strokeDasharray="3 4" />
-          <line x1="0" y1="330" x2="800" y2="330" stroke="#C5A880" strokeWidth="0.6" strokeDasharray="4 6" />
-          <line x1={lang === 'ar' ? '368' : '498'} y1="0" x2={lang === 'ar' ? '368' : '498'} y2="600" stroke="#C5A880" strokeWidth="0.6" strokeDasharray="3 4" />
+        <g className="pointer-events-none">
+          <text
+            x={lang === 'ar' ? '355' : '485'}
+            y="310"
+            fill="#6B7B8A"
+            fontSize="3.5"
+            fontFamily="var(--font-serif), serif"
+            fontStyle="italic"
+            letterSpacing="0.15em"
+            textAnchor="middle"
+            opacity="0.7"
+            transform={`rotate(-25, ${lang === 'ar' ? '355' : '485'}, 310)`}
+          >
+            {lang === 'ar' ? 'البحر الأحمر' : 'RED SEA'}
+          </text>
+          <text
+            x={lang === 'ar' ? '340' : '470'}
+            y="238"
+            fill="#6B7B8A"
+            fontSize="3"
+            fontFamily="var(--font-serif), serif"
+            fontStyle="italic"
+            letterSpacing="0.12em"
+            textAnchor="middle"
+            opacity="0.6"
+          >
+            {lang === 'ar' ? 'البحر الأبيض المتوسط' : 'MEDITERRANEAN SEA'}
+          </text>
+          <text
+            x={lang === 'ar' ? '415' : '545'}
+            y="280"
+            fill="#6B7B8A"
+            fontSize="2.8"
+            fontFamily="var(--font-serif), serif"
+            fontStyle="italic"
+            letterSpacing="0.12em"
+            textAnchor="middle"
+            opacity="0.6"
+            transform={`rotate(-60, ${lang === 'ar' ? '415' : '545'}, 280)`}
+          >
+            {lang === 'ar' ? 'الخليج العربي' : 'ARABIAN GULF'}
+          </text>
         </g>
       )}
 
@@ -196,26 +269,26 @@ export function RegionalMap() {
             (hoveredCountry?.iso && hoveredCountry.iso === country.id) ||
             (hoveredCountry?.nameEn && hoveredCountry.nameEn === country.name)
 
-          let fill = '#E7DEC9'
-          let stroke = '#D7CCA8'
+          let fill = '#D6CCB9'
+          let stroke = '#C4B9A3'
           let strokeWidth = isMobile ? 0.25 : 0.45
           let cursor = 'pointer'
           let filter = 'none'
 
           if (isSelected) {
-            fill = '#C5A880'
-            stroke = '#181715'
-            strokeWidth = isMobile ? 0.75 : 1.3
+            fill = '#151412'
+            stroke = '#C5A880'
+            strokeWidth = isMobile ? 1 : 1.6
             cursor = 'pointer'
             filter = `url(#gold-glow-${isMobile ? 'm' : 'd'})`
           } else if (isWorkedCountry) {
-            fill = isHovered ? '#D8C3A5' : '#DFD3BF'
-            stroke = isHovered ? '#8C6D46' : '#C5A88090'
-            strokeWidth = isMobile ? 0.5 : 0.85
+            fill = isHovered ? '#1E1C19' : '#1A1916'
+            stroke = isHovered ? '#C5A880' : '#C5A88080'
+            strokeWidth = isMobile ? 0.7 : 1.2
             cursor = 'pointer'
             filter = isHovered ? `url(#hover-glow-${isMobile ? 'm' : 'd'})` : 'none'
           } else if (isHovered) {
-            fill = '#D9CCA8'
+            fill = '#C9BDA6'
             stroke = '#8C7355'
             strokeWidth = isMobile ? 0.45 : 0.75
             cursor = 'pointer'
@@ -538,7 +611,29 @@ export function RegionalMap() {
 
         {/* Full-bleed background map container */}
         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-auto">
-          {renderMapSvg(false)}
+          {mapViewMode === 'cartography' ? (
+            renderMapSvg(false)
+          ) : (
+            <div className="w-full h-full relative">
+              <iframe
+                src={`https://www.google.com/maps?q=${active.lat},${active.lng}&hl=${lang}&z=${active.zoom}&t=h&output=embed`}
+                className="w-full h-full border-0"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Google Maps Satellite View"
+              />
+              <a
+                href={`https://www.google.com/maps?q=${active.lat},${active.lng}&hl=${lang}&z=${active.zoom}&t=h`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-4 end-4 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#161513]/90 text-gold border border-gold/40 rounded-xs text-[11px] font-medium backdrop-blur-sm hover:bg-gold hover:text-charcoal transition-all duration-200"
+              >
+                <ExternalLink className="size-3" />
+                {lang === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'}
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Floating Architectural Content Panel with Harmonious Space Allocation */}
@@ -564,6 +659,36 @@ export function RegionalMap() {
                   : 'Select a territory from the controls or directly on the map to review our delivered architectural scope.'}
               </p>
             </Reveal>
+
+            {/* Map View Mode Switcher */}
+            <div className="flex items-center p-0.5 bg-[#ECE5D7]/80 dark:bg-[#1D1B18]/80 border border-stone/20 rounded-xs w-full gap-0.5 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setMapViewMode('cartography')}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-[10px] font-medium transition-all duration-200 cursor-pointer rounded-2xs select-none',
+                  mapViewMode === 'cartography'
+                    ? 'bg-charcoal text-ivory border border-gold/40 shadow-xs'
+                    : 'text-charcoal/70 dark:text-ivory/70 hover:text-charcoal dark:hover:text-ivory'
+                )}
+              >
+                <Globe className="size-3" />
+                <span>{lang === 'ar' ? 'الخريطة المعمارية' : 'Architectural Map'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapViewMode('satellite')}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-[10px] font-medium transition-all duration-200 cursor-pointer rounded-2xs select-none',
+                  mapViewMode === 'satellite'
+                    ? 'bg-charcoal text-ivory border border-gold/40 shadow-xs'
+                    : 'text-charcoal/70 dark:text-ivory/70 hover:text-charcoal dark:hover:text-ivory'
+                )}
+              >
+                <Satellite className="size-3" />
+                <span>{lang === 'ar' ? 'أقمار صناعية' : 'Satellite View'}</span>
+              </button>
+            </div>
 
             {/* Apple-Style Unified Segmented Control */}
             <div
@@ -673,12 +798,12 @@ export function RegionalMap() {
             {/* Minimalist Legend Indicator */}
             <div className="flex items-center gap-4 text-[10px] eyebrow text-charcoal/65 dark:text-ivory/65 pt-0.5">
               <div className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-gold" />
-                <span>{lang === 'ar' ? 'الدولة المحددة' : 'Active Territory'}</span>
+                <span className="size-2 rounded-full bg-[#151412] border border-gold" />
+                <span>{lang === 'ar' ? 'تواجد VIWAN' : 'VIWAN Presence'}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-[#DFD3BF] border border-gold/40" />
-                <span>{lang === 'ar' ? 'مشاريع واستشارات' : 'Consultancy Reach'}</span>
+                <span className="size-2 rounded-full bg-[#D6CCB9] border border-stone/40" />
+                <span>{lang === 'ar' ? 'دول المنطقة' : 'Regional Context'}</span>
               </div>
             </div>
           </div>
