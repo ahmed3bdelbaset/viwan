@@ -151,10 +151,10 @@ export function RegionalMap() {
   }, [pins])
 
   // Mobile focused viewBox: Close-up zoom on Egypt, Saudi Arabia, and Syria (MENA core)
-  const mobileViewBox = lang === 'ar' ? '280 165 210 240' : '410 165 210 240'
+  const mobileViewBox = lang === 'ar' ? '238 117 294 336' : '368 117 294 336'
 
-  // Desktop regional viewBox: Zoomed into Middle East & North Africa region for maximum detail
-  const desktopViewBox = lang === 'ar' ? '258 181 255 203' : '388 181 255 203'
+  // Desktop regional viewBox: Zoomed into Middle East & North Africa region
+  const desktopViewBox = lang === 'ar' ? '207 141 357 284' : '337 141 357 284'
 
   // Common SVG Map Renderer with Refined Architectural Micro-Beacons
   const renderMapSvg = (isMobile: boolean) => (
@@ -271,28 +271,28 @@ export function RegionalMap() {
 
           let fill = '#D6CCB9'
           let stroke = '#C4B9A3'
-          let strokeWidth = isMobile ? 0.25 : 0.45
+          let strokeWidth = isMobile ? 0.25 : 0.4
           let cursor = 'pointer'
           let filter = 'none'
 
           if (isSelected) {
-            fill = '#151412'
+            fill = '#1A1916'
             stroke = '#C5A880'
-            strokeWidth = isMobile ? 1 : 1.6
+            strokeWidth = isMobile ? 0.8 : 1.2
             cursor = 'pointer'
             filter = `url(#gold-glow-${isMobile ? 'm' : 'd'})`
           } else if (isWorkedCountry) {
-            fill = isHovered ? '#1E1C19' : '#1A1916'
-            stroke = isHovered ? '#C5A880' : '#C5A88080'
-            strokeWidth = isMobile ? 0.7 : 1.2
+            fill = isHovered ? '#B5AC9A' : '#C0B7A5'
+            stroke = '#C5A880'
+            strokeWidth = isMobile ? 0.6 : 0.9
             cursor = 'pointer'
-            filter = isHovered ? `url(#hover-glow-${isMobile ? 'm' : 'd'})` : 'none'
+            filter = 'none'
           } else if (isHovered) {
             fill = '#C9BDA6'
             stroke = '#8C7355'
-            strokeWidth = isMobile ? 0.45 : 0.75
+            strokeWidth = isMobile ? 0.4 : 0.6
             cursor = 'pointer'
-            filter = `url(#hover-glow-${isMobile ? 'm' : 'd'})`
+            filter = 'none'
           }
 
           return (
@@ -331,100 +331,68 @@ export function RegionalMap() {
         })}
       </g>
 
-      {/* Refined Architectural Coordinate Beacons (Proportioned to Viewport) */}
+      {/* Minimal Elegant Location Pins */}
       <g className="rsm-markers pointer-events-auto">
         {pinMarkers.map((pin) => {
           const isSelected = pin.id === selectedId
 
           return (
             <g key={pin.id} className="transition-all duration-500">
-              {isSelected ? (
-                // Active Coordinate Beacon: Delicate Dual-Ring Glow + Micro-Badge
-                <g
-                  transform={`translate(${pin.x}, ${pin.y})`}
-                  className="cursor-pointer group"
-                  onClick={() => setSelectedId(pin.id)}
-                >
-                  {/* Subtle, slow outer radar pulse */}
+              <g
+                transform={`translate(${pin.x}, ${pin.y})`}
+                className="cursor-pointer group"
+                onClick={() => setSelectedId(pin.id)}
+              >
+                {/* Subtle pulse ring for selected */}
+                {isSelected && (
                   <circle
-                    r={isMobile ? 5 : 11}
-                    fill="#C5A880"
-                    opacity="0.3"
+                    r={isMobile ? 3 : 4.5}
+                    fill="none"
+                    stroke="#C5A880"
+                    strokeWidth={isMobile ? 0.3 : 0.4}
+                    opacity="0.5"
                     className="animate-ping"
-                    style={{ animationDuration: '2.8s' }}
+                    style={{ animationDuration: '3s' }}
                   />
-                  <circle
-                    r={isMobile ? 3.5 : 7}
-                    fill="#C5A880"
-                    opacity="0.22"
-                  />
+                )}
 
-                  {/* Sleek precision coordinate core */}
-                  <circle
-                    r={isMobile ? 2.2 : 4.25}
-                    fill="#181715"
-                    stroke="#C5A880"
-                    strokeWidth={isMobile ? 0.8 : 1.5}
-                    filter={`url(#pin-shadow-${isMobile ? 'm' : 'd'})`}
-                  />
-                  <circle
-                    r={isMobile ? 0.9 : 1.8}
-                    fill="#C5A880"
-                  />
+                {/* Pin drop shape */}
+                <path
+                  d={isMobile
+                    ? 'M0,-3.5 C1.5,-3.5 2.8,-2.2 2.8,-0.7 C2.8,0.8 0,3.5 0,3.5 C0,3.5 -2.8,0.8 -2.8,-0.7 C-2.8,-2.2 -1.5,-3.5 0,-3.5Z'
+                    : 'M0,-5 C2.2,-5 4,-3.2 4,-1 C4,1.2 0,5 0,5 C0,5 -4,1.2 -4,-1 C-4,-3.2 -2.2,-5 0,-5Z'
+                  }
+                  fill={isSelected ? '#C5A880' : '#8C7355'}
+                  stroke={isSelected ? '#FAF8F5' : '#C5A880'}
+                  strokeWidth={isMobile ? 0.3 : 0.4}
+                  className="group-hover:fill-gold transition-colors duration-300"
+                  filter={`url(#pin-shadow-${isMobile ? 'm' : 'd'})`}
+                />
 
-                  {/* Micro-badge pill: Compact, slender, and elegant */}
-                  <g
-                    transform={`translate(0, ${isMobile ? -8 : -15})`}
-                    className="pointer-events-none"
+                {/* Inner dot */}
+                <circle
+                  r={isMobile ? 0.8 : 1.2}
+                  cy={isMobile ? -0.7 : -1}
+                  fill={isSelected ? '#181715' : '#FAF8F5'}
+                />
+
+                {/* Tiny label - only on desktop for selected */}
+                {isSelected && !isMobile && (
+                  <text
+                    x="0"
+                    y={-8}
+                    fill="#C5A880"
+                    fontSize="3"
+                    fontFamily="var(--font-serif), serif"
+                    fontWeight="500"
+                    letterSpacing="0.06em"
+                    textAnchor="middle"
+                    opacity="0.9"
                   >
-                    <rect
-                      x={lang === 'ar' ? (isMobile ? -18 : -34) : (isMobile ? -22 : -40)}
-                      y={isMobile ? -4.5 : -8}
-                      width={lang === 'ar' ? (isMobile ? 36 : 68) : (isMobile ? 44 : 80)}
-                      height={isMobile ? 9 : 16}
-                      rx={isMobile ? 4.5 : 8}
-                      fill="#181715"
-                      stroke="#C5A880"
-                      strokeWidth={isMobile ? 0.5 : 0.75}
-                      opacity="0.95"
-                      filter={`url(#pin-shadow-${isMobile ? 'm' : 'd'})`}
-                    />
-                    <text
-                      x="0"
-                      y={isMobile ? 2 : 3.5}
-                      fill="#FAF8F5"
-                      fontSize={isMobile ? 4.2 : 8.5}
-                      fontFamily="var(--font-serif), serif"
-                      fontWeight="500"
-                      letterSpacing="0.04em"
-                      textAnchor="middle"
-                    >
-                      {lang === 'ar' ? pin.nameAr : pin.nameEn} · {pin.projectsCount}+
-                    </text>
-                  </g>
-                </g>
-              ) : (
-                // Inactive Coordinate Dot: Clean, elegant blueprint marker
-                <g
-                  transform={`translate(${pin.x}, ${pin.y})`}
-                  onClick={() => setSelectedId(pin.id)}
-                  className="cursor-pointer group"
-                >
-                  <circle
-                    r={isMobile ? 2.2 : 4.25}
-                    fill="#FAF8F5"
-                    stroke="#C5A880"
-                    strokeWidth={isMobile ? 0.75 : 1.25}
-                    className="group-hover:scale-125 transition-transform duration-300"
-                    filter={`url(#pin-shadow-${isMobile ? 'm' : 'd'})`}
-                  />
-                  <circle
-                    r={isMobile ? 0.9 : 1.8}
-                    fill="#8C7355"
-                    className="group-hover:fill-gold transition-colors duration-300"
-                  />
-                </g>
-              )}
+                    {lang === 'ar' ? pin.nameAr : pin.nameEn}
+                  </text>
+                )}
+              </g>
             </g>
           )
         })}
@@ -798,12 +766,12 @@ export function RegionalMap() {
             {/* Minimalist Legend Indicator */}
             <div className="flex items-center gap-4 text-[10px] eyebrow text-charcoal/65 dark:text-ivory/65 pt-0.5">
               <div className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-[#151412] border border-gold" />
-                <span>{lang === 'ar' ? 'تواجد VIWAN' : 'VIWAN Presence'}</span>
+                <span className="size-2 rounded-full bg-[#1A1916] border border-gold" />
+                <span>{lang === 'ar' ? 'الدولة المحددة' : 'Selected'}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-[#D6CCB9] border border-stone/40" />
-                <span>{lang === 'ar' ? 'دول المنطقة' : 'Regional Context'}</span>
+                <span className="size-2 rounded-full bg-[#C0B7A5] border border-gold/50" />
+                <span>{lang === 'ar' ? 'تواجد VIWAN' : 'VIWAN Presence'}</span>
               </div>
             </div>
           </div>
