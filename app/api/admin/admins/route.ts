@@ -1,10 +1,40 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { readDb, writeDb, AdminUser } from '@/lib/db'
+import { hashPassword } from '@/lib/admin-auth'
+import { verifySecureAdminToken } from '@/lib/security'
 
-export async function GET() {
+async function checkAdminAuth(req: Request): Promise<boolean> {
+  const cookieStore = await cookies()
+  const cookieToken = cookieStore.get('viwan_admin_token')?.value
+  const authHeader = req.headers.get('authorization')
+  const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+  const token = cookieToken || headerToken
+  return verifySecureAdminToken(token).valid
+}
+
+/**
+ * Strips password and sensitive hash fields from admin objects before serialization
+ */
+function sanitizeAdminResponse(admin: any) {
+  if (!admin) return null
+  const { password, ...safeAdmin } = admin
+  return safeAdmin
+}
+
+export async function GET(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { error: 'غير مصرح: يجب تسجيل الدخول للوصول إلى بيانات المسؤولين' },
+        { status: 401 }
+      )
+    }
+
     const db = readDb()
-    return NextResponse.json({ success: true, admins: db.admins || [] })
+    const safeAdmins = (db.admins || []).map(sanitizeAdminResponse)
+    return NextResponse.json({ success: true, admins: safeAdmins })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch administrators' }, { status: 500 })
   }
@@ -12,6 +42,14 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { error: 'غير مصرح: يجب تسجيل الدخول لإضافة مسؤول جديد' },
+        { status: 401 }
+      )
+    }
+
     const body = await req.json()
     const { name, email, role, avatar, password } = body || {}
 
@@ -30,13 +68,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'هذا البريد الإلكتروني مسجل بالفعل لمسؤول آخر' }, { status: 400 })
     }
 
+    const rawPassword = password ? String(password).trim() : 'viwan_admin_2026'
     const newAdmin: AdminUser = {
       id: `adm-${Date.now()}`,
       name: String(name).trim(),
       email: cleanEmail,
       role: role ? String(role).trim() : 'Studio Architect',
       avatar: avatar ? String(avatar).trim() : '/images/consultation-architects.jpg',
-      password: password ? String(password).trim() : 'viwan_admin_2026',
+      password: hashPassword(rawPassword),
       createdAt: new Date().toISOString(),
       status: 'active',
     }
@@ -44,7 +83,11 @@ export async function POST(req: Request) {
     db.admins.push(newAdmin)
     writeDb(db)
 
-    return NextResponse.json({ success: true, admin: newAdmin, message: 'تمت إضافة المسؤول بنجاح' })
+    return NextResponse.json({
+      success: true,
+      admin: sanitizeAdminResponse(newAdmin),
+      message: 'تمت إضافة المسؤول بنجاح',
+    })
   } catch (error) {
     console.error('Error creating admin:', error)
     return NextResponse.json({ error: 'Failed to create administrator' }, { status: 500 })
@@ -53,6 +96,14 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { error: 'غير مصرح: يجب تسجيل الدخول لتعديل بيانات المسؤول' },
+        { status: 401 }
+      )
+    }
+
     const body = await req.json()
     const { id, email, updates } = body || {}
     const identifier = id || email
@@ -77,17 +128,25 @@ export async function PUT(req: Request) {
     const current = db.admins[idx]
     const dataToUpdate = updates || body
 
+    const updatedPassword = dataToUpdate.password
+      ? hashPassword(String(dataToUpdate.password).trim())
+      : current.password
+
     db.admins[idx] = {
       ...current,
       name: dataToUpdate.name ? String(dataToUpdate.name).trim() : current.name,
       role: dataToUpdate.role ? String(dataToUpdate.role).trim() : current.role,
       avatar: dataToUpdate.avatar ? String(dataToUpdate.avatar).trim() : current.avatar,
       status: dataToUpdate.status === 'inactive' ? 'inactive' : 'active',
-      password: dataToUpdate.password ? String(dataToUpdate.password).trim() : current.password,
+      password: updatedPassword,
     }
 
     writeDb(db)
-    return NextResponse.json({ success: true, admin: db.admins[idx], message: 'تم تحديث بيانات المسؤول' })
+    return NextResponse.json({
+      success: true,
+      admin: sanitizeAdminResponse(db.admins[idx]),
+      message: 'تم تحديث بيانات المسؤول بنجاح',
+    })
   } catch (error) {
     console.error('Error updating admin:', error)
     return NextResponse.json({ error: 'Failed to update administrator' }, { status: 500 })
@@ -96,6 +155,14 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { error: 'غير مصرح: يجب تسجيل الدخول لحذف مسؤول' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(req.url)
     let id = searchParams.get('id') || searchParams.get('email')
     if (!id) {

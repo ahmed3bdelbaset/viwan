@@ -32,6 +32,54 @@ const globalForAuth = globalThis as unknown as {
 const otpStore = globalForAuth.viwanOtpStore ?? new Map<string, OtpEntry>()
 if (process.env.NODE_ENV !== 'production') globalForAuth.viwanOtpStore = otpStore
 
+import crypto from 'crypto'
+
+// PBKDF2 Strong Cryptographic Password Hashing (OWASP Recommendation)
+export function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString('hex')
+  const iterations = 100000
+  const keylen = 64
+  const digest = 'sha512'
+  const hash = crypto.pbkdf2Sync(password, salt, iterations, keylen, digest).toString('hex')
+  return `pbkdf2$${iterations}$${salt}$${hash}`
+}
+
+export function verifyPassword(password: string, storedHash: string): boolean {
+  if (!storedHash || !password) return false
+
+  // If password was hashed with PBKDF2
+  if (storedHash.startsWith('pbkdf2$')) {
+    try {
+      const parts = storedHash.split('$')
+      if (parts.length !== 4) return false
+      const iterations = parseInt(parts[1], 10)
+      const salt = parts[2]
+      const originalHash = parts[3]
+      const keylen = 64
+      const digest = 'sha512'
+      const computedHash = crypto.pbkdf2Sync(password, salt, iterations, keylen, digest).toString('hex')
+
+      const bufA = Buffer.from(computedHash, 'hex')
+      const bufB = Buffer.from(originalHash, 'hex')
+      if (bufA.length !== bufB.length) return false
+      return crypto.timingSafeEqual(bufA, bufB)
+    } catch {
+      return false
+    }
+  }
+
+  // Graceful transition fallback for legacy plaintext passwords
+  try {
+    const bufA = Buffer.from(password)
+    const bufB = Buffer.from(storedHash)
+    if (bufA.length === bufB.length) {
+      return crypto.timingSafeEqual(bufA, bufB)
+    }
+  } catch {}
+
+  return false
+}
+
 // Read current password from db.json or fallback
 export function getAdminPassword(email?: string): string {
   try {
@@ -53,7 +101,7 @@ export function getAdminPassword(email?: string): string {
   return DEFAULT_ADMIN_PASSWORD
 }
 
-// Update admin password in db.json
+// Update admin password in db.json with strong PBKDF2 hashing
 export function setAdminPassword(newPassword: string, email?: string): boolean {
   try {
     const dbPath = getDbPath()
@@ -65,14 +113,16 @@ export function setAdminPassword(newPassword: string, email?: string): boolean {
     if (!data.adminAuth) {
       data.adminAuth = {}
     }
-    data.adminAuth.password = newPassword
+
+    const secureHash = hashPassword(newPassword)
+    data.adminAuth.password = secureHash
     data.adminAuth.updatedAt = new Date().toISOString()
 
     // Also update individual admin if found
     if (email && Array.isArray(data.admins)) {
       const idx = data.admins.findIndex((a: any) => a.email?.toLowerCase() === email.trim().toLowerCase())
       if (idx !== -1) {
-        data.admins[idx].password = newPassword
+        data.admins[idx].password = secureHash
       }
     }
 

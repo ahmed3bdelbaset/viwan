@@ -2,13 +2,23 @@ import crypto from 'crypto'
 
 /**
  * Secret key for signing admin sessions.
- * Falls back to a deterministic machine key if not explicitly set in environment,
- * but never uses a predictable public static constant.
+ * Uses high-entropy random key if not explicitly set in environment,
+ * preventing token forgery via hardcoded keys.
  */
-const SESSION_SECRET =
-  process.env.SESSION_SECRET ||
-  process.env.ADMIN_PASSWORD ||
-  'viwan_secure_session_secret_fallback_key_2026_salt'
+let cachedSessionSecret: string | null = null;
+
+export function getSessionSecret(): string {
+  if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.trim().length >= 16) {
+    return process.env.SESSION_SECRET.trim();
+  }
+  if (process.env.ADMIN_PASSWORD && process.env.ADMIN_PASSWORD.trim().length >= 8) {
+    return `viwan_salt_env_${process.env.ADMIN_PASSWORD.trim()}`;
+  }
+  if (!cachedSessionSecret) {
+    cachedSessionSecret = crypto.randomBytes(32).toString('hex');
+  }
+  return cachedSessionSecret;
+}
 
 /**
  * XSS & Script Injection Sanitizer
@@ -97,7 +107,7 @@ export function createSecureAdminToken(email: string, maxAgeMs: number = 24 * 60
   const payload = Buffer.from(`${cleanEmail}:${expiresAt}:${randomSalt}`).toString('base64url')
 
   const signature = crypto
-    .createHmac('sha256', SESSION_SECRET)
+    .createHmac('sha256', getSessionSecret())
     .update(payload)
     .digest('base64url')
 
@@ -128,7 +138,7 @@ export function verifySecureAdminToken(token: string | null | undefined): { vali
   const [payload, signature] = parts
 
   const expectedSignature = crypto
-    .createHmac('sha256', SESSION_SECRET)
+    .createHmac('sha256', getSessionSecret())
     .update(payload)
     .digest('base64url')
 

@@ -33,13 +33,14 @@ export async function POST(req: Request) {
     if (action === 'request-otp') {
       // Step 1: Check if the email is an authorized administrator
       if (!isAuthorizedAdminEmail(cleanEmail)) {
-        return NextResponse.json(
-          {
-            code: 'ACCOUNT_NOT_FOUND',
-            error: isEn ? 'This account is not registered in our system.' : 'هذا الحساب غير مسجل لدينا',
-          },
-          { status: 404 }
-        )
+        // OWASP Anti-Enumeration Defense: Return uniform success message so attackers cannot probe for valid admin accounts
+        return NextResponse.json({
+          success: true,
+          code: 'OTP_SENT',
+          message: isEn
+            ? 'If this email is registered in our system, a verification code has been dispatched.'
+            : 'إذا كان هذا البريد مسجلاً في النظام، فقد تم إرسال كود التحقق بنجاح.',
+        })
       }
 
       // Step 2: Generate 6-digit OTP and send via Brevo

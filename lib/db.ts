@@ -403,6 +403,18 @@ export function readDb(): DatabaseSchema {
 
 export function writeDb(data: DatabaseSchema): void {
   const dbFile = ensureDbFile()
-  fs.writeFileSync(dbFile, JSON.stringify(data, null, 2), 'utf-8')
+  const tempFile = `${dbFile}.tmp.${process.pid}.${Date.now()}`
+
+  try {
+    const jsonString = JSON.stringify(data, null, 2)
+    fs.writeFileSync(tempFile, jsonString, 'utf-8')
+    fs.renameSync(tempFile, dbFile)
+  } catch (err) {
+    console.error('[DB] Atomic write error, falling back to direct write:', err)
+    try {
+      if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile)
+    } catch {}
+    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2), 'utf-8')
+  }
 }
 

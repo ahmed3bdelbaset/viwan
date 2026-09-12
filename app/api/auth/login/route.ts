@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
-import { isAuthorizedAdminEmail, getAdminPassword } from '@/lib/admin-auth';
+import { isAuthorizedAdminEmail, getAdminPassword, verifyPassword } from '@/lib/admin-auth';
 import { INITIAL_ADMIN_USERS } from '@/lib/data/seed';
 import { createSecureAdminToken } from '@/lib/security';
 
@@ -49,14 +49,7 @@ export async function POST(req: Request) {
     const isEn = locale === 'en';
 
     const currentPassword = getAdminPassword(email);
-    let isPasswordCorrect = false;
-    try {
-      const bufA = Buffer.from(password);
-      const bufB = Buffer.from(currentPassword);
-      if (bufA.length === bufB.length) {
-        isPasswordCorrect = crypto.timingSafeEqual(bufA, bufB);
-      }
-    } catch {}
+    const isPasswordCorrect = verifyPassword(password, currentPassword);
 
     // Check against authorized emails or initial users
     const matchedSeedUser = INITIAL_ADMIN_USERS.find(
