@@ -19,7 +19,8 @@ import {
   Phone,
   RefreshCw,
   CheckCircle2,
-  Clock
+  Clock,
+  Mail
 } from 'lucide-react';
 
 interface OverviewStats {

@@ -87,8 +87,21 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-charcoal flex items-center justify-center text-gold font-cinzel text-sm tracking-widest uppercase">
-        {isRtl ? 'جاري التحقق من صلاحيات الجلسة...' : 'VERIFYING SESSION CREDENTIALS...'}
+      <div className="min-h-screen bg-transparent flex items-center justify-center relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+          <img
+            src="/images/admin-sea-aerial.jpg"
+            alt="Viwan Luxury Aerial Sea & Boat Horizon"
+            className="w-full h-full object-cover object-center brightness-[0.96] contrast-[1.02]"
+          />
+          <div className="absolute inset-0 bg-[#FAF7F2]/40 dark:bg-[#121110]/70 backdrop-blur-[1px]" />
+        </div>
+        <div className="relative z-10 bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl border border-stone-200/80 dark:border-white/10 px-8 py-6 rounded-3xl shadow-xl text-center space-y-3">
+          <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-gold font-cinzel text-xs tracking-widest uppercase font-medium">
+            {isRtl ? 'جاري التحقق من صلاحيات الجلسة...' : 'VERIFYING SESSION CREDENTIALS...'}
+          </p>
+        </div>
       </div>
     );
   }
@@ -124,14 +137,14 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ========================================================================= */}
       {/* 0. PHOTOREALISTIC AERIAL SEA & BOAT BACKGROUND WITH ARCHITECTURAL CALMNESS */}
       {/* ========================================================================= */}
-      <div className="fixed inset-0 pointer-events-none -z-30 overflow-hidden select-none">
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
         <img
           src="/images/admin-sea-aerial.jpg"
           alt="Viwan Luxury Aerial Sea & Boat Horizon"
-          className="w-full h-full object-cover object-center scale-105 blur-[2.5px] brightness-[0.98] contrast-[1.02]"
+          className="w-full h-full object-cover object-center brightness-[0.96] contrast-[1.02]"
         />
         {/* Soft luxury frosted-glass overlay for visual calmness and optimal UI readability */}
-        <div className="absolute inset-0 bg-[#FAF7F2]/40 dark:bg-[#121110]/70 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-[#FAF7F2]/30 dark:bg-[#121110]/65 backdrop-blur-[0.5px]" />
       </div>
 
       {/* ========================================================================= */}
@@ -222,7 +235,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ========================================================================= */}
       {/* 2. MAIN CONTENT WRAPPER */}
       {/* ========================================================================= */}
-      <div className={`flex-1 flex flex-col min-w-0 ${isRtl ? 'lg:pr-64' : 'lg:pl-64'}`}>
+      <div className={`flex-1 flex flex-col min-w-0 relative z-10 ${isRtl ? 'lg:pr-64' : 'lg:pl-64'}`}>
         {/* Luxury Top Bar Curtain: Fixed on scroll, Gradient matching Image 3, Logo Only in Center, Auto-Hides on Form */}
         <header
           className={`admin-navbar sticky top-0 z-40 h-24 md:h-28 px-6 sm:px-8 flex items-center justify-between transition-all duration-400 ease-out select-none border-none shadow-none ${
