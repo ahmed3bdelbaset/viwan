@@ -57,20 +57,21 @@ export async function POST(req: Request) {
 
       const token = createSecureAdminToken(email);
 
-      const cookieStore = await cookies();
-      cookieStore.set('viwan_admin_token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 24 * 7,
-        path: '/',
-      });
-
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         token,
         user,
       });
+
+      response.cookies.set('viwan_admin_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      });
+
+      return response;
     }
 
     // 2. IF CREDENTIALS ARE WRONG: Enforce strict per-IP rate limiting

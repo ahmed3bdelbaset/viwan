@@ -45,15 +45,27 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isPublicAuthPage) {
-      if (!AuthService.isAuthenticated()) {
-        router.push('/portal-vault-vw792');
-      } else {
+      if (AuthService.isAuthenticated()) {
         setIsCheckingAuth(false);
+      } else {
+        // Double-check with server cookie session before kicking user out
+        fetch('/api/admin/auth')
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.authenticated) {
+              setIsCheckingAuth(false);
+            } else {
+              window.location.href = '/portal-vault-vw792?redirect=' + encodeURIComponent(pathname);
+            }
+          })
+          .catch(() => {
+            window.location.href = '/portal-vault-vw792?redirect=' + encodeURIComponent(pathname);
+          });
       }
     } else {
       setIsCheckingAuth(false);
     }
-  }, [pathname, isPublicAuthPage, router]);
+  }, [pathname, isPublicAuthPage]);
 
   // Reactive listener to auto-hide Navbar when ANY modal/dialog is open
   useEffect(() => {

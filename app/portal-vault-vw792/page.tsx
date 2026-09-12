@@ -257,7 +257,15 @@ export default function AdminLoginPage() {
     try {
       const res = await AuthService.login(email, password, locale);
       if (res.success) {
-        router.push('/admin');
+        let destination = '/admin';
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search);
+          const redirectParam = params.get('redirect');
+          if (redirectParam && redirectParam.startsWith('/admin')) {
+            destination = redirectParam;
+          }
+        }
+        window.location.href = destination;
       } else {
         if (res.retryAfter) {
           setRetryCountdown(res.retryAfter);

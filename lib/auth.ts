@@ -44,9 +44,14 @@ export const AuthService = {
       if (typeof window !== 'undefined') {
         const sessionData = {
           user: data.user,
-          expiresAt: Date.now() + 15 * 60 * 1000,
+          token: data.token,
+          expiresAt: Date.now() + 24 * 60 * 60 * 1000,
         };
         sessionStorage.setItem('viwan_active_session', JSON.stringify(sessionData));
+        localStorage.setItem('viwan_admin_session', JSON.stringify(sessionData));
+        if (data.token) {
+          document.cookie = `viwan_admin_token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+        }
       }
 
       return {
