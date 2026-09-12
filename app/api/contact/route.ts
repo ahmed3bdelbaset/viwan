@@ -3,6 +3,8 @@ import { readDb, writeDb, ContactSubmission } from '@/lib/db'
 import { sendContactNotification } from '@/lib/mailer'
 import { isHoneypotTriggered, isVelocitySuspicious, sanitizeInput } from '@/lib/security'
 
+import { contactFormSchema, validatePayload } from '@/lib/validations'
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -18,26 +20,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, id: `cs-${Date.now()}` })
     }
 
-    const { name, email, phone, company, projectLocation, projectType, projectSize, budget, stage, message } = body
-
-    if (!name || !email || !phone || !message) {
+    // 3. Strict Server-Side Schema Validation & Sanitization
+    const validation = validatePayload(contactFormSchema, body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Name, email, phone and message are required.' },
-        { status: 400 },
+        {
+          error: 'بيانات غير صالحة، يرجى مراجعة الحقول المطلوبة.',
+          details: validation.errors,
+        },
+        { status: 400 }
       )
     }
 
-    // 3. XSS & Injection Defense: Sanitize all user inputs
-    const cleanName = sanitizeInput(name)
-    const cleanEmail = sanitizeInput(email)
-    const cleanPhone = sanitizeInput(phone)
-    const cleanMessage = sanitizeInput(message)
-    const cleanCompany = company ? sanitizeInput(company) : undefined
-    const cleanLocation = projectLocation ? sanitizeInput(projectLocation) : undefined
-    const cleanType = projectType ? sanitizeInput(projectType) : undefined
-    const cleanSize = projectSize ? sanitizeInput(projectSize) : undefined
-    const cleanBudget = budget ? sanitizeInput(budget) : undefined
-    const cleanStage = stage ? sanitizeInput(stage) : undefined
+    const {
+      name,
+      email,
+      phone,
+      company,
+      projectLocation,
+      projectType,
+      projectSize,
+      budget,
+      stage,
+      message,
+    } = validation.data
 
     const db = readDb()
     const newSubmission: ContactSubmission = {

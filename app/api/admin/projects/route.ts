@@ -67,15 +67,45 @@ export async function GET() {
   }
 }
 
+import { verifySecureAdminToken } from '@/lib/security'
+import { cookies } from 'next/headers'
+import { projectItemSchema, validatePayload } from '@/lib/validations'
+
+async function checkAdminAuth(req: Request): Promise<boolean> {
+  const cookieStore = await cookies()
+  const cookieToken = cookieStore.get('viwan_admin_token')?.value
+  const authHeader = req.headers.get('authorization')
+  const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+  const token = cookieToken || headerToken
+  return verifySecureAdminToken(token).valid
+}
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { success: false, code: 'UNAUTHORIZED', error: 'غير مصرح: يرجى تسجيل الدخول كمسؤول' },
+        { status: 401 }
+      )
+    }
+
+    const rawBody = await req.json()
+    const validation = validatePayload(projectItemSchema, rawBody)
+    if (!validation.success) {
+      return NextResponse.json(
+        { success: false, error: 'بيانات المشروع غير صالحة', details: validation.errors },
+        { status: 400 }
+      )
+    }
+
+    const body = validation.data
     const db = readDb()
 
     const rawName = body.name || body.title || body.title_en || 'New Architectural Project'
-    const rawNameAr = body.nameAr || body.title_ar || body.titleAr || rawName
-    const rawCover = body.cover || body.cover_image || body.coverImage || '/images/hero-villa.png'
-    const rawCategory = body.type || body.category || body.sector_en || 'Architecture'
+    const rawNameAr = body.nameAr || body.title_ar || rawName
+    const rawCover = body.cover || '/images/hero-villa.png'
+    const rawCategory = body.type || body.category || 'Architecture'
     const generatedSlug = (body.slug || rawName)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -161,6 +191,14 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { success: false, code: 'UNAUTHORIZED', error: 'غير مصرح: يرجى تسجيل الدخول كمسؤول' },
+        { status: 401 }
+      )
+    }
+
     const body = await req.json()
     const slug = body.slug || body.updates?.slug || body.id
     const updates = body.updates || body
@@ -242,6 +280,14 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { success: false, code: 'UNAUTHORIZED', error: 'غير مصرح: يرجى تسجيل الدخول كمسؤول' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(req.url)
     let slug = searchParams.get('slug') || searchParams.get('id')
     if (!slug) {

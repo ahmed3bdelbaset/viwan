@@ -61,15 +61,15 @@ export function proxy(request: NextRequest) {
   // 2. Rate Limiting for Public APIs and Authentication
   // =========================================================================
   if (pathname === '/portal-vault-vw792' || pathname === '/api/auth/login' || pathname === '/api/admin/login') {
-    const allowed = checkRateLimit(`login_${ip}`, 10, 15 * 60 * 1000)
+    const allowed = checkRateLimit(`login_${ip}`, 5, 15 * 60 * 1000)
     if (!allowed) {
       return NextResponse.json(
         {
           success: false,
           code: 'RATE_LIMIT_EXCEEDED',
-          error: 'تم تجاوز الحد الأقصى للمحاولات. يرجى الانتظار 15 دقيقة ثم المحاولة مجدداً.',
+          error: 'تم تجاوز الحد الأقصى للمحاولات (5 محاولات). يرجى الانتظار 15 دقيقة ثم المحاولة مجدداً.',
         },
-        { status: 429, headers: { 'Retry-After': '900' } }
+        { status: 429, headers: { 'Retry-After': '900', 'X-RateLimit-Limit': '5', 'X-RateLimit-Remaining': '0' } }
       )
     }
   }
@@ -80,21 +80,21 @@ export function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith('/api/')) {
-    // Rate limits for public forms (Anti-Spam & Denial of Service defense): 6 per minute
+    // Rate limits for public forms (Anti-Spam & Denial of Service defense): 5 per 10 minutes
     if (
       pathname === '/api/contact' ||
       pathname === '/api/consultation' ||
       pathname === '/api/careers'
     ) {
-      const allowed = checkRateLimit(`form_${ip}`, 6, 60 * 1000)
+      const allowed = checkRateLimit(`form_${ip}`, 5, 10 * 60 * 1000)
       if (!allowed) {
         return NextResponse.json(
           {
             success: false,
             code: 'RATE_LIMIT_EXCEEDED',
-            error: 'تم إرسال طلبات متعددة خلال وقت قصير. يرجى الانتظار دقيقة قبل المحاولة ثانية.',
+            error: 'تم إرسال طلبات متعددة خلال وقت قصير. يرجى الانتظار 10 دقائق قبل المحاولة ثانية.',
           },
-          { status: 429, headers: { 'Retry-After': '60' } }
+          { status: 429, headers: { 'Retry-After': '600', 'X-RateLimit-Limit': '5', 'X-RateLimit-Remaining': '0' } }
         )
       }
     }
@@ -111,31 +111,41 @@ export function proxy(request: NextRequest) {
     pathname === '/api/auth/login' ||
     pathname === '/api/admin/auth/forgot-password'
 
-  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
-    if (!isPublicAdminRoute) {
-      const token =
-        request.cookies.get('viwan_admin_token')?.value ||
-        request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
+  const isServicesMutation =
+    (pathname === '/api/services' || pathname.startsWith('/api/services/')) &&
+    ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)
 
-      const authResult = verifySecureAdminToken(token)
+  const isProtectedAdminRoute =
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/api/admin') ||
+    isServicesMutation
 
-      if (!authResult.valid) {
-        // If API route, return 401 JSON
-        if (pathname.startsWith('/api/admin')) {
-          return NextResponse.json(
-            {
-              success: false,
-              code: 'UNAUTHORIZED',
-              error: 'غير مصرح: يجب تسجيل الدخول كمسؤول للوصول إلى هذا المسار',
-            },
-            { status: 401 }
-          )
-        }
+  if (isProtectedAdminRoute && !isPublicAdminRoute) {
+    const token =
+      request.cookies.get('viwan_admin_token')?.value ||
+      request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
 
-        // If UI page, redirect to secret admin login portal
-        const loginUrl = new URL('/portal-vault-vw792', request.url)
-        return NextResponse.redirect(loginUrl)
+    const authResult = verifySecureAdminToken(token)
+
+    if (!authResult.valid) {
+      // If API route, return 401 JSON
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json(
+          {
+            success: false,
+            code: authResult.expired ? 'SESSION_EXPIRED' : 'UNAUTHORIZED',
+            error: authResult.expired
+              ? 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً'
+              : 'غير مصرح: يجب تسجيل الدخول كمسؤول للوصول إلى هذا المسار',
+          },
+          { status: 401 }
+        )
       }
+
+      // If UI page, redirect to secret admin login portal
+      const loginUrl = new URL('/portal-vault-vw792', request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
     }
   }
 

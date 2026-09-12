@@ -1,5 +1,16 @@
 import { NextResponse } from 'next/server'
 import { readDb, writeDb } from '@/lib/db'
+import { verifySecureAdminToken } from '@/lib/security'
+import { cookies } from 'next/headers'
+
+async function checkAdminAuth(req: Request): Promise<boolean> {
+  const cookieStore = await cookies()
+  const cookieToken = cookieStore.get('viwan_admin_token')?.value
+  const authHeader = req.headers.get('authorization')
+  const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+  const token = cookieToken || headerToken
+  return verifySecureAdminToken(token).valid
+}
 
 export async function GET() {
   try {
@@ -18,6 +29,14 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req)
+    if (!isAuth) {
+      return NextResponse.json(
+        { success: false, code: 'UNAUTHORIZED', error: 'غير مصرح: يرجى تسجيل الدخول كمسؤول' },
+        { status: 401 }
+      )
+    }
+
     const body = await req.json()
     const db = readDb()
 

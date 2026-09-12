@@ -4,6 +4,8 @@ import { readDb, writeDb, ConsultationBooking } from '@/lib/db'
 import { sendConsultationNotification } from '@/lib/mailer'
 import { isHoneypotTriggered, isVelocitySuspicious, sanitizeInput, verifySecureAdminToken } from '@/lib/security'
 
+import { consultationFormSchema, validatePayload } from '@/lib/validations'
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -19,24 +21,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, id: `cb-${Date.now()}` })
     }
 
-    const { name, email, phone, preferredDate, preferredTime, projectType, location, notes } = body
-
-    if (!name || !email || !phone || !projectType) {
+    // 3. Strict Server-Side Schema Validation & Sanitization
+    const validation = validatePayload(consultationFormSchema, body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Name, email, phone and project type are required.' },
-        { status: 400 },
+        {
+          error: 'بيانات غير صالحة، يرجى مراجعة الحقول المطلوبة.',
+          details: validation.errors,
+        },
+        { status: 400 }
       )
     }
 
-    // 3. XSS & Injection Defense: Sanitize all user inputs
-    const cleanName = sanitizeInput(name)
-    const cleanEmail = sanitizeInput(email)
-    const cleanPhone = sanitizeInput(phone)
-    const cleanProjectType = sanitizeInput(projectType)
-    const cleanLocation = location ? sanitizeInput(location) : undefined
-    const cleanNotes = notes ? sanitizeInput(notes) : undefined
-    const cleanDate = preferredDate ? sanitizeInput(preferredDate) : undefined
-    const cleanTime = preferredTime ? sanitizeInput(preferredTime) : undefined
+    const {
+      name,
+      email,
+      phone,
+      preferredDate,
+      date,
+      preferredTime,
+      timeSlot,
+      projectType,
+      location,
+      notes,
+    } = validation.data
+
+    const cleanDate = preferredDate || date
+    const cleanTime = preferredTime || timeSlot
 
     const db = readDb()
     const newBooking: ConsultationBooking = {

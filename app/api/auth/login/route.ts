@@ -5,25 +5,48 @@ import { isAuthorizedAdminEmail, getAdminPassword } from '@/lib/admin-auth';
 import { INITIAL_ADMIN_USERS } from '@/lib/data/seed';
 import { createSecureAdminToken } from '@/lib/security';
 
+import { adminLoginSchema, validatePayload } from '@/lib/validations';
+import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limiter';
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const email = (body.email || '').trim().toLowerCase();
-    const password = body.password || '';
-
-    const locale = body.locale || 'ar';
-    const isEn = locale === 'en';
-
-    if (!email || !password) {
+    const clientIp = getClientIp(req);
+    const rateCheck = checkRateLimit(clientIp, RATE_LIMITS.AUTH_LOGIN);
+    if (!rateCheck.success) {
       return NextResponse.json(
         {
           success: false,
-          code: 'REQUIRED_FIELDS',
-          error: isEn ? 'Email and password are required' : 'يرجى إدخال البريد الإلكتروني وكلمة المرور',
+          code: 'RATE_LIMIT_EXCEEDED',
+          error: `تم تجاوز الحد الأقصى للمحاولات (5 محاولات). يرجى الانتظار ${rateCheck.retryAfterSeconds} ثانية ثم المحاولة مجدداً.`,
+          retryAfter: rateCheck.retryAfterSeconds,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(rateCheck.retryAfterSeconds),
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+          },
+        }
+      );
+    }
+
+    const body = await req.json();
+    const validation = validatePayload(adminLoginSchema, body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'INVALID_INPUT',
+          error: 'البيانات المدخلة غير صالحة، يرجى إدخال بريد إلكتروني وكلمة مرور صحيحين.',
+          details: validation.errors,
         },
         { status: 400 }
       );
     }
+
+    const { email, password, locale } = validation.data;
+    const isEn = locale === 'en';
 
     const currentPassword = getAdminPassword(email);
     let isPasswordCorrect = false;

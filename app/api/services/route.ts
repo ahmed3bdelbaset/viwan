@@ -28,14 +28,41 @@ export async function GET() {
   }
 }
 
+import { verifySecureAdminToken } from '@/lib/security';
+import { serviceItemSchema, validatePayload } from '@/lib/validations';
+import { cookies } from 'next/headers';
+
+async function checkAdminAuth(req: Request): Promise<boolean> {
+  const cookieStore = await cookies();
+  const cookieToken = cookieStore.get('viwan_admin_token')?.value;
+  const authHeader = req.headers.get('authorization');
+  const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+  const token = cookieToken || headerToken;
+  return verifySecureAdminToken(token).valid;
+}
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const service: ServiceItem = body.service || body;
-
-    if (!service || !service.id) {
-      return NextResponse.json({ success: false, error: 'Invalid service payload' }, { status: 400 });
+    const isAuth = await checkAdminAuth(req);
+    if (!isAuth) {
+      return NextResponse.json(
+        { success: false, code: 'UNAUTHORIZED', error: 'غير مصرح: يرجى تسجيل الدخول كمسؤول' },
+        { status: 401 }
+      );
     }
+
+    const body = await req.json();
+    const rawService = body.service || body;
+
+    const validation = validatePayload(serviceItemSchema, rawService);
+    if (!validation.success) {
+      return NextResponse.json(
+        { success: false, error: 'بيانات الخدمة غير صالحة', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
+    const service = validation.data as ServiceItem;
 
     const db = readDb();
     let services: ServiceItem[] = db.services && Array.isArray(db.services) && db.services.length > 0
@@ -71,6 +98,14 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const isAuth = await checkAdminAuth(req);
+    if (!isAuth) {
+      return NextResponse.json(
+        { success: false, code: 'UNAUTHORIZED', error: 'غير مصرح: يرجى تسجيل الدخول كمسؤول' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
