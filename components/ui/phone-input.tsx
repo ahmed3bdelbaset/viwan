@@ -93,6 +93,17 @@ export function PhoneInput({
   useEffect(() => {
     if (!value) {
       setLocalNumber('')
+      // Auto-detect visitor's country (Qatar, Saudi, Egypt, etc.) when empty
+      import('@/lib/geo').then(({ detectVisitorCountry }) => {
+        detectVisitorCountry().then((countryCode) => {
+          if (!value && countryCode) {
+            const detected = COUNTRIES.find((c) => c.code.toUpperCase() === countryCode.toUpperCase())
+            if (detected) {
+              setSelectedCountry(detected)
+            }
+          }
+        })
+      })
       return
     }
 

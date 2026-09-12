@@ -65,20 +65,6 @@ export function proxy(request: NextRequest) {
   // =========================================================================
   // 2. Rate Limiting for Public APIs and Authentication
   // =========================================================================
-  if (pathname === '/portal-vault-vw792' || pathname === '/api/auth/login' || pathname === '/api/admin/login') {
-    const allowed = checkRateLimit(`login_${ip}`, 5, 15 * 60 * 1000)
-    if (!allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          code: 'RATE_LIMIT_EXCEEDED',
-          error: 'تم تجاوز الحد الأقصى للمحاولات (5 محاولات). يرجى الانتظار 15 دقيقة ثم المحاولة مجدداً.',
-        },
-        { status: 429, headers: { 'Retry-After': '900', 'X-RateLimit-Limit': '5', 'X-RateLimit-Remaining': '0' } }
-      )
-    }
-  }
-
   // Block old predictable admin login path with 404 Not Found
   if (pathname === '/admin/login') {
     return new NextResponse('Not Found', { status: 404 })
@@ -159,13 +145,16 @@ export function proxy(request: NextRequest) {
   // =========================================================================
   const response = NextResponse.next()
 
-  // Security Headers
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-XSS-Protection', '1; mode=block')
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+  // Content Security Policy & Geo headers
+  const cfCountry = request.headers.get('cf-ipcountry') || request.headers.get('x-vercel-ip-country')
+  if (cfCountry && cfCountry !== 'XX') {
+    response.headers.set('x-user-country', cfCountry.toUpperCase())
+    response.cookies.set('viwan_geo_country', cfCountry.toUpperCase(), {
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+      sameSite: 'lax',
+    })
+  }
 
   // Content Security Policy
   const cspHeader = [

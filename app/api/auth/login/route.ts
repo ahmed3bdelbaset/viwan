@@ -6,7 +6,7 @@ import { INITIAL_ADMIN_USERS } from '@/lib/data/seed';
 import { createSecureAdminToken } from '@/lib/security';
 
 import { adminLoginSchema, validatePayload } from '@/lib/validations';
-import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limiter';
+import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limiter';
 
 export async function POST(req: Request) {
   try {
@@ -59,6 +59,9 @@ export async function POST(req: Request) {
     const isAuthorized = isAuthorizedAdminEmail(email) || !!matchedSeedUser;
 
     if (!isAuthorized || !isPasswordCorrect) {
+      // Record this failed attempt specifically
+      recordFailedAttempt(clientIp, RATE_LIMITS.AUTH_LOGIN);
+
       return NextResponse.json(
         {
           success: false,
@@ -70,6 +73,9 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
+
+    // Reset failed attempts on successful login
+    resetRateLimit(clientIp, RATE_LIMITS.AUTH_LOGIN.prefix);
 
     const user = matchedSeedUser || {
       id: 'usr-1',

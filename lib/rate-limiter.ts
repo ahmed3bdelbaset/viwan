@@ -81,16 +81,55 @@ export function checkRateLimit(key: string, config: RateLimitConfig): RateLimitR
     };
   }
 
-  // Record this request
-  record.timestamps.push(now);
-
+  // Read-only check: Do not automatically increment here - allow fine-grained control
   return {
     success: true,
     limit: config.maxRequests,
-    remaining: remaining - 1,
+    remaining: remaining,
     resetTime,
     retryAfterSeconds: 0,
   };
+}
+
+/**
+ * Check and immediately consume a slot (used for public form submissions, etc.)
+ */
+export function checkAndConsumeRateLimit(key: string, config: RateLimitConfig): RateLimitResult {
+  const result = checkRateLimit(key, config);
+  if (!result.success) return result;
+
+  const storageKey = `${config.prefix || 'rl'}:${key}`;
+  let record = store.get(storageKey);
+  if (!record) {
+    record = { timestamps: [] };
+    store.set(storageKey, record);
+  }
+  record.timestamps.push(Date.now());
+  return {
+    ...result,
+    remaining: Math.max(0, result.remaining - 1),
+  };
+}
+
+/**
+ * Specifically record a failed attempt (e.g. wrong password or bad credentials)
+ */
+export function recordFailedAttempt(key: string, config: RateLimitConfig): void {
+  const storageKey = `${config.prefix || 'rl'}:${key}`;
+  let record = store.get(storageKey);
+  if (!record) {
+    record = { timestamps: [] };
+    store.set(storageKey, record);
+  }
+  record.timestamps.push(Date.now());
+}
+
+/**
+ * Reset / clear rate limit attempts for a key (e.g. upon successful authentication)
+ */
+export function resetRateLimit(key: string, prefix = 'auth_login'): void {
+  const storageKey = `${prefix}:${key}`;
+  store.delete(storageKey);
 }
 
 /**

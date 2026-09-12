@@ -40,6 +40,7 @@ export interface LiveContactInfo {
 }
 
 export function useSiteSettings() {
+  const [visitorCountry, setVisitorCountry] = useState<string>('EG')
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -53,6 +54,13 @@ export function useSiteSettings() {
   })
 
   useEffect(() => {
+    // Detect visitor country dynamically
+    import('@/lib/geo').then(({ detectVisitorCountry }) => {
+      detectVisitorCountry().then((cc) => {
+        if (cc) setVisitorCountry(cc)
+      })
+    })
+
     // Initial fetch from server to get persistent DB state
     fetch('/api/settings')
       .then((res) => res.json())
@@ -95,7 +103,7 @@ export function useSiteSettings() {
   }, [])
 
   const contact = useMemo<LiveContactInfo>(() => {
-    const phones =
+    const rawPhones =
       companyInfo.phones && companyInfo.phones.length > 0
         ? companyInfo.phones
         : [
@@ -107,6 +115,18 @@ export function useSiteSettings() {
               is_whatsapp: false,
             },
           ]
+
+    // Smart sort: If visitor is from Saudi (SA) or Qatar (QA), bring Riyadh/GCC numbers first
+    const isGccOrSaudi = visitorCountry === 'SA' || visitorCountry === 'QA' || visitorCountry === 'AE' || visitorCountry === 'KW' || visitorCountry === 'BH' || visitorCountry === 'OM'
+    const phones = [...rawPhones].sort((a, b) => {
+      if (isGccOrSaudi) {
+        const aIsRiyadh = a.label_en?.toLowerCase().includes('riyadh') || a.label_ar?.includes('الرياض') || a.number?.startsWith('+966') || a.number?.startsWith('+974')
+        const bIsRiyadh = b.label_en?.toLowerCase().includes('riyadh') || b.label_ar?.includes('الرياض') || b.number?.startsWith('+966') || b.number?.startsWith('+974')
+        if (aIsRiyadh && !bIsRiyadh) return -1
+        if (!aIsRiyadh && bIsRiyadh) return 1
+      }
+      return 0
+    })
 
     const phoneCairo =
       phones.find(
@@ -126,6 +146,9 @@ export function useSiteSettings() {
       phones[1]?.number ||
       ''
 
+    // Active phone based on country: if GCC/Saudi, prefer phoneRiyadh
+    const activePhone = (isGccOrSaudi && phoneRiyadh) ? phoneRiyadh : (phones[0]?.number || CONTACT.phone)
+
     const generalEmail =
       companyInfo.emails?.find(
         (e) =>
@@ -141,7 +164,7 @@ export function useSiteSettings() {
       CONTACT.whatsapp
 
     return {
-      phone: phones[0]?.number || CONTACT.phone,
+      phone: activePhone,
       phoneCairo,
       phoneRiyadh,
       phones,

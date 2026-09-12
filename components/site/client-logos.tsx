@@ -29,30 +29,38 @@ export function EmaarLogo({ className = 'h-6 sm:h-7 md:h-8 lg:h-9 w-auto' }: Log
  */
 export function SodicLogo({ className = 'h-8 sm:h-9 md:h-10 lg:h-11 w-auto' }: LogoProps) {
   return (
-    <svg
-      viewBox="0 0 170 42"
-      fill="currentColor"
-      className={`${className} max-w-[130px] sm:max-w-[155px] max-h-10 sm:max-h-12 w-auto transition-transform duration-300 select-none`}
-      aria-label="SODIC"
-    >
-      {/* 3D Isometric Cube Symbol */}
-      <g transform="translate(4, 5)">
-        <polygon points="17,3 31,11 17,19 3,11" opacity="0.95" />
-        <polygon points="3,13 16,21 16,35 3,27" opacity="0.65" />
-        <polygon points="18,21 31,13 31,27 18,35" opacity="0.8" />
-      </g>
-      {/* SODIC Wordmark */}
-      <text
-        x="45"
-        y="28"
-        fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-        fontSize="24"
-        fontWeight="900"
-        letterSpacing="2.5"
+    <div dir="ltr" className="inline-flex items-center justify-center">
+      <svg
+        viewBox="0 0 170 42"
+        fill="currentColor"
+        className={`${className} max-w-[130px] sm:max-w-[155px] max-h-10 sm:max-h-12 w-auto transition-transform duration-300 select-none`}
+        aria-label="SODIC"
+        direction="ltr"
+        style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}
       >
-        SODIC
-      </text>
-    </svg>
+        {/* 3D Isometric Cube Symbol */}
+        <g transform="translate(4, 5)">
+          <polygon points="17,3 31,11 17,19 3,11" opacity="0.95" />
+          <polygon points="3,13 16,21 16,35 3,27" opacity="0.65" />
+          <polygon points="18,21 31,13 31,27 18,35" opacity="0.8" />
+        </g>
+        {/* SODIC Wordmark */}
+        <text
+          x="45"
+          y="28"
+          textAnchor="start"
+          direction="ltr"
+          xmlSpace="preserve"
+          style={{ direction: 'ltr', unicodeBidi: 'bidi-override', textAnchor: 'start' }}
+          fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+          fontSize="24"
+          fontWeight="900"
+          letterSpacing="2.5"
+        >
+          SODIC
+        </text>
+      </svg>
+    </div>
   )
 }
 
@@ -61,13 +69,15 @@ export function SodicLogo({ className = 'h-8 sm:h-9 md:h-10 lg:h-11 w-auto' }: L
  */
 export function TmgLogo({ className = 'h-9 sm:h-11 md:h-12 lg:h-14 w-auto' }: LogoProps) {
   return (
-    <img
-      src="/images/clients/tmg.png"
-      alt="TMG - طلعت مصطفى"
-      className={`${className} max-w-[145px] sm:max-w-[170px] max-h-12 sm:max-h-14 w-auto object-contain transition-transform duration-300 select-none`}
-      loading="eager"
-      decoding="async"
-    />
+    <div dir="ltr" className="inline-flex items-center justify-center">
+      <img
+        src="/images/clients/tmg.png"
+        alt="TMG - طلعت مصطفى"
+        className={`${className} max-w-[145px] sm:max-w-[170px] max-h-12 sm:max-h-14 w-auto object-contain transition-transform duration-300 select-none`}
+        loading="eager"
+        decoding="async"
+      />
+    </div>
   )
 }
 
@@ -76,7 +86,7 @@ export function TmgLogo({ className = 'h-9 sm:h-11 md:h-12 lg:h-14 w-auto' }: Lo
  */
 export function AlMarasemLogo({ className = 'h-10 sm:h-12 md:h-13 lg:h-15 w-auto' }: LogoProps) {
   return (
-    <div className="flex items-center justify-center">
+    <div dir="ltr" className="inline-flex items-center justify-center">
       <img
         src="/images/clients/almarasem-charcoal.png"
         alt="Al Marasem Development"
@@ -100,13 +110,15 @@ export function AlMarasemLogo({ className = 'h-10 sm:h-12 md:h-13 lg:h-15 w-auto
  */
 export function HydeParkLogo({ className = 'h-8 sm:h-10 md:h-11 lg:h-13 w-auto' }: LogoProps) {
   return (
-    <img
-      src="/images/clients/hydepark.png"
-      alt="Hyde Park Developments"
-      className={`${className} max-w-[150px] sm:max-w-[175px] max-h-11 sm:max-h-13 w-auto object-contain dark:invert transition-transform duration-300 select-none`}
-      loading="eager"
-      decoding="async"
-    />
+    <div dir="ltr" className="inline-flex items-center justify-center">
+      <img
+        src="/images/clients/hydepark.png"
+        alt="Hyde Park Developments"
+        className={`${className} max-w-[150px] sm:max-w-[175px] max-h-11 sm:max-h-13 w-auto object-contain dark:invert transition-transform duration-300 select-none`}
+        loading="eager"
+        decoding="async"
+      />
+    </div>
   )
 }
 
@@ -115,43 +127,55 @@ export function HydeParkLogo({ className = 'h-8 sm:h-10 md:h-11 lg:h-13 w-auto' 
  */
 export function MisrItaliaLogo({ className = 'h-8 sm:h-9 md:h-10 lg:h-11 w-auto' }: LogoProps) {
   return (
-    <svg
-      viewBox="0 0 185 40"
-      fill="currentColor"
-      className={`${className} max-w-[140px] sm:max-w-[160px] max-h-10 sm:max-h-12 w-auto transition-transform duration-300 select-none`}
-      aria-label="MISR ITALIA"
-    >
-      {/* Square M Icon */}
-      <g transform="translate(4, 5)">
-        <rect x="0" y="0" width="28" height="28" rx="2" fill="currentColor" />
-        <polygon
-          points="5.5,22.5 5.5,6.5 9.5,6.5 14,15 18.5,6.5 22.5,6.5 22.5,22.5 19,22.5 19,11 15,18.5 13,18.5 9,11 9,22.5"
-          fill="#FAF8F5"
-        />
-      </g>
-      {/* Text */}
-      <text
-        x="40"
-        y="21"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="15"
-        fontWeight="800"
-        letterSpacing="1"
+    <div dir="ltr" className="inline-flex items-center justify-center">
+      <svg
+        viewBox="0 0 185 40"
+        fill="currentColor"
+        className={`${className} max-w-[140px] sm:max-w-[160px] max-h-10 sm:max-h-12 w-auto transition-transform duration-300 select-none`}
+        aria-label="MISR ITALIA"
+        direction="ltr"
+        style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}
       >
-        MISR ITALIA
-      </text>
-      <text
-        x="41"
-        y="31"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        fontSize="7"
-        fontWeight="600"
-        letterSpacing="3"
-        opacity="0.75"
-      >
-        PROPERTIES
-      </text>
-    </svg>
+        {/* Square M Icon */}
+        <g transform="translate(4, 5)">
+          <rect x="0" y="0" width="28" height="28" rx="2" fill="currentColor" />
+          <polygon
+            points="5.5,22.5 5.5,6.5 9.5,6.5 14,15 18.5,6.5 22.5,6.5 22.5,22.5 19,22.5 19,11 15,18.5 13,18.5 9,11 9,22.5"
+            fill="#FAF8F5"
+          />
+        </g>
+        {/* Text */}
+        <text
+          x="40"
+          y="21"
+          textAnchor="start"
+          direction="ltr"
+          xmlSpace="preserve"
+          style={{ direction: 'ltr', unicodeBidi: 'bidi-override', textAnchor: 'start' }}
+          fontFamily="system-ui, -apple-system, sans-serif"
+          fontSize="15"
+          fontWeight="800"
+          letterSpacing="1"
+        >
+          MISR ITALIA
+        </text>
+        <text
+          x="41"
+          y="31"
+          textAnchor="start"
+          direction="ltr"
+          xmlSpace="preserve"
+          style={{ direction: 'ltr', unicodeBidi: 'bidi-override', textAnchor: 'start' }}
+          fontFamily="system-ui, -apple-system, sans-serif"
+          fontSize="7"
+          fontWeight="600"
+          letterSpacing="3"
+          opacity="0.75"
+        >
+          PROPERTIES
+        </text>
+      </svg>
+    </div>
   )
 }
 
