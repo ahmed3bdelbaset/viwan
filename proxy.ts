@@ -49,6 +49,11 @@ export function proxy(request: NextRequest) {
     request.headers.get('x-real-ip') ||
     '127.0.0.1'
 
+  // 0. Verification Bypass for Loader.io Load Testing
+  if (pathname.startsWith('/loaderio-')) {
+    return NextResponse.next()
+  }
+
   // =========================================================================
   // 1. Anti-Bot: Block Automated Vulnerability Scanners & Exploit Probes
   // =========================================================================
