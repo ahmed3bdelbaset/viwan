@@ -31,6 +31,10 @@ const ERROR_DICTIONARY: Record<string, { ar: string; en: string }> = {
     ar: 'هذا الحساب غير مسجل لدينا في سجلات الإدارة',
     en: 'This account is not registered in our system.',
   },
+  RATE_LIMIT_EXCEEDED: {
+    ar: 'تم تجاوز الحد الأقصى للمحاولات المسموح بها. يرجى إعادة المحاولة بعد 15 دقيقة.',
+    en: 'Maximum attempts exceeded. Please try again in 15 minutes.',
+  },
   INVALID_CREDENTIALS: {
     ar: 'بيانات الدخول غير صحيحة، يرجى التحقق من البريد وكلمة المرور',
     en: 'Invalid credentials. Please check your email and password.',
@@ -546,13 +550,13 @@ export default function AdminLoginPage() {
 
             {/* Error Message Display (Dynamic reactive error switching on language change) */}
             {getErrorMessage() && (
-              <div className="p-2.5 sm:p-3 bg-red-50/90 border border-red-200 text-xs text-red-700 rounded-lg space-y-1 animate-shake">
-                <p className="font-medium">{getErrorMessage()}</p>
-                {retryCountdown && (
-                  <p className="font-mono text-amber-700 font-semibold text-[11px]">
+              <div className="p-3 sm:p-3.5 bg-red-50/95 dark:bg-[#201515] border border-red-200/80 dark:border-red-900/40 text-xs text-red-700 dark:text-red-400 rounded-sm space-y-1.5 animate-shake">
+                <p className="font-medium leading-relaxed">{getErrorMessage()}</p>
+                {retryCountdown && errorCode !== 'RATE_LIMIT_EXCEEDED' && (
+                  <p className="font-sans text-[#8C6D45] dark:text-[#C5A880] font-medium text-[11px] tracking-wide">
                     {isRtl
-                      ? `⏳ يرجى الانتظار: ${retryCountdown} ثانية قبل إعادة المحاولة`
-                      : `⏳ Security Lockout: Please wait ${retryCountdown}s`}
+                      ? 'تم تعليق المحاولات مؤقتاً لأسباب أمنية. يرجى إعادة المحاولة بعد 15 دقيقة.'
+                      : 'Security notice: Please try again in 15 minutes.'}
                   </p>
                 )}
               </div>

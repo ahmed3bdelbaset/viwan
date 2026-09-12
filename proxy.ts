@@ -45,8 +45,10 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const userAgent = request.headers.get('user-agent') || ''
   const ip =
+    request.headers.get('cf-connecting-ip')?.trim() ||
+    request.headers.get('true-client-ip')?.trim() ||
+    request.headers.get('x-real-ip')?.trim() ||
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
     '127.0.0.1'
 
   // 0. Verification Bypass for Loader.io Load Testing

@@ -133,17 +133,54 @@ export function resetRateLimit(key: string, prefix = 'auth_login'): void {
 }
 
 /**
- * Extract client IP from request headers
+ * Extract true client IP from request headers
+ * Prioritizes Cloudflare and direct edge proxies to prevent shared IP lockouts.
  */
 export function getClientIp(req: Request): string {
+  // 1. Cloudflare direct connecting IP (Highest priority & tamper-proof via Cloudflare proxy)
+  const cfConnectingIp = req.headers.get('cf-connecting-ip');
+  if (cfConnectingIp && cfConnectingIp.trim()) {
+    return cfConnectingIp.trim();
+  }
+
+  // 2. True-Client-IP header (Cloudflare Enterprise / Edge)
+  const trueClientIp = req.headers.get('true-client-ip');
+  if (trueClientIp && trueClientIp.trim()) {
+    return trueClientIp.trim();
+  }
+
+  // 3. X-Real-IP (Direct reverse proxy)
+  const realIp = req.headers.get('x-real-ip');
+  if (
+    realIp &&
+    realIp.trim() &&
+    !realIp.startsWith('10.') &&
+    !realIp.startsWith('172.') &&
+    !realIp.startsWith('192.168.') &&
+    !realIp.startsWith('127.') &&
+    realIp !== '::1'
+  ) {
+    return realIp.trim();
+  }
+
+  // 4. X-Forwarded-For: find first public non-private IP
   const forwardedFor = req.headers.get('x-forwarded-for');
   if (forwardedFor) {
-    return forwardedFor.split(',')[0].trim();
+    const parts = forwardedFor.split(',').map((p) => p.trim()).filter(Boolean);
+    const publicIp = parts.find(
+      (ip) =>
+        !ip.startsWith('10.') &&
+        !ip.startsWith('172.') &&
+        !ip.startsWith('192.168.') &&
+        !ip.startsWith('127.') &&
+        ip !== '::1'
+    );
+    if (publicIp) return publicIp;
+    if (parts[0]) return parts[0];
   }
-  const realIp = req.headers.get('x-real-ip');
-  if (realIp) return realIp.trim();
-  const cfConnectingIp = req.headers.get('cf-connecting-ip');
-  if (cfConnectingIp) return cfConnectingIp.trim();
+
+  if (realIp && realIp.trim()) return realIp.trim();
+
   return '127.0.0.1';
 }
 

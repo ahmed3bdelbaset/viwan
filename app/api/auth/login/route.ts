@@ -11,26 +11,6 @@ import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp, RATE_
 export async function POST(req: Request) {
   try {
     const clientIp = getClientIp(req);
-    const rateCheck = checkRateLimit(clientIp, RATE_LIMITS.AUTH_LOGIN);
-    if (!rateCheck.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          code: 'RATE_LIMIT_EXCEEDED',
-          error: `تم تجاوز الحد الأقصى للمحاولات (5 محاولات). يرجى الانتظار ${rateCheck.retryAfterSeconds} ثانية ثم المحاولة مجدداً.`,
-          retryAfter: rateCheck.retryAfterSeconds,
-        },
-        {
-          status: 429,
-          headers: {
-            'Retry-After': String(rateCheck.retryAfterSeconds),
-            'X-RateLimit-Limit': '5',
-            'X-RateLimit-Remaining': '0',
-          },
-        }
-      );
-    }
-
     const body = await req.json();
     const validation = validatePayload(adminLoginSchema, body);
     if (!validation.success) {
@@ -53,29 +33,82 @@ export async function POST(req: Request) {
 
     // Check against authorized emails or initial users
     const matchedSeedUser = INITIAL_ADMIN_USERS.find(
-      (u) => u.email.toLowerCase() === email
+      (u) => u.email.toLowerCase() === email.toLowerCase()
     );
 
     const isAuthorized = isAuthorizedAdminEmail(email) || !!matchedSeedUser;
 
-    if (!isAuthorized || !isPasswordCorrect) {
-      // Record this failed attempt specifically
-      recordFailedAttempt(clientIp, RATE_LIMITS.AUTH_LOGIN);
+    // 1. IF CREDENTIALS ARE VALID: Authenticate instantly & reset any lockout counter
+    if (isAuthorized && isPasswordCorrect) {
+      resetRateLimit(clientIp, RATE_LIMITS.AUTH_LOGIN.prefix);
 
+      const user = matchedSeedUser || {
+        id: 'usr-1',
+        name: 'Tarek Mansour',
+        name_ar: 'طارق منصور',
+        email: email,
+        role: 'Super Admin' as const,
+        role_ar: 'المدير العام وكبير المعماريين',
+        phone: '+20 100 234 5678',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop',
+        status: 'Active' as const,
+        createdAt: '2024-01-15',
+      };
+
+      const token = createSecureAdminToken(email);
+
+      const cookieStore = await cookies();
+      cookieStore.set('viwan_admin_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      });
+
+      return NextResponse.json({
+        success: true,
+        token,
+        user,
+      });
+    }
+
+    // 2. IF CREDENTIALS ARE WRONG: Enforce strict per-IP rate limiting
+    const rateCheck = checkRateLimit(clientIp, RATE_LIMITS.AUTH_LOGIN);
+    if (!rateCheck.success) {
       return NextResponse.json(
         {
           success: false,
-          code: 'INVALID_CREDENTIALS',
+          code: 'RATE_LIMIT_EXCEEDED',
           error: isEn
-            ? 'Invalid credentials, please check your email and password.'
-            : 'بيانات الدخول غير صحيحة، يرجى التحقق من البريد وكلمة المرور',
+            ? 'Maximum attempts exceeded. Please try again in 15 minutes.'
+            : 'تم تجاوز الحد الأقصى للمحاولات المسموح بها. يرجى إعادة المحاولة بعد 15 دقيقة.',
+          retryAfter: rateCheck.retryAfterSeconds,
         },
-        { status: 401 }
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(rateCheck.retryAfterSeconds),
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+          },
+        }
       );
     }
 
-    // Reset failed attempts on successful login
-    resetRateLimit(clientIp, RATE_LIMITS.AUTH_LOGIN.prefix);
+    // Record this failed attempt specifically for this client IP
+    recordFailedAttempt(clientIp, RATE_LIMITS.AUTH_LOGIN);
+
+    return NextResponse.json(
+      {
+        success: false,
+        code: 'INVALID_CREDENTIALS',
+        error: isEn
+          ? 'Invalid credentials, please check your email and password.'
+          : 'بيانات الدخول غير صحيحة، يرجى التحقق من البريد وكلمة المرور',
+      },
+      { status: 401 }
+    );
 
     const user = matchedSeedUser || {
       id: 'usr-1',
