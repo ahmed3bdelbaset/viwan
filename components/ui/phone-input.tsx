@@ -63,6 +63,8 @@ export interface PhoneInputProps {
   defaultCountryCode?: string
 }
 
+import { getInitialVisitorCountry, detectVisitorCountry } from '@/lib/geo'
+
 export function PhoneInput({
   id,
   name,
@@ -70,18 +72,21 @@ export function PhoneInput({
   onChange,
   required = false,
   disabled = false,
-  placeholder = '100 000 0000',
+  placeholder,
   className = '',
   defaultCountryCode = 'EG',
 }: PhoneInputProps) {
   const autoId = useId()
   const inputId = id || autoId
 
-  // Find initial country based on defaultCountryCode or value
-  const initialCountry =
-    COUNTRIES.find((c) => c.code.toUpperCase() === defaultCountryCode.toUpperCase()) || COUNTRIES[0]
-
-  const [selectedCountry, setSelectedCountry] = useState<Country>(initialCountry)
+  const [selectedCountry, setSelectedCountry] = useState<Country>(() => {
+    const geoCode = typeof window !== 'undefined' ? getInitialVisitorCountry() : defaultCountryCode
+    return (
+      COUNTRIES.find((c) => c.code.toUpperCase() === geoCode.toUpperCase()) ||
+      COUNTRIES.find((c) => c.code.toUpperCase() === defaultCountryCode.toUpperCase()) ||
+      COUNTRIES[0]
+    )
+  })
   const [localNumber, setLocalNumber] = useState<string>('')
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -89,20 +94,31 @@ export function PhoneInput({
   const containerRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
+  // Listen to external country change events (e.g. from Geo detection)
+  useEffect(() => {
+    const handleCountryChanged = (e: any) => {
+      const code = e?.detail
+      if (!value && code) {
+        const found = COUNTRIES.find((c) => c.code.toUpperCase() === code.toUpperCase())
+        if (found) setSelectedCountry(found)
+      }
+    }
+    window.addEventListener('viwan_country_changed', handleCountryChanged)
+    return () => window.removeEventListener('viwan_country_changed', handleCountryChanged)
+  }, [value])
+
   // Parse existing value if it starts with known country dial code
   useEffect(() => {
     if (!value) {
       setLocalNumber('')
       // Auto-detect visitor's country (Qatar, Saudi, Egypt, etc.) when empty
-      import('@/lib/geo').then(({ detectVisitorCountry }) => {
-        detectVisitorCountry().then((countryCode) => {
-          if (!value && countryCode) {
-            const detected = COUNTRIES.find((c) => c.code.toUpperCase() === countryCode.toUpperCase())
-            if (detected) {
-              setSelectedCountry(detected)
-            }
+      detectVisitorCountry().then((countryCode) => {
+        if (!value && countryCode) {
+          const detected = COUNTRIES.find((c) => c.code.toUpperCase() === countryCode.toUpperCase())
+          if (detected) {
+            setSelectedCountry(detected)
           }
-        })
+        }
       })
       return
     }
@@ -141,6 +157,15 @@ export function PhoneInput({
     }
   }, [isOpen])
 
+  // Dynamic placeholder based on selected country
+  const resolvedPlaceholder = placeholder || (
+    selectedCountry.code === 'QA' ? '3300 0000' :
+    selectedCountry.code === 'SA' ? '50 123 4567' :
+    selectedCountry.code === 'AE' ? '50 123 4567' :
+    selectedCountry.code === 'KW' ? '9000 0000' :
+    '100 000 0000'
+  )
+
   // Filter countries based on search
   const filteredCountries = COUNTRIES.filter((country) => {
     const q = searchQuery.toLowerCase().trim()
@@ -157,12 +182,15 @@ export function PhoneInput({
 
   // Handle local number change
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
-    setLocalNumber(val)
-    if (!val.trim()) {
+    const rawVal = e.target.value
+    setLocalNumber(rawVal)
+    const trimmed = rawVal.trim()
+    if (!trimmed) {
       onChange('')
     } else {
-      onChange(`${selectedCountry.dial} ${val.trim()}`)
+      // Strip leading zero if present for correct international formatting
+      const cleanNumber = trimmed.startsWith('0') ? trimmed.replace(/^0+/, '') : trimmed
+      onChange(`${selectedCountry.dial} ${cleanNumber}`)
     }
   }
 
@@ -171,8 +199,10 @@ export function PhoneInput({
     setSelectedCountry(country)
     setIsOpen(false)
     setSearchQuery('')
-    if (localNumber.trim()) {
-      onChange(`${country.dial} ${localNumber.trim()}`)
+    const trimmed = localNumber.trim()
+    if (trimmed) {
+      const cleanNumber = trimmed.startsWith('0') ? trimmed.replace(/^0+/, '') : trimmed
+      onChange(`${country.dial} ${cleanNumber}`)
     }
   }
 
@@ -218,7 +248,7 @@ export function PhoneInput({
         dir="ltr"
         required={required}
         disabled={disabled}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         value={localNumber}
         onChange={handleNumberChange}
         className="w-full bg-white dark:bg-[#181614] border border-stone/40 p-3.5 text-sm font-sans text-charcoal dark:text-ivory placeholder:text-stone/70 focus-visible:ring-1 focus-visible:ring-gold focus-visible:outline-none transition-colors rounded-e-xs shadow-2xs text-start"

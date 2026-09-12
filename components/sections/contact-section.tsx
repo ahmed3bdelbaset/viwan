@@ -1,5 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
+import { PhoneInput } from "@/components/ui/phone-input"
+import { useSiteSettings, formatPhoneTel } from "@/hooks/use-site-settings"
 
 const SERVICES = [
   "Architecture Design",
@@ -11,6 +13,7 @@ const SERVICES = [
 ]
 
 export function ContactSection() {
+  const { contact, visitorCountry } = useSiteSettings()
   const [config, setConfig] = useState<any>(null)
   const [form, setForm]     = useState({ name:"", email:"", phone:"", service:"", budget:"", message:"" })
   const [state, setState]   = useState<"idle"|"sending"|"sent"|"error">("idle")
@@ -87,8 +90,12 @@ export function ContactSection() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[9px] text-white/30 tracking-[0.3em] uppercase mb-1.5">Phone</label>
-                    <input type="tel" value={form.phone} onChange={set("phone")} placeholder="+20 100 000 0000" className={inputClass} />
+                    <label className="block text-[9px] text-white/30 tracking-[0.3em] uppercase mb-1.5">Phone *</label>
+                    <PhoneInput
+                      value={form.phone}
+                      onChange={(val) => setForm(f => ({ ...f, phone: val }))}
+                      required
+                    />
                   </div>
                   <div>
                     <label className="block text-[9px] text-white/30 tracking-[0.3em] uppercase mb-1.5">Service</label>
@@ -142,16 +149,16 @@ export function ContactSection() {
               {/* Location pin label */}
               <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm px-3 py-2">
                 <p className="text-white text-xs font-medium">VIWAN Studio</p>
-                <p className="text-[var(--gold)] text-[10px]">{config?.address || "Cairo, Egypt"}</p>
+                <p className="text-[var(--gold)] text-[10px]">{contact.studios?.[0]?.address_en || config?.address || "Cairo, Egypt"}</p>
               </div>
             </div>
 
             {/* Contact details */}
             <div className="space-y-5">
               {[
-                { label: "Phone",   value: config?.phone || "+20 100 000 0000", href: `tel:${config?.phone||""}`   },
-                { label: "Email",   value: config?.email || "info@viwan.com",   href: `mailto:${config?.email||""}` },
-                { label: "Address", value: config?.address || "Cairo, Egypt",   href: undefined },
+                { label: "Phone",   value: contact.phone || config?.phone || "+20 100 000 0000", href: `tel:${formatPhoneTel(contact.phone || config?.phone || "")}` },
+                { label: "Email",   value: contact.email || config?.email || "info@viwan.com",   href: `mailto:${contact.email || config?.email || ""}` },
+                { label: "Address", value: contact.studios?.[0]?.address_en || config?.address || "Cairo, Egypt", href: undefined },
                 { label: "Hours",   value: "Sun – Thu, 9AM – 6PM",            href: undefined },
               ].map(({ label, value, href }) => (
                 <div key={label} className="flex gap-4">

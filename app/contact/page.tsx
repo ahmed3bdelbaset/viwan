@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -42,7 +42,7 @@ function InstagramIcon({ className }: { className?: string }) {
 
 export default function ContactPage() {
   const { t, lang } = useLanguage()
-  const { contact } = useSiteSettings()
+  const { contact, visitorCountry } = useSiteSettings()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -59,6 +59,23 @@ export default function ContactPage() {
   const [customLocationText, setCustomLocationText] = useState('')
   const [honeypot, setHoneypot] = useState('')
   const [formLoadedAt] = useState(() => Date.now())
+
+  // Auto-detect project location based on visitor's country
+  useEffect(() => {
+    if (!form.projectLocation && visitorCountry) {
+      if (visitorCountry === 'QA') {
+        setForm((f) => ({ ...f, projectLocation: lang === 'ar' ? 'قطر' : 'Qatar' }))
+      } else if (visitorCountry === 'SA') {
+        setForm((f) => ({ ...f, projectLocation: lang === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia' }))
+      } else if (visitorCountry === 'EG') {
+        setForm((f) => ({ ...f, projectLocation: lang === 'ar' ? 'مصر' : 'Egypt' }))
+      } else if (visitorCountry === 'AE') {
+        setForm((f) => ({ ...f, projectLocation: lang === 'ar' ? 'الإمارات العربية المتحدة' : 'United Arab Emirates' }))
+      } else if (visitorCountry === 'KW') {
+        setForm((f) => ({ ...f, projectLocation: lang === 'ar' ? 'الكويت' : 'Kuwait' }))
+      }
+    }
+  }, [visitorCountry, lang])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -105,13 +122,16 @@ export default function ContactPage() {
     }
   }
 
-  // Location Options: Egypt, Saudi Arabia, Syria, Middle East, or Custom
+  // Location Options: Egypt, Saudi Arabia, Qatar, UAE, Kuwait, Syria, Middle East, or Custom
   const locationOptions =
     lang === 'ar'
       ? [
           { value: '', label: 'اختر موقع المشروع' },
           { value: 'مصر', label: 'مصر' },
           { value: 'المملكة العربية السعودية', label: 'المملكة العربية السعودية' },
+          { value: 'قطر', label: 'قطر' },
+          { value: 'الإمارات العربية المتحدة', label: 'الإمارات العربية المتحدة' },
+          { value: 'الكويت', label: 'الكويت' },
           { value: 'سوريا', label: 'سوريا' },
           { value: 'الشرق الأوسط', label: 'الشرق الأوسط' },
           { value: 'custom', label: 'مخصص / دولة أخرى (اكتب موقعك)' },
@@ -120,6 +140,9 @@ export default function ContactPage() {
           { value: '', label: 'Select project location' },
           { value: 'Egypt', label: 'Egypt' },
           { value: 'Saudi Arabia', label: 'Saudi Arabia' },
+          { value: 'Qatar', label: 'Qatar' },
+          { value: 'United Arab Emirates', label: 'United Arab Emirates' },
+          { value: 'Kuwait', label: 'Kuwait' },
           { value: 'Syria', label: 'Syria' },
           { value: 'Middle East', label: 'Middle East' },
           { value: 'custom', label: 'Custom / Other location (Specify)' },
