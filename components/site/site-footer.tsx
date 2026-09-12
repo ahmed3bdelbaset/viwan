@@ -71,13 +71,15 @@ export function SiteFooter() {
             ))}
           </nav>
 
-          {/* Col 3: OUR STUDIOS (Dynamic Cairo, Riyadh, and any added studios) */}
+          {/* Col 3: OUR STUDIOS (Dynamic Cairo, Riyadh, and any added studios - Clean no-frame & centered title) */}
           <div className="md:col-span-6 flex flex-col gap-4">
-            <span className="eyebrow text-xs text-foreground/90 font-medium mb-1 tracking-wider uppercase">
-              {lang === 'ar' ? 'مقرات الاستوديو' : 'Our Studios'}
-            </span>
+            <div className="text-center w-full">
+              <span className="eyebrow text-xs text-foreground/90 font-medium tracking-wider uppercase block">
+                {lang === 'ar' ? 'مقرات الاستوديو' : 'Our Studios'}
+              </span>
+            </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12">
               {(contact.studios && contact.studios.length > 0 ? contact.studios : [
                 {
                   id: 'cairo',
@@ -98,7 +100,7 @@ export function SiteFooter() {
                   email: contact.email,
                 }
               ]).map((studio, idx) => (
-                <div key={studio.id || idx} className="flex flex-col gap-2 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-gold/30 transition-colors">
+                <div key={studio.id || idx} className="flex flex-col gap-2">
                   <h4 className="font-cinzel text-xs font-semibold tracking-wider text-foreground/95 uppercase">
                     {lang === 'ar' ? (studio.title_ar || 'مقر الاستوديو') : (studio.title_en || 'Studio Location')}
                   </h4>
@@ -107,7 +109,7 @@ export function SiteFooter() {
                     {lang === 'ar' ? studio.address_ar : studio.address_en}
                   </p>
 
-                  <div className="flex flex-col gap-1 pt-1.5 border-t border-white/[0.04]">
+                  <div className="flex flex-col gap-1 pt-1">
                     {studio.phone && (
                       <a
                         href={`tel:${formatPhoneTel(studio.phone)}`}

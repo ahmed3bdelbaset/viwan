@@ -667,8 +667,10 @@ html[data-scroll-dir="up"] .reveal:not(.is-visible) {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
 }
 
-/* Auto-hide admin navbar when any modal / dialog is active */
-body:has([role="dialog"]) .admin-navbar {
+/* Auto-hide admin navbar when any modal / dialog / form is active */
+body:has([role="dialog"]) .admin-navbar,
+body:has([aria-modal="true"]) .admin-navbar,
+body:has(.admin-modal-open) .admin-navbar {
   transform: translateY(-100%) !important;
   opacity: 0 !important;
   pointer-events: none !important;

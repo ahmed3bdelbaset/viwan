@@ -229,22 +229,22 @@ export default function AdminDashboardOverviewPage() {
         {/* KPI 1: TOTAL PROJECTS */}
         <Link
           href="/admin/projects"
-          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+          className="bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl p-6 border border-stone-200/80 dark:border-white/10 rounded-[24px] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:border-gold/60 transition-all group"
         >
           <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
-            <FolderKanban className="w-14 h-14 text-charcoal" />
+            <FolderKanban className="w-14 h-14 text-charcoal dark:text-white" />
           </div>
 
           <div className="space-y-1 relative z-10">
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 dark:text-stone-400 block">
               {isRtl ? 'المشاريع المعمارية' : 'TOTAL PROJECTS'}
             </span>
-            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
+            <div className="font-cinzel text-4xl text-charcoal dark:text-white font-normal group-hover:text-gold transition-colors">
               {stats.projectsCount}
             </div>
           </div>
 
-          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+          <div className="text-xs text-stone-500 dark:text-stone-400 font-light flex items-center justify-between pt-3 border-t border-stone-200/50 dark:border-white/10 relative z-10">
             <span>{isRtl ? 'عبر التخصصات الـ 5' : 'Across 5 Disciplines'}</span>
             <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
           </div>
@@ -253,22 +253,22 @@ export default function AdminDashboardOverviewPage() {
         {/* KPI 2: CORE DISCIPLINES */}
         <Link
           href="/admin/services"
-          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+          className="bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl p-6 border border-stone-200/80 dark:border-white/10 rounded-[24px] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:border-gold/60 transition-all group"
         >
           <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
-            <Briefcase className="w-14 h-14 text-charcoal" />
+            <Briefcase className="w-14 h-14 text-charcoal dark:text-white" />
           </div>
 
           <div className="space-y-1 relative z-10">
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 dark:text-stone-400 block">
               {isRtl ? 'التخصصات الهندسية' : 'CORE DISCIPLINES'}
             </span>
-            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
+            <div className="font-cinzel text-4xl text-charcoal dark:text-white font-normal group-hover:text-gold transition-colors">
               {stats.servicesCount}
             </div>
           </div>
 
-          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+          <div className="text-xs text-stone-500 dark:text-stone-400 font-light flex items-center justify-between pt-3 border-t border-stone-200/50 dark:border-white/10 relative z-10">
             <span>{isRtl ? 'خدمات معمارية متكاملة' : 'Integrated Services'}</span>
             <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
           </div>
@@ -277,22 +277,22 @@ export default function AdminDashboardOverviewPage() {
         {/* KPI 3: OFFICIAL EMAIL ROUTING GATEWAY */}
         <Link
           href="/admin/settings"
-          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+          className="bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl p-6 border border-stone-200/80 dark:border-white/10 rounded-[24px] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:border-gold/60 transition-all group"
         >
           <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
-            <Mail className="w-14 h-14 text-charcoal" />
+            <Mail className="w-14 h-14 text-charcoal dark:text-white" />
           </div>
 
           <div className="space-y-1 relative z-10">
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 dark:text-stone-400 block">
               {isRtl ? 'بوابة البريد الرسمي (GoDaddy)' : 'OFFICIAL EMAIL GATEWAY'}
             </span>
-            <div className="font-cinzel text-xl text-charcoal font-semibold group-hover:text-gold transition-colors truncate pt-1">
+            <div className="font-cinzel text-xl text-charcoal dark:text-white font-semibold group-hover:text-gold transition-colors truncate pt-1">
               info@viwan.net
             </div>
           </div>
 
-          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+          <div className="text-xs text-stone-500 dark:text-stone-400 font-light flex items-center justify-between pt-3 border-t border-stone-200/50 dark:border-white/10 relative z-10">
             <span>{isRtl ? 'توجيه فوري للاستشارات والرسائل' : 'Live Forwarding to Corporate Inbox'}</span>
             <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
           </div>
@@ -301,22 +301,22 @@ export default function AdminDashboardOverviewPage() {
         {/* KPI 4: ADMIN TEAM */}
         <Link
           href="/admin/users"
-          className="bg-white p-6 border border-[#E7E2D8] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:border-gold transition-colors group"
+          className="bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl p-6 border border-stone-200/80 dark:border-white/10 rounded-[24px] relative overflow-hidden flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:border-gold/60 transition-all group"
         >
           <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-4 opacity-10 pointer-events-none group-hover:opacity-15 transition-opacity`}>
-            <Users className="w-14 h-14 text-charcoal" />
+            <Users className="w-14 h-14 text-charcoal dark:text-white" />
           </div>
 
           <div className="space-y-1 relative z-10">
-            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 block">
+            <span className="text-[10px] font-semibold tracking-widest uppercase text-stone-500 dark:text-stone-400 block">
               {isRtl ? 'مسؤولو النظام' : 'ADMINISTRATORS'}
             </span>
-            <div className="font-cinzel text-4xl text-charcoal font-normal group-hover:text-gold transition-colors">
+            <div className="font-cinzel text-4xl text-charcoal dark:text-white font-normal group-hover:text-gold transition-colors">
               {stats.adminsCount}
             </div>
           </div>
 
-          <div className="text-xs text-stone-500 font-light flex items-center justify-between pt-3 border-t border-[#F3EDE3] relative z-10">
+          <div className="text-xs text-stone-500 dark:text-stone-400 font-light flex items-center justify-between pt-3 border-t border-stone-200/50 dark:border-white/10 relative z-10">
             <span>{isRtl ? 'حسابات إدارة نشطة' : 'Active Admin Accounts'}</span>
             <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
           </div>
@@ -348,13 +348,13 @@ export default function AdminDashboardOverviewPage() {
           {publicPagesPortals.map((portal) => (
             <div
               key={portal.num}
-              className="bg-white border border-[#E7E2D8] p-5 flex flex-col justify-between shadow-sm hover:border-gold/60 transition-colors"
+              className="bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl border border-stone-200/80 dark:border-white/10 rounded-[24px] p-6 flex flex-col justify-between shadow-sm hover:shadow-md hover:border-gold/60 transition-all"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
                     <span className="font-mono text-xs font-bold text-gold">{portal.num}</span>
-                    <h3 className="font-cinzel text-sm font-semibold text-charcoal">
+                    <h3 className="font-cinzel text-sm font-semibold text-charcoal dark:text-white">
                       {isRtl ? portal.titleAr : portal.titleEn}
                     </h3>
                   </div>
@@ -368,20 +368,20 @@ export default function AdminDashboardOverviewPage() {
                   </Link>
                 </div>
 
-                <p className="text-xs text-stone-600 font-light leading-relaxed">
+                <p className="text-xs text-stone-600 dark:text-stone-300 font-light leading-relaxed">
                   {isRtl ? portal.descAr : portal.descEn}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-[#F3EDE3] mt-4">
+              <div className="pt-4 border-t border-stone-200/50 dark:border-white/10 mt-4">
                 <Link
                   href={portal.manageRoute}
-                  className="w-full bg-[#FAF6EE] hover:bg-charcoal hover:text-white border border-[#E7E2D8] text-charcoal px-3 py-2 text-xs font-medium tracking-wider uppercase flex items-center justify-between transition-all group"
+                  className="w-full bg-[#FAF6EE] dark:bg-black/40 hover:bg-charcoal hover:text-white dark:hover:bg-gold dark:hover:text-charcoal border border-stone-200/80 dark:border-white/10 text-charcoal dark:text-stone-200 px-3.5 py-2.5 text-xs font-medium tracking-wider uppercase rounded-xl flex items-center justify-between transition-all group"
                 >
                   <span className="text-[11px] font-sans">
                     {isRtl ? portal.manageLabelAr : portal.manageLabelEn}
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:text-white group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:text-white dark:group-hover:text-charcoal group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
@@ -392,22 +392,22 @@ export default function AdminDashboardOverviewPage() {
       {/* ========================================================================= */}
       {/* 3. OFFICIAL EMAIL AUTOMATED DISPATCH & ROUTING MONITOR */}
       {/* ========================================================================= */}
-      <div className="bg-white border border-[#E7E2D8] p-7 space-y-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#E7E2D8] gap-3">
+      <div className="bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl border border-stone-200/80 dark:border-white/10 rounded-[28px] p-7 space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-200/60 dark:border-white/10 gap-3">
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <div className="w-8 h-8 bg-[#FAF6EE] border border-[#E7E2D8] flex items-center justify-center text-charcoal">
-              <Mail className="w-4 h-4 text-gold" />
+            <div className="w-10 h-10 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center text-charcoal">
+              <Mail className="w-5 h-5 text-gold" />
             </div>
             <div>
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <h3 className="font-cinzel text-sm font-semibold text-charcoal uppercase tracking-wider">
+                <h3 className="font-cinzel text-sm font-semibold text-charcoal dark:text-white uppercase tracking-wider">
                   {isRtl ? 'منظومة توجيه الإشعارات للبريد الاحترافي' : 'OFFICIAL EMAIL DISPATCH & ROUTING SYSTEM'}
                 </h3>
-                <span className="text-[10px] bg-[#FAF6EE] border border-[#E7E2D8] text-charcoal font-mono px-2 py-0.5">
+                <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono px-2.5 py-0.5 rounded-full">
                   GoDaddy SMTP Active
                 </span>
               </div>
-              <p className="text-[11px] text-stone-500 font-light mt-0.5">
+              <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light mt-0.5">
                 {isRtl
                   ? 'يتم تحويل كافة الطلبات الواردة فوراً إلى البريد الرسمي المحدد لكل قسم دون إشغال لوحة التحكم.'
                   : 'All incoming submissions are instantly forwarded to the designated corporate inboxes.'}
@@ -417,7 +417,7 @@ export default function AdminDashboardOverviewPage() {
 
           <Link
             href="/admin/settings"
-            className="inline-flex items-center space-x-1.5 rtl:space-x-reverse bg-charcoal hover:bg-gold text-white text-[11px] font-semibold tracking-wider uppercase px-4 py-2 transition-all shadow-xs"
+            className="inline-flex items-center space-x-1.5 rtl:space-x-reverse bg-charcoal hover:bg-gold text-white text-[11px] font-semibold tracking-wider uppercase px-5 py-2.5 rounded-full transition-all shadow-xs"
           >
             <span>{isRtl ? 'تخصيص الإيميلات في الإعدادات' : 'CONFIGURE IN SETTINGS'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -426,58 +426,58 @@ export default function AdminDashboardOverviewPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Channel 1: Consultations */}
-          <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
+          <div className="p-5 rounded-2xl bg-white/60 dark:bg-black/20 border border-stone-200/60 dark:border-white/10 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 01</span>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono">ACTIVE</span>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono rounded-full">ACTIVE</span>
             </div>
             <div>
-              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal">
+              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal dark:text-white">
                 {isRtl ? 'حجوزات الاستشارات المعمارية' : '30-Min Architectural Consultations'}
               </div>
               <div className="text-xs font-mono text-gold font-semibold mt-1">
                 info@viwan.net
               </div>
             </div>
-            <p className="text-[11px] text-stone-500 font-light pt-2 border-t border-[#E7E2D8]">
+            <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light pt-2 border-t border-stone-200/40 dark:border-white/10">
               {isRtl ? 'إشعار رسمي فوري ببيانات العميل والموعد المفضل وتفاصيل المشروع.' : 'Instant executive dispatch with client profile, preferred slot and scope.'}
             </p>
           </div>
 
           {/* Channel 2: General Inquiries */}
-          <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
+          <div className="p-5 rounded-2xl bg-white/60 dark:bg-black/20 border border-stone-200/60 dark:border-white/10 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 02</span>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono">ACTIVE</span>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono rounded-full">ACTIVE</span>
             </div>
             <div>
-              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal">
+              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal dark:text-white">
                 {isRtl ? 'استفسارات تواصل معنا والمشاريع' : 'General Contact & Inquiries'}
               </div>
               <div className="text-xs font-mono text-gold font-semibold mt-1">
                 info@viwan.net
               </div>
             </div>
-            <p className="text-[11px] text-stone-500 font-light pt-2 border-t border-[#E7E2D8]">
+            <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light pt-2 border-t border-stone-200/40 dark:border-white/10">
               {isRtl ? 'إشعار رسمي ببيانات العميل، الشركة، موقع المشروع، والميزانية.' : 'Instant dispatch with company, project location, budget and client brief.'}
             </p>
           </div>
 
           {/* Channel 3: Careers */}
-          <div className="p-4 bg-[#FAF6EE]/50 border border-[#E7E2D8] space-y-3">
+          <div className="p-5 rounded-2xl bg-white/60 dark:bg-black/20 border border-stone-200/60 dark:border-white/10 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 03</span>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono">ACTIVE</span>
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono rounded-full">ACTIVE</span>
             </div>
             <div>
-              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal">
+              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal dark:text-white">
                 {isRtl ? 'طلبات التوظيف واستقطاب الكفاءات' : 'Careers & Talent Acquisition'}
               </div>
               <div className="text-xs font-mono text-gold font-semibold mt-1">
                 info@viwan.net
               </div>
             </div>
-            <p className="text-[11px] text-stone-500 font-light pt-2 border-t border-[#E7E2D8]">
+            <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light pt-2 border-t border-stone-200/40 dark:border-white/10">
               {isRtl ? 'إشعار رسمي بملف أعمال المتقدم (Portfolio) وسنوات الخبرة ورقم هاتفه.' : 'Instant dispatch with applicant CV portfolio link, experience and contact info.'}
             </p>
           </div>

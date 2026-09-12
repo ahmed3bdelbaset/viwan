@@ -110,16 +110,16 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-transparent flex relative">
       {/* ========================================================================= */}
-      {/* 0. RESPONSIVE NATURE & TREES BACKGROUND WITH ELEGANT BLUR */}
+      {/* 0. RESPONSIVE HOUSES & TREES BACKGROUND WITH ARCHITECTURAL BLUR */}
       {/* ========================================================================= */}
       <div className="fixed inset-0 pointer-events-none -z-30 overflow-hidden select-none">
         <img
-          src="/images/service-landscape-design.jpg"
-          alt="Viwan Architectural Garden Background"
-          className="w-full h-full object-cover object-center scale-105"
+          src="/images/hero-villa-2.jpg"
+          alt="Viwan Architectural Villa & Trees Landscape"
+          className="w-full h-full object-cover object-center scale-110 blur-[8px] brightness-[0.92] contrast-[1.05]"
         />
-        {/* Frosted translucent wash for high contrast & readability on desktop and mobile */}
-        <div className="absolute inset-0 backdrop-blur-[6px] bg-[#FAF6EE]/85 dark:bg-[#121110]/90" />
+        {/* Frosted translucent wash: houses & trees clearly visible while maintaining UI contrast */}
+        <div className="absolute inset-0 bg-[#FAF7F2]/60 dark:bg-[#121110]/75" />
       </div>
 
       {/* ========================================================================= */}
@@ -136,23 +136,15 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        {/* Brand Header */}
-        <div className="p-6 border-b border-stone-200/60 dark:border-white/10 flex items-center justify-between">
-          <Link href="/admin" dir="ltr" className="flex items-center space-x-3.5 group">
-            <ViwanMark className="w-8 h-8 text-gold group-hover:scale-105 transition-transform" isDark={false} />
-            <div className="text-left">
-              <div className="font-cinzel text-lg font-bold tracking-widest text-charcoal dark:text-white">
-                {t.sidebar.brand}
-              </div>
-              <div className="text-[9px] tracking-[0.2em] text-gold uppercase font-montserrat -mt-0.5">
-                {t.sidebar.subtitle}
-              </div>
-            </div>
+        {/* Brand Header: Large Centered Logo Only (No VIWAN text or subtitle) */}
+        <div className="py-7 px-6 border-b border-stone-200/60 dark:border-white/10 relative flex items-center justify-center">
+          <Link href="/admin" className="flex items-center justify-center group" aria-label="Viwan Dashboard">
+            <ViwanMark className="w-16 h-16 text-gold group-hover:scale-105 transition-transform duration-300 drop-shadow-sm" isDark={false} />
           </Link>
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-stone-400 hover:text-charcoal dark:hover:text-white p-1 rounded-full hover:bg-black/5"
+            className="lg:hidden absolute end-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-charcoal dark:hover:text-white p-2 rounded-full hover:bg-black/5 cursor-pointer"
             aria-label="Close menu"
           >
             <X className="w-5 h-5" />
@@ -219,14 +211,18 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       {/* 2. MAIN CONTENT WRAPPER */}
       {/* ========================================================================= */}
       <div className={`flex-1 flex flex-col min-w-0 ${isRtl ? 'lg:pr-64' : 'lg:pl-64'}`}>
-        {/* Luxury Top Bar Curtain (Matches platform's dark gradient & hides during modals) */}
+        {/* Luxury Top Bar Curtain: Fixed on scroll, Gradient matching Image 3, Logo Only in Center, Auto-Hides on Form */}
         <header
-          className={`admin-navbar h-20 bg-gradient-to-b from-[#141312]/95 via-[#181716]/85 to-[#1c1a17]/75 backdrop-blur-xl border-b border-white/10 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-30 transition-all duration-300 ${
+          className={`admin-navbar sticky top-0 z-40 h-24 md:h-28 px-6 sm:px-8 flex items-center justify-between transition-all duration-400 ease-out select-none border-none shadow-none ${
             hasOpenModal ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
           }`}
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(14, 14, 12, 0.98) 0%, rgba(14, 14, 12, 0.88) 32%, rgba(14, 14, 12, 0.55) 62%, rgba(14, 14, 12, 0.18) 86%, rgba(14, 14, 12, 0) 100%)',
+          }}
         >
           {/* Start: Hamburger & Current Page Title */}
-          <div className="flex items-center space-x-4 rtl:space-x-reverse">
+          <div className="flex items-center space-x-4 rtl:space-x-reverse z-10">
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 rounded-full text-white/80 hover:text-gold hover:bg-white/10 transition-colors cursor-pointer"
@@ -236,24 +232,21 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             </button>
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
               <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-              <h1 className="font-cinzel text-sm sm:text-base font-semibold text-white tracking-wide uppercase">
+              <h1 className="font-cinzel text-sm sm:text-base font-semibold text-white tracking-wide uppercase drop-shadow-sm">
                 {getPageTitle()}
               </h1>
             </div>
           </div>
 
-          {/* Absolute Center: Company Logo (VIWAN) */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-2.5 rtl:space-x-reverse select-none">
-            <Link href="/admin" className="flex items-center space-x-2.5 rtl:space-x-reverse group">
-              <ViwanMark className="w-7 h-7 text-gold transition-transform group-hover:scale-105" isDark={true} />
-              <span className="font-cinzel text-base sm:text-lg font-bold tracking-[0.2em] text-white uppercase group-hover:text-gold transition-colors">
-                VIWAN
-              </span>
+          {/* Absolute Center: Logo ONLY (No VIWAN text) */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center select-none z-10">
+            <Link href="/admin" className="flex items-center justify-center group" aria-label="Viwan Admin">
+              <ViwanMark className="w-9 h-9 sm:w-10 sm:h-10 text-gold transition-transform duration-300 group-hover:scale-110 drop-shadow-md" isDark={true} />
             </Link>
           </div>
 
           {/* End: Language Switcher Only */}
-          <div className="flex items-center">
+          <div className="flex items-center z-10">
             <button
               onClick={toggleLocale}
               className="border border-white/20 bg-white/10 hover:bg-white/20 hover:border-gold px-4 py-1.5 text-xs text-white rounded-full flex items-center space-x-2 rtl:space-x-reverse shadow-sm backdrop-blur-md transition-all cursor-pointer group"
