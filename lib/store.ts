@@ -409,32 +409,46 @@ export const DataStore = {
       updated = [...list];
       updated[existingIndex] = service;
     } else {
-      updated = [service, ...list];
+      updated = [...list, service];
     }
+    updated.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    inMemoryServices = updated;
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('viwan_services', JSON.stringify(updated));
-      // Save permanently to SQLite physical database
+      window.dispatchEvent(new CustomEvent('viwan_services_updated', { detail: updated }));
+
+      const token = AuthService.getToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       fetch('/api/services', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(service)
       }).catch((e) => console.error('Error saving to DB:', e));
     }
-    inMemoryServices = updated;
     return service;
   },
 
   deleteService: (id: string): boolean => {
     const list = DataStore.getServices();
     const updated = list.filter((s) => s.id !== id);
+    inMemoryServices = updated;
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('viwan_services', JSON.stringify(updated));
-      // Delete permanently from SQLite physical database
-      fetch(`/api/services/${id}`, {
-        method: 'DELETE'
+      window.dispatchEvent(new CustomEvent('viwan_services_updated', { detail: updated }));
+
+      const token = AuthService.getToken();
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      fetch(`/api/services/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers
       }).catch((e) => console.error('Error deleting from DB:', e));
     }
-    inMemoryServices = updated;
     return true;
   },
 

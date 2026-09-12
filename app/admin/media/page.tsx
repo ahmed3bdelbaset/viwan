@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { useViwanModal } from '@/components/ui/ViwanModalProvider';
 import { SiteImageItem, DEFAULT_SITE_IMAGES } from '@/lib/site-images';
+import { AuthService } from '@/lib/auth';
 import {
   Upload,
   RotateCcw,
@@ -44,6 +45,9 @@ export default function AdminMediaPage() {
         const data = await res.json();
         if (Array.isArray(data.siteImages) && data.siteImages.length > 0) {
           setSiteImages(data.siteImages);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('viwan_site_images', JSON.stringify(data.siteImages));
+          }
         } else {
           setSiteImages(DEFAULT_SITE_IMAGES);
         }
@@ -62,14 +66,22 @@ export default function AdminMediaPage() {
 
   const saveUpdatedImages = async (updatedList: SiteImageItem[], successMsg?: string) => {
     try {
+      const token = AuthService.getToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ siteImages: updatedList }),
       });
 
       if (res.ok) {
         setSiteImages(updatedList);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('viwan_site_images', JSON.stringify(updatedList));
+          window.dispatchEvent(new CustomEvent('viwan_site_images_updated', { detail: updatedList }));
+        }
         showNotification(
           successMsg || (isRtl ? 'تم تحديث الصورة وحفظها بنجاح' : 'Image updated and saved successfully'),
           isRtl ? 'إدارة الوسائط' : 'Media Management'
@@ -92,8 +104,13 @@ export default function AdminMediaPage() {
       const formData = new FormData();
       formData.append('file', file);
 
+      const token = AuthService.getToken();
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const uploadRes = await fetch('/api/admin/upload', {
         method: 'POST',
+        headers,
         body: formData,
       });
 

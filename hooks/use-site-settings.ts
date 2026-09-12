@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { CONTACT } from '@/lib/site'
 import { DataStore } from '@/lib/store'
 import { CompanyInfo, ContactPhone, StudioLocation } from '@/lib/types'
+import { SiteImageItem, DEFAULT_SITE_IMAGES } from '@/lib/site-images'
 
 export function formatWhatsAppUrl(input?: string): string {
   if (!input) return CONTACT.whatsapp
@@ -59,6 +60,17 @@ export function useSiteSettings() {
     }
     return DataStore.getCompanyInfo()
   })
+  const [siteImages, setSiteImages] = useState<SiteImageItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('viwan_site_images')
+        if (stored) {
+          return JSON.parse(stored)
+        }
+      } catch (e) {}
+    }
+    return DEFAULT_SITE_IMAGES
+  })
 
   useEffect(() => {
     // Detect visitor country dynamically & sync
@@ -91,6 +103,10 @@ export function useSiteSettings() {
             },
           }))
         }
+        if (Array.isArray(json.siteImages) && json.siteImages.length > 0) {
+          setSiteImages(json.siteImages)
+          localStorage.setItem('viwan_site_images', JSON.stringify(json.siteImages))
+        }
       })
       .catch(() => {})
 
@@ -103,12 +119,32 @@ export function useSiteSettings() {
       }
     }
 
+    const handleImagesUpdate = (e: any) => {
+      if (Array.isArray(e?.detail)) {
+        setSiteImages(e.detail)
+        localStorage.setItem('viwan_site_images', JSON.stringify(e.detail))
+      } else {
+        fetch('/api/settings')
+          .then((res) => res.json())
+          .then((json) => {
+            if (Array.isArray(json?.siteImages) && json.siteImages.length > 0) {
+              setSiteImages(json.siteImages)
+            }
+          })
+          .catch(() => {})
+      }
+    }
+
     window.addEventListener('viwan_settings_updated', handleUpdate)
+    window.addEventListener('viwan_site_images_updated', handleImagesUpdate)
     window.addEventListener('storage', handleUpdate)
+    window.addEventListener('storage', handleImagesUpdate)
 
     return () => {
       window.removeEventListener('viwan_settings_updated', handleUpdate)
+      window.removeEventListener('viwan_site_images_updated', handleImagesUpdate)
       window.removeEventListener('storage', handleUpdate)
+      window.removeEventListener('storage', handleImagesUpdate)
       window.removeEventListener('viwan_country_changed', handleCountryChange)
     }
   }, [])
@@ -261,9 +297,16 @@ export function useSiteSettings() {
     }
   }, [companyInfo, visitorCountry])
 
+  const getSiteImage = (id: string, fallback?: string): string => {
+    const item = siteImages.find((img) => img.id === id)
+    return item?.currentUrl || fallback || ''
+  }
+
   return {
     companyInfo,
     contact,
     visitorCountry,
+    siteImages,
+    getSiteImage,
   }
 }

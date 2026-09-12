@@ -1383,5 +1383,253 @@
       "order": 3,
       "createdAt": "2026-01-03T00:00:00.000Z"
     }
+  ],
+  "services": [
+    {
+      "id": "srv-architecture",
+      "num": "01",
+      "slug": "architecture",
+      "title_en": "Architecture",
+      "title_ar": "الهندسة المعمارية",
+      "desc_en": "We craft contextually grounded architectural forms that unite spatial function, authentic proportion, and enduring materiality across residential, commercial, and mixed-use typology.",
+      "desc_ar": "نبتكر حلولاً معمارية متجذرة في سياقها المكاني، تجمع بين وظيفة الفراغ وأصالة النسب ودقة الإضاءة لتدوم للأجيال القادمة في المشاريع السكنية والتجارية.",
+      "image": "/images/service-architecture.jpg",
+      "alt": "Contemporary luxury travertine stone and glass villa at twilight",
+      "scope_en": [
+        "Concept Design",
+        "Schematic Design",
+        "Design Development",
+        "Architectural Documentation",
+        "Façade Design",
+        "BIM Coordination"
+      ],
+      "scope_ar": [
+        "التصميم المبدئي وتطوير الفكرة",
+        "المخططات المعمارية الأولية",
+        "تطوير التصميم والنسب الفراغية",
+        "الوثائق المعمارية ورخص البناء",
+        "تصميم الواجهات والإكساء الخارجي",
+        "التنسيق المعماري عبر نماذج BIM"
+      ],
+      "status": "Active",
+      "display_order": 1
+    },
+    {
+      "id": "srv-interior-design",
+      "num": "02",
+      "slug": "interior-design",
+      "title_en": "Interior Design",
+      "title_ar": "التصميم الداخلي",
+      "desc_en": "Approaching interior design as a sensory spatial choreography — balancing circulation flow, tactile warmth, tailored joinery, and bespoke decorative elements.",
+      "desc_ar": "نتعامل مع التصميم الداخلي كتجربة فراغية حسية متكاملة — نوازن بين تدفق الحركة، ودفء المواد الطبيعية، وتصميم الإضاءة التخصصية، والقطع الحصرية.",
+      "image": "/images/service-interior-design.jpg",
+      "alt": "Ultra-luxury modern interior living room with bespoke furniture and cove lighting",
+      "scope_en": [
+        "Space Planning",
+        "Interior Concept",
+        "Materials & Finishes",
+        "FF&E",
+        "Lighting Design",
+        "Custom Furniture",
+        "Styling & Art Direction"
+      ],
+      "scope_ar": [
+        "التخطيط الفراغي وتوزيع الحركة",
+        "المفهوم الجمالي الداخلي",
+        "انتقاء الخامات والأحجار الطبيعية",
+        "جداول الأثاث والتجهيزات FF&E",
+        "تصميم الإضاءة المعمارية المتخصصة",
+        "تصميم قطع الأثاث المخصصة",
+        "التنسيق الفني واختيار التحف الفنية"
+      ],
+      "status": "Active",
+      "display_order": 2
+    },
+    {
+      "id": "srv-landscape-design",
+      "num": "03",
+      "slug": "landscape-design",
+      "title_en": "Landscape Design",
+      "title_ar": "تصميم اللاندسكيب",
+      "desc_en": "Harmonizing botanical architecture, natural stone paths, reflecting water bodies, and bioclimatic microclimates to seamlessly extend living space into the outdoors.",
+      "desc_ar": "تصميم متناغم يدمج البيئات النباتية والمائية والمسارات الحجرية والمظلات الخارجية لتعزيز الاتصال الفطري بين المساحات الداخلية والمحيط الطبيعي.",
+      "image": "/images/service-landscape-design.jpg",
+      "alt": "Luxury private villa landscape garden at sunset with pool and pergola",
+      "scope_en": [
+        "Landscape Concept",
+        "Masterplanning",
+        "Hardscape Design",
+        "Softscape Design",
+        "Outdoor Living",
+        "Public Realm",
+        "Irrigation & Sustainability"
+      ],
+      "scope_ar": [
+        "المفهوم البيئي للحدائق",
+        "المخطط العام للموقع والمسارات",
+        "تصميم العناصر الصلبة والمظلات",
+        "اختيار وتنسيق النباتات المتوافقة مناخياً",
+        "مناطق الجلوس والمعيشة الخارجية",
+        "الفضاءات المفتوحة والساحات",
+        "شبكات الري الذكية والاستدامة"
+      ],
+      "status": "Active",
+      "display_order": 3
+    },
+    {
+      "id": "srv-urban-design",
+      "num": "04",
+      "slug": "urban-design",
+      "title_en": "Urban Design",
+      "title_ar": "التصميم والتخطيط العمراني",
+      "desc_en": "Strategic spatial planning for forward-thinking urban communities, mixed-use destinations, and pedestrian-first public infrastructure.",
+      "desc_ar": "تخطيط مكاني استراتيجي للمجتمعات الحضرية الرائدة، والوجهات متعددة الاستخدامات، والبنى التحتية الصديقة للمشاة والمناخ.",
+      "image": "/images/service-urban-design.jpg",
+      "alt": "Aerial architectural drone view of contemporary masterplanned community",
+      "scope_en": [
+        "Urban Planning",
+        "Mixed-Use Developments",
+        "Public Spaces",
+        "Mobility & Connectivity",
+        "Sustainability Strategies",
+        "Urban Guidelines",
+        "3D Visualization"
+      ],
+      "scope_ar": [
+        "التخطيط الحضري وتوزيع الكتل",
+        "تطوير المجمعات متعددة الاستخدامات",
+        "تصميم الساحات والفضاءات العامة",
+        "شبكات الحركة والتنقل والمشاة",
+        "استراتيجيات الاستدامة العمرانية",
+        "صياغة الأدلة والمعايير العمرانية",
+        "الإظهار والمحاكاة ثلاثية الأبعاد"
+      ],
+      "status": "Active",
+      "display_order": 4
+    },
+    {
+      "id": "srv-engineering",
+      "num": "05",
+      "slug": "engineering",
+      "title_en": "Engineering",
+      "title_ar": "التنسيق الهندسي الشامل",
+      "desc_en": "Rigorous multidisciplinary engineering coordination ensuring structural integrity, MEP optimization, clash-free BIM integration, and strict buildability.",
+      "desc_ar": "تنسيق هندسي متعدد التخصصات يجمع بين السلامة الإنشائية والأنظمة الكهروميكانيكية ونمذجة BIM لضمان تنفيذ دقيق وخالٍ تماماً من أخطاء الموقع.",
+      "image": "/images/service-engineering.jpg",
+      "alt": "Contemporary architectural engineering office building with precise structural grid",
+      "scope_en": [
+        "Structural Coordination",
+        "MEP Coordination",
+        "BIM",
+        "Technical Documentation",
+        "Shop Drawing Review",
+        "Construction Support",
+        "Value Engineering"
+      ],
+      "scope_ar": [
+        "التنسيق والتدقيق الإنشائي",
+        "تنسيق الأنظمة الكهروميكانيكية MEP",
+        "نمذجة BIM الموحدة وكشف التعارضات",
+        "إعداد المخططات الفنية المتكاملة",
+        "مراجعة واعتماد رسومات الورشة التنفيذية",
+        "الدعم الفني المباشر للموقع",
+        "الهندسة القيمية وترشيد الميزانيات"
+      ],
+      "status": "Active",
+      "display_order": 5
+    },
+    {
+      "id": "srv-project-management",
+      "num": "06",
+      "slug": "project-management",
+      "title_en": "Project Management",
+      "title_ar": "إدارة المشاريع",
+      "desc_en": "End-to-end management ensuring project delivery on schedule, within approved budget limits, and in complete fidelity to the architectural specification.",
+      "desc_ar": "إدارة شاملة لجميع مراحل المشروع تضمن التسليم في الموعد المحدد وضمن الميزانية المعتمدة مع الالتزام التام بالمواصفات المعمارية القياسية.",
+      "image": "/images/service-project-management.jpg",
+      "alt": "Architectural project management desk setup with white hardhat and blueprints",
+      "scope_en": [
+        "Project Planning",
+        "Cost Management",
+        "Time Management",
+        "Contract Administration",
+        "Consultant Coordination",
+        "Progress Monitoring",
+        "Quality Control"
+      ],
+      "scope_ar": [
+        "إعداد المخططات الزمنية للمشروع",
+        "إدارة التكاليف وضبط الميزانيات",
+        "إدارة الوقت ومسار الأعمال الحرج",
+        "إدارة العقود ومستحقات المقاولين",
+        "التنسيق بين كافة الاستشاريين والموردين",
+        "التقارير الدورية لمعدلات الإنجاز",
+        "معايير وضوابط مراقبة الجودة"
+      ],
+      "status": "Active",
+      "display_order": 6
+    },
+    {
+      "id": "srv-finishing-fit-out",
+      "num": "07",
+      "slug": "finishing-fit-out",
+      "title_en": "Finishing & Fit-Out",
+      "title_ar": "التشطيبات والتجهيز الداخلي",
+      "desc_en": "Meticulous execution of bespoke architectural joinery, stone cladding, metal trims, and artisan fit-outs to realize the intended design vision flawlessly.",
+      "desc_ar": "تنفيذ دقيق للتجاليد المعمارية، وتكسيات الرخام الطبيعي، والقواطع المعدنية، والأعمال الخشبية الحرفية لتحويل الرؤية التصميمية إلى واقع ملموس.",
+      "image": "/images/service-fitout-marble.jpg",
+      "alt": "Architectural bookmatched marble wall adjacent to fluted wood paneling",
+      "scope_en": [
+        "Interior & Exterior Finishing",
+        "Material Selection",
+        "Technical Detailing",
+        "Custom Joinery",
+        "Fit-Out Execution",
+        "Quality Assurance",
+        "Handover Support"
+      ],
+      "scope_ar": [
+        "تنفيذ التشطيبات الداخلية والخارجية",
+        "انتقاء وتوريد الرخام والأخشاب الفاخرة",
+        "التفاصيل الفنية الدقيقة للتركيبات",
+        "أعمال النجارة والتجاليد الحصرية",
+        "التنفيذ الميداني بأعلى دقة حرفية",
+        "توكيد الجودة ومطابقة عينات المواد",
+        "الدعم الفني وإجراءات التسليم النهائي"
+      ],
+      "status": "Active",
+      "display_order": 7
+    },
+    {
+      "id": "srv-construction-supervision",
+      "num": "08",
+      "slug": "construction-supervision",
+      "title_en": "Construction Supervision",
+      "title_ar": "الإشراف على التنفيذ",
+      "desc_en": "On-site architectural representation, continuous quality enforcement, progress audits, and technical direction from ground-breaking through turnkey handover.",
+      "desc_ar": "تواجد هندسي مستمر بالموقع، ومراقبة صارمة للجودة، ومراجعة معدلات الإنجاز، وتوجيه فني مباشر من وضع الأساسات حتى التسليم على المفتاح.",
+      "image": "/images/service-construction-supervision.jpg",
+      "alt": "Site engineer in hardhat and safety vest inspecting building under construction",
+      "scope_en": [
+        "Site Supervision",
+        "Quality Control",
+        "Compliance with Specifications",
+        "Progress Reporting",
+        "Consultant & Contractor Coordination",
+        "On-Site Problem Solving",
+        "Final Inspection & Handover"
+      ],
+      "scope_ar": [
+        "الإشراف الميداني اليومي بالموقع",
+        "فحص ومطابقة جودة الأعمال المنفذة",
+        "الالتزام الصارم بالمواصفات وكود البناء",
+        "إعداد التقارير الفنية المصورة للمالك",
+        "تنسيق المهام بين المقاولين والاستشاري",
+        "إيجاد حلول فورية للتحديات الهندسية الميدانية",
+        "الفحص الهندسي النهائي والاستلام"
+      ],
+      "status": "Active",
+      "display_order": 8
+    }
   ]
 }

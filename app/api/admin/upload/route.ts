@@ -6,7 +6,7 @@ import { getUploadsDir } from '@/lib/db'
 import { verifySecureAdminToken, validateImageMagicBytes, isSafeSvg } from '@/lib/security'
 
 const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.pdf', '.mp4', '.svg'])
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB (Supports large high-resolution architectural assets)
 
 export async function POST(req: Request) {
   try {

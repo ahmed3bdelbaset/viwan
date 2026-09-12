@@ -291,32 +291,56 @@ export default function ServicesPage() {
   const [selectedService, setSelectedService] = useState<ServiceDetail | null>(null)
   const [heroImgUrl, setHeroImgUrl] = useState('/images/services-hero-colonnade.jpg')
 
-  // Load dynamic services from backend
+  // Load dynamic services from backend and keep synced
+  const mapServices = (rawList: any[]): ServiceDetail[] => {
+    const activeServices = rawList.filter((s: any) => s.status !== 'Inactive');
+    activeServices.sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0));
+    return activeServices.map((s: any, idx: number) => ({
+      num: s.num || String(s.display_order || idx + 1).padStart(2, '0'),
+      slug: s.slug || (s.title_en ? s.title_en.toLowerCase().replace(/[^a-z0-9]+/g, '-') : `service-${idx + 1}`),
+      titleEn: s.title_en || s.titleEn || '',
+      titleAr: s.title_ar || s.titleAr || s.title_en || '',
+      image: s.image || '/images/service-architecture.jpg',
+      alt: s.alt || s.title_en || 'Viwan Architectural Service',
+      scopeEn: (s.scope_en && s.scope_en.length > 0) ? s.scope_en : (s.desc_en ? [s.desc_en] : ['Architectural Consultation', 'Concept Design', 'Technical Documentation', 'Project Coordination']),
+      scopeAr: (s.scope_ar && s.scope_ar.length > 0) ? s.scope_ar : (s.desc_ar ? [s.desc_ar] : ['الاستشارات المعمارية', 'التصميم المبدئي', 'المخططات التنفيذية', 'التنسيق الهندسي']),
+      descEn: s.desc_en || s.descEn || '',
+      descAr: s.desc_ar || s.descAr || '',
+    }));
+  };
+
   useEffect(() => {
-    fetch('/api/services')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.success && Array.isArray(data.data) && data.data.length > 0) {
-          const activeServices = data.data.filter((s: any) => s.status !== 'Inactive');
-          if (activeServices.length > 0) {
-            const mapped: ServiceDetail[] = activeServices.map((s: any, idx: number) => ({
-              num: s.num || String(s.display_order || idx + 1).padStart(2, '0'),
-              slug: s.slug || s.code?.toLowerCase() || `service-${idx + 1}`,
-              titleEn: s.title_en || s.titleEn || '',
-              titleAr: s.title_ar || s.titleAr || '',
-              image: s.image || '/images/service-architecture.jpg',
-              alt: s.alt || s.title_en || 'Viwan Service',
-              scopeEn: s.scope_en || s.scopeEn || (s.desc_en ? [s.desc_en] : []),
-              scopeAr: s.scope_ar || s.scopeAr || (s.desc_ar ? [s.desc_ar] : []),
-              descEn: s.desc_en || s.descEn || '',
-              descAr: s.desc_ar || s.descAr || '',
-            }));
-            setServicesList(mapped);
+    const fetchServices = () => {
+      fetch('/api/services')
+        .then((res) => res.json())
+        .then((data) => {
+          const list = data?.data || data?.services;
+          if (Array.isArray(list) && list.length > 0) {
+            const mapped = mapServices(list);
+            if (mapped.length > 0) setServicesList(mapped);
           }
-        }
-      })
-      .catch(() => {})
-  }, [])
+        })
+        .catch(() => {});
+    };
+
+    fetchServices();
+
+    const handleServicesUpdated = (e: any) => {
+      if (Array.isArray(e?.detail)) {
+        const mapped = mapServices(e.detail);
+        if (mapped.length > 0) setServicesList(mapped);
+      } else {
+        fetchServices();
+      }
+    };
+
+    window.addEventListener('viwan_services_updated', handleServicesUpdated);
+    window.addEventListener('storage', handleServicesUpdated);
+    return () => {
+      window.removeEventListener('viwan_services_updated', handleServicesUpdated);
+      window.removeEventListener('storage', handleServicesUpdated);
+    };
+  }, []);
 
   // Load dynamic hero image from site settings
   useEffect(() => {

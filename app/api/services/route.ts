@@ -107,7 +107,13 @@ export async function DELETE(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
+    let id = searchParams.get('id');
+    if (!id) {
+      try {
+        const body = await req.json();
+        id = body?.id;
+      } catch {}
+    }
 
     if (!id) {
       return NextResponse.json({ success: false, error: 'Missing service ID' }, { status: 400 });

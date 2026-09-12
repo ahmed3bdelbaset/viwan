@@ -959,7 +959,6 @@ export const INITIAL_EXPERTISE_SECTORS: import('../types').ExpertiseSector[] = [
 export const INITIAL_SERVICES: ServiceItem[] = [
   {
     id: 'srv-architecture',
-    code: 'SRV-ARCH',
     num: '01',
     slug: 'architecture',
     title_en: 'Architecture',
@@ -989,7 +988,6 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
   {
     id: 'srv-interior-design',
-    code: 'SRV-INT',
     num: '02',
     slug: 'interior-design',
     title_en: 'Interior Design',
@@ -1021,7 +1019,6 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
   {
     id: 'srv-landscape-design',
-    code: 'SRV-LND',
     num: '03',
     slug: 'landscape-design',
     title_en: 'Landscape Design',
@@ -1053,7 +1050,6 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
   {
     id: 'srv-urban-design',
-    code: 'SRV-URB',
     num: '04',
     slug: 'urban-design',
     title_en: 'Urban Design',
@@ -1085,7 +1081,6 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
   {
     id: 'srv-engineering',
-    code: 'SRV-ENG',
     num: '05',
     slug: 'engineering',
     title_en: 'Engineering',
@@ -1117,7 +1112,6 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
   {
     id: 'srv-project-management',
-    code: 'SRV-PM',
     num: '06',
     slug: 'project-management',
     title_en: 'Project Management',
@@ -1149,7 +1143,6 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
   {
     id: 'srv-finishing-fit-out',
-    code: 'SRV-FIT',
     num: '07',
     slug: 'finishing-fit-out',
     title_en: 'Finishing & Fit-Out',
@@ -1181,7 +1174,6 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   },
   {
     id: 'srv-construction-supervision',
-    code: 'SRV-SUP',
     num: '08',
     slug: 'construction-supervision',
     title_en: 'Construction Supervision',

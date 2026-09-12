@@ -3,6 +3,8 @@ import path from 'path'
 import { PROJECTS as INITIAL_PROJECTS, Project } from './projects'
 import { JOBS as INITIAL_JOBS, Job } from './jobs'
 import { CONTACT as INITIAL_CONTACT } from './site'
+import { ServiceItem } from './admin-types'
+import { INITIAL_SERVICES } from './data/seed'
 
 export function getStorageDir(): string {
   if (process.env.STORAGE_PATH) {
@@ -192,6 +194,7 @@ export interface DatabaseSchema {
   siteImages?: SiteImageItem[]
   counters?: CounterMetric[]
   youtubeVideos?: YouTubeVideo[]
+  services?: ServiceItem[]
   adminAuth?: {
     password?: string
     updatedAt?: string
@@ -335,6 +338,7 @@ function getInitialData(): DatabaseSchema {
     siteImages: DEFAULT_SITE_IMAGES,
     counters: DEFAULT_COUNTERS,
     youtubeVideos: DEFAULT_YOUTUBE_VIDEOS,
+    services: INITIAL_SERVICES,
   }
 }
 
@@ -369,6 +373,22 @@ export function readDb(): DatabaseSchema {
     if (!Array.isArray(data.youtubeVideos) || data.youtubeVideos.length === 0) {
       data.youtubeVideos = DEFAULT_YOUTUBE_VIDEOS
       changed = true
+    }
+    if (!Array.isArray(data.services) || data.services.length === 0) {
+      data.services = INITIAL_SERVICES
+      changed = true
+    } else {
+      // Ensure no obsolete 'code' field remains on any service
+      let codeStripped = false
+      data.services = data.services.map((s: any) => {
+        if ('code' in s) {
+          const { code, ...rest } = s
+          codeStripped = true
+          return rest
+        }
+        return s
+      })
+      if (codeStripped) changed = true
     }
 
     // Default settings fields

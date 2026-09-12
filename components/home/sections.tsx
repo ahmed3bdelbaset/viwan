@@ -18,8 +18,8 @@ import {
 } from '@/components/site/client-logos'
 import { DisciplinesShowcase } from '@/components/home/disciplines-showcase'
 import { PROCESS, SERVICES } from '@/lib/site'
-import { FEATURED_PROJECT, HOME_PROJECTS, type Project } from '@/lib/projects'
 import { useLanguage } from '@/lib/i18n'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 import {
   ArchitecturalFrame,
   ArchitecturalDivider,
@@ -524,6 +524,8 @@ export function ArchitecturalMarquee() {
 /* 06–09 — HOME IMPACT, SELECTED CLIENTS & FEEDBACK */
 export function HomeImpactSection() {
   const { t, lang, isRtl } = useLanguage()
+  const { getSiteImage } = useSiteSettings()
+  const airplaneBannerImg = getSiteImage('impact-airplane-banner', '/images/airplane-banner-viwan.jpg')
   const [logosVisible, setLogosVisible] = useState(false)
   const clientsRef = useRef<HTMLDivElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
@@ -634,7 +636,7 @@ export function HomeImpactSection() {
           {/* Desktop realistic airplane image */}
           <div className="hidden sm:block absolute inset-0">
             <Image
-              src="/images/airplane-banner-viwan.jpg"
+              src={airplaneBannerImg}
               alt="Realistic Airplane Towing VIWAN Architecture Banner Over Coastal Sea"
               fill
               sizes="100vw"
@@ -645,7 +647,7 @@ export function HomeImpactSection() {
           {/* Mobile realistic airplane image */}
           <div className="sm:hidden absolute inset-0">
             <Image
-              src="/images/airplane-banner-viwan-mobile.jpg"
+              src={airplaneBannerImg}
               alt="Realistic Airplane Towing VIWAN Architecture Banner Over Coastal Sea"
               fill
               sizes="100vw"

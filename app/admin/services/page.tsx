@@ -8,6 +8,7 @@ import { useAdminLang } from '@/lib/i18n/AdminLanguageContext';
 import { useViwanModal } from '@/components/ui/ViwanModalProvider';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { ViwanMark } from '@/components/ui/Icons';
+import { AuthService } from '@/lib/auth';
 import {
   Search,
   Plus,
@@ -17,7 +18,9 @@ import {
   Check,
   Briefcase,
   X,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Upload,
+  Loader2
 } from 'lucide-react';
 
 const PRESET_SERVICE_IMAGES = [
@@ -40,6 +43,8 @@ export default function AdminServicesPage() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string; title: string }>({
     isOpen: false,
@@ -48,7 +53,6 @@ export default function AdminServicesPage() {
   });
 
   const [formData, setFormData] = useState<Partial<ServiceItem>>({
-    code: '',
     num: '',
     slug: '',
     title_en: '',
@@ -75,7 +79,6 @@ export default function AdminServicesPage() {
     const nextOrder = services.length + 1;
     setFormData({
       id: `srv-${Date.now()}`,
-      code: `SRV-${String(nextOrder).padStart(2, '0')}`,
       num: String(nextOrder).padStart(2, '0'),
       slug: `service-${nextOrder}`,
       title_en: '',
@@ -93,6 +96,42 @@ export default function AdminServicesPage() {
     setEditingService(srv);
     setFormData({ ...srv });
     setIsModalOpen(true);
+  };
+
+  const handleImageFileUpload = async (file: File) => {
+    try {
+      setIsUploadingImage(true);
+      const data = new FormData();
+      data.append('file', file);
+
+      const token = AuthService.getToken();
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers,
+        body: data,
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Upload failed');
+      }
+
+      const json = await res.json();
+      if (json.url) {
+        setFormData((prev) => ({ ...prev, image: json.url }));
+        showSuccess(
+          isRtl ? 'تم رفع الصورة بنجاح وتعيينها للخدمة' : 'Image uploaded successfully',
+          isRtl ? 'رفع صورة' : 'Upload Image'
+        );
+      }
+    } catch (err: any) {
+      showError(err.message || (isRtl ? 'فشل رفع الصورة' : 'Failed to upload image'));
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handleDelete = (id: string, title: string) => {
@@ -121,7 +160,6 @@ export default function AdminServicesPage() {
     const orderNum = Number(formData.display_order) || 1;
     const srvToSave: ServiceItem = {
       id: formData.id || `srv-${Date.now()}`,
-      code: formData.code || `SRV-${String(orderNum).padStart(2, '0')}`,
       num: formData.num || String(orderNum).padStart(2, '0'),
       slug: formData.slug || formData.title_en.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       title_en: formData.title_en,
@@ -149,8 +187,7 @@ export default function AdminServicesPage() {
     const matchesQuery =
       !query ||
       s.title_en.toLowerCase().includes(query) ||
-      s.title_ar.toLowerCase().includes(query) ||
-      (s.code && s.code.toLowerCase().includes(query));
+      s.title_ar.toLowerCase().includes(query);
     return matchesStatus && matchesQuery;
   });
 
@@ -177,7 +214,7 @@ export default function AdminServicesPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isRtl ? 'ابحث عن خدمة أو كود...' : 'Search services or code...'}
+              placeholder={isRtl ? 'ابحث عن خدمة معمارية...' : 'Search services...'}
               className={`w-full bg-white/90 backdrop-blur-sm border border-[#E7E2D8] focus:border-gold text-xs text-charcoal rounded-full ${isRtl ? 'pr-9 pl-4' : 'pl-9 pr-4'} py-2.5 outline-none shadow-sm`}
             />
           </div>
@@ -232,8 +269,8 @@ export default function AdminServicesPage() {
 
                   {/* Badges on Image */}
                   <div className="absolute top-3 inset-x-3 flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-semibold text-gold bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-gold/30">
-                      {srv.code || `SRV-${String(srv.display_order || idx + 1).padStart(2, '0')}`}
+                    <span className="text-[11px] font-mono font-bold text-gold bg-black/70 backdrop-blur-md px-3 py-1 rounded-full border border-gold/40 shadow-xs">
+                      #{String(srv.display_order || idx + 1).padStart(2, '0')}
                     </span>
 
                     <span
@@ -244,13 +281,6 @@ export default function AdminServicesPage() {
                       }`}
                     >
                       {srv.status === 'Active' ? t.expertise.active : t.expertise.inactive}
-                    </span>
-                  </div>
-
-                  {/* Order Tag Bottom on Image */}
-                  <div className="absolute bottom-3 start-3">
-                    <span className="text-[10px] font-mono font-medium text-white/90 bg-black/50 backdrop-blur-md px-2 py-0.5 rounded-md">
-                      #{String(srv.display_order || idx + 1).padStart(2, '0')}
                     </span>
                   </div>
                 </div>
@@ -347,25 +377,11 @@ export default function AdminServicesPage() {
 
             {/* Form */}
             <form onSubmit={handleSave} className="space-y-4 relative z-10">
-              {/* Row 1: Code & Order */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Row 1: Order & Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">
-                    {isRtl ? 'كود الخدمة' : 'Service Code'}
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.code || ''}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    placeholder="SRV-ARCH"
-                    className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white font-mono outline-none focus:border-gold"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">
-                    {isRtl ? 'ترتيب الظهور' : 'Display Order'}
+                    {isRtl ? 'ترتيب الظهور في الموقع' : 'Display Order'}
                   </label>
                   <input
                     type="number"
@@ -374,6 +390,20 @@ export default function AdminServicesPage() {
                     onChange={(e) => setFormData({ ...formData, display_order: Number(e.target.value) })}
                     className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold"
                   />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">
+                    {isRtl ? 'حالة النشر' : 'Publish Status'}
+                  </label>
+                  <select
+                    value={formData.status || 'Active'}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                    className="w-full bg-[#1e1d1b] border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold cursor-pointer"
+                  >
+                    <option value="Active">{isRtl ? 'نشط (معروض بصفحة الخدمات بالموقع)' : 'Active (Visible on public site)'}</option>
+                    <option value="Inactive">{isRtl ? 'غير نشط (معطل ومخفي)' : 'Inactive (Hidden)'}</option>
+                  </select>
                 </div>
               </div>
 
@@ -407,21 +437,59 @@ export default function AdminServicesPage() {
                 />
               </div>
 
-              {/* Row 4: Service Image URL & Presets */}
-              <div className="space-y-2 p-3.5 rounded-2xl bg-white/[0.03] border border-white/10">
-                <label className="text-[10px] uppercase font-semibold text-gold block tracking-wider flex items-center gap-1.5">
-                  <ImageIcon className="w-3.5 h-3.5" />
-                  <span>{isRtl ? 'صورة الخدمة المعمارية' : 'Service Image'}</span>
-                </label>
+              {/* Row 4: Service Image (URL OR Upload from Device of Any Size) */}
+              <div className="space-y-3 p-4 rounded-2xl bg-white/[0.04] border border-white/15">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] uppercase font-semibold text-gold tracking-wider flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>{isRtl ? 'صورة الخدمة المعمارية' : 'Service Image'}</span>
+                  </label>
+                  <span className="text-[10px] text-stone-400">
+                    {isRtl ? 'رابط مباشر أو رفع من جهازك بأي حجم' : 'Direct URL or upload any size'}
+                  </span>
+                </div>
 
-                <div className="flex gap-3 items-center">
+                <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={formData.image || ''}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      placeholder={isRtl ? 'أدخل رابط الصورة أو اضغط رفع من جهازي...' : 'Enter image URL or click upload...'}
+                      className="w-full bg-white/5 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none focus:border-gold font-mono"
+                    />
+                  </div>
+
                   <input
-                    type="text"
-                    value={formData.image || ''}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    placeholder="/images/service-architecture.jpg"
-                    className="flex-1 bg-white/5 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none focus:border-gold font-mono"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageFileUpload(file);
+                    }}
                   />
+
+                  <button
+                    type="button"
+                    disabled={isUploadingImage}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center justify-center gap-2 bg-gold/20 hover:bg-gold text-gold hover:text-charcoal border border-gold/40 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    {isUploadingImage ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>{isRtl ? 'جاري الرفع...' : 'Uploading...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{isRtl ? 'رفع من جهازي' : 'Upload File'}</span>
+                      </>
+                    )}
+                  </button>
+
                   {formData.image && (
                     <div className="w-12 h-10 rounded-lg overflow-hidden border border-white/20 shrink-0 bg-stone-800">
                       <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
@@ -432,7 +500,7 @@ export default function AdminServicesPage() {
                 {/* Quick Presets for luxury images */}
                 <div className="pt-1">
                   <span className="text-[10px] text-stone-400 block mb-1.5">
-                    {isRtl ? 'أو اختر صورة من مكتبة الموقع:' : 'Or choose from library presets:'}
+                    {isRtl ? 'أو اختر صورة من مكتبة الموقع الجاهزة:' : 'Or choose from library presets:'}
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {PRESET_SERVICE_IMAGES.map((preset) => (
@@ -479,21 +547,6 @@ export default function AdminServicesPage() {
                   placeholder="تصميم كامل يغطي الـ 9 مراحل المعمارية، تراخيص البناء واعتماد المخططات."
                   className="w-full bg-white/5 border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold resize-none"
                 />
-              </div>
-
-              {/* Row 6: Status */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-semibold text-stone-300 block tracking-wider">
-                  {isRtl ? 'حالة النشر' : 'Publish Status'}
-                </label>
-                <select
-                  value={formData.status || 'Active'}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                  className="w-full bg-[#1e1d1b] border border-white/15 rounded-2xl p-3 text-xs text-white outline-none focus:border-gold cursor-pointer"
-                >
-                  <option value="Active">{isRtl ? 'نشط (معروض بصفحة الخدمات بالموقع)' : 'Active (Visible on public site)'}</option>
-                  <option value="Inactive">{isRtl ? 'غير نشط (معطل ومخفي)' : 'Inactive (Hidden)'}</option>
-                </select>
               </div>
 
               {/* Action Buttons Centered (Pill rounded-full) */}

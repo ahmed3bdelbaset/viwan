@@ -228,7 +228,6 @@ export interface ExpertiseSector {
 
 export interface ServiceItem {
   id: string;
-  code?: string;
   num?: string;
   slug?: string;
   title_en: string;

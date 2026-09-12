@@ -16,7 +16,6 @@ import {
   Workflow,
   Sparkles,
   Calendar,
-  Mail,
   Phone,
   RefreshCw,
   CheckCircle2,
@@ -386,101 +385,6 @@ export default function AdminDashboardOverviewPage() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 3. OFFICIAL EMAIL AUTOMATED DISPATCH & ROUTING MONITOR */}
-      {/* ========================================================================= */}
-      <div className="bg-white/85 dark:bg-[#181716]/85 backdrop-blur-xl border border-stone-200/80 dark:border-white/10 rounded-[28px] p-7 space-y-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-200/60 dark:border-white/10 gap-3">
-          <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <div className="w-10 h-10 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center text-charcoal">
-              <Mail className="w-5 h-5 text-gold" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <h3 className="font-cinzel text-sm font-semibold text-charcoal dark:text-white uppercase tracking-wider">
-                  {isRtl ? 'منظومة توجيه الإشعارات للبريد الاحترافي' : 'OFFICIAL EMAIL DISPATCH & ROUTING SYSTEM'}
-                </h3>
-                <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono px-2.5 py-0.5 rounded-full">
-                  GoDaddy SMTP Active
-                </span>
-              </div>
-              <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light mt-0.5">
-                {isRtl
-                  ? 'يتم تحويل كافة الطلبات الواردة فوراً إلى البريد الرسمي المحدد لكل قسم دون إشغال لوحة التحكم.'
-                  : 'All incoming submissions are instantly forwarded to the designated corporate inboxes.'}
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/admin/settings"
-            className="inline-flex items-center space-x-1.5 rtl:space-x-reverse bg-charcoal hover:bg-gold text-white text-[11px] font-semibold tracking-wider uppercase px-5 py-2.5 rounded-full transition-all shadow-xs"
-          >
-            <span>{isRtl ? 'تخصيص الإيميلات في الإعدادات' : 'CONFIGURE IN SETTINGS'}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Channel 1: Consultations */}
-          <div className="p-5 rounded-2xl bg-white/60 dark:bg-black/20 border border-stone-200/60 dark:border-white/10 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 01</span>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono rounded-full">ACTIVE</span>
-            </div>
-            <div>
-              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal dark:text-white">
-                {isRtl ? 'حجوزات الاستشارات المعمارية' : '30-Min Architectural Consultations'}
-              </div>
-              <div className="text-xs font-mono text-gold font-semibold mt-1">
-                info@viwan.net
-              </div>
-            </div>
-            <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light pt-2 border-t border-stone-200/40 dark:border-white/10">
-              {isRtl ? 'إشعار رسمي فوري ببيانات العميل والموعد المفضل وتفاصيل المشروع.' : 'Instant executive dispatch with client profile, preferred slot and scope.'}
-            </p>
-          </div>
-
-          {/* Channel 2: General Inquiries */}
-          <div className="p-5 rounded-2xl bg-white/60 dark:bg-black/20 border border-stone-200/60 dark:border-white/10 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 02</span>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono rounded-full">ACTIVE</span>
-            </div>
-            <div>
-              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal dark:text-white">
-                {isRtl ? 'استفسارات تواصل معنا والمشاريع' : 'General Contact & Inquiries'}
-              </div>
-              <div className="text-xs font-mono text-gold font-semibold mt-1">
-                info@viwan.net
-              </div>
-            </div>
-            <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light pt-2 border-t border-stone-200/40 dark:border-white/10">
-              {isRtl ? 'إشعار رسمي ببيانات العميل، الشركة، موقع المشروع، والميزانية.' : 'Instant dispatch with company, project location, budget and client brief.'}
-            </p>
-          </div>
-
-          {/* Channel 3: Careers */}
-          <div className="p-5 rounded-2xl bg-white/60 dark:bg-black/20 border border-stone-200/60 dark:border-white/10 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase text-stone-400">CHANNEL 03</span>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 font-mono rounded-full">ACTIVE</span>
-            </div>
-            <div>
-              <div className="font-cinzel text-xs font-semibold uppercase text-charcoal dark:text-white">
-                {isRtl ? 'طلبات التوظيف واستقطاب الكفاءات' : 'Careers & Talent Acquisition'}
-              </div>
-              <div className="text-xs font-mono text-gold font-semibold mt-1">
-                info@viwan.net
-              </div>
-            </div>
-            <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light pt-2 border-t border-stone-200/40 dark:border-white/10">
-              {isRtl ? 'إشعار رسمي بملف أعمال المتقدم (Portfolio) وسنوات الخبرة ورقم هاتفه.' : 'Instant dispatch with applicant CV portfolio link, experience and contact info.'}
-            </p>
-          </div>
         </div>
       </div>
     </div>

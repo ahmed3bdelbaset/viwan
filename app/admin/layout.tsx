@@ -122,16 +122,16 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-transparent flex relative">
       {/* ========================================================================= */}
-      {/* 0. RESPONSIVE HOUSES & TREES BACKGROUND WITH ARCHITECTURAL BLUR */}
+      {/* 0. PHOTOREALISTIC AERIAL SEA & BOAT BACKGROUND WITH ARCHITECTURAL CALMNESS */}
       {/* ========================================================================= */}
       <div className="fixed inset-0 pointer-events-none -z-30 overflow-hidden select-none">
         <img
-          src="/images/hero-villa-2.jpg"
-          alt="Viwan Architectural Villa & Trees Landscape"
-          className="w-full h-full object-cover object-center scale-110 blur-[8px] brightness-[0.92] contrast-[1.05]"
+          src="/images/admin-sea-aerial.jpg"
+          alt="Viwan Luxury Aerial Sea & Boat Horizon"
+          className="w-full h-full object-cover object-center scale-105 blur-[2.5px] brightness-[0.98] contrast-[1.02]"
         />
-        {/* Frosted translucent wash: houses & trees clearly visible while maintaining UI contrast */}
-        <div className="absolute inset-0 bg-[#FAF7F2]/60 dark:bg-[#121110]/75" />
+        {/* Soft luxury frosted-glass overlay for visual calmness and optimal UI readability */}
+        <div className="absolute inset-0 bg-[#FAF7F2]/40 dark:bg-[#121110]/70 backdrop-blur-[1px]" />
       </div>
 
       {/* ========================================================================= */}

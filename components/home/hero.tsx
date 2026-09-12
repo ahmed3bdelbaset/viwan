@@ -5,47 +5,49 @@ import Image from 'next/image'
 import { ArrowDown } from 'lucide-react'
 import { ButtonLink, Eyebrow } from '@/components/site/primitives'
 import { useLanguage } from '@/lib/i18n'
-
-const HERO_SLIDES = [
-  {
-    src: '/images/hero-villa.png',
-    alt: 'Contemporary villa in stone, glass and wood overlooking an infinity pool at dusk',
-  },
-  {
-    src: '/images/hero-villa-2.jpg',
-    alt: 'Modern desert villa with cantilevered glass volumes and reflective pool at twilight',
-  },
-  {
-    src: '/images/hero-villa-3.jpg',
-    alt: 'Limestone private villa estate with illuminated pool terrace at sunset',
-  },
-  {
-    src: '/images/project-private-residence.png',
-    alt: 'Private luxury residence with travertine volumes and integrated landscaping',
-  },
-  {
-    src: '/images/project-hillside-villa.png',
-    alt: 'Hillside contemporary villa with floating cantilevered terraces',
-  },
-]
+import { useSiteSettings } from '@/hooks/use-site-settings'
 
 export function Hero() {
   const { t, lang } = useLanguage()
+  const { getSiteImage } = useSiteSettings()
   const [currentSlide, setCurrentSlide] = useState(0)
+
+  const slides = [
+    {
+      src: getSiteImage('home-hero-villa', '/images/hero-villa.png'),
+      alt: 'Contemporary villa in stone, glass and wood overlooking an infinity pool at dusk',
+    },
+    {
+      src: getSiteImage('hero-villa-2', '/images/hero-villa-2.jpg'),
+      alt: 'Modern desert villa with cantilevered glass volumes and reflective pool at twilight',
+    },
+    {
+      src: getSiteImage('hero-villa-3', '/images/hero-villa-3.jpg'),
+      alt: 'Limestone private villa estate with illuminated pool terrace at sunset',
+    },
+    {
+      src: getSiteImage('project-private-residence', '/images/project-private-residence.png'),
+      alt: 'Private luxury residence with travertine volumes and integrated landscaping',
+    },
+    {
+      src: getSiteImage('project-hillside-villa', '/images/project-hillside-villa.png'),
+      alt: 'Hillside contemporary villa with floating cantilevered terraces',
+    },
+  ]
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
     }, 6000)
     return () => clearInterval(timer)
-  }, [currentSlide])
+  }, [currentSlide, slides.length])
 
   return (
     <section id="top" className="relative min-h-[100svh] surface-dark overflow-hidden flex flex-col justify-end">
       {/* 5-Slide Auto-Transitioning Background Slideshow */}
       <div className="absolute inset-0 select-none overflow-hidden">
-        {HERO_SLIDES.map((slide, idx) => {
+        {slides.map((slide, idx) => {
           const isActive = idx === currentSlide
 
           return (
